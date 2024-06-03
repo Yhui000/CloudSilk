@@ -13,11 +13,11 @@ func CreateProductProcessRoute(m *model.ProductProcessRoute) (string, error) {
 }
 
 func UpdateProductProcessRoute(m *model.ProductProcessRoute) error {
-	return model.DB.DB().Omit("created_at").Save(m).Error
+	return model.DB.DB().Omit("created_at", "create_time").Save(m).Error
 }
 
 func QueryProductProcessRoute(req *proto.QueryProductProcessRouteRequest, resp *proto.QueryProductProcessRouteResponse, preload bool) {
-	db := model.DB.DB().Model(&model.ProductProcessRoute{}).Preload("ProductionStation").Preload("ProductInfo").Preload("ProductInfo.ProductOrder")
+	db := model.DB.DB().Model(&model.ProductProcessRoute{}).Preload("ProductionStation").Preload("ProductInfo").Preload("ProductInfo.ProductOrder").Preload("CurrentProcess").Preload(clause.Associations)
 	if req.CurrentProcessID != "" {
 		db = db.Where("`current_process_id` = ?", req.CurrentProcessID)
 	}
@@ -44,7 +44,7 @@ func QueryProductProcessRoute(req *proto.QueryProductProcessRouteRequest, resp *
 		db = db.Where("`current_state` = ?", req.CurrentState)
 	}
 
-	orderStr, err := utils.GenerateOrderString(req.SortConfig, "created_at desc")
+	orderStr, err := utils.GenerateOrderString(req.SortConfig, "`created_at` desc")
 	if err != nil {
 		resp.Code = proto.Code_BadRequest
 		resp.Message = err.Error()

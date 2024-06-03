@@ -47,3 +47,16 @@ func (u *ProductProcessRouteProvider) Query(ctx context.Context, in *proto.Query
 	logic.QueryProductProcessRoute(in, resp, false)
 	return resp, nil
 }
+
+func (u *ProductProcessRouteProvider) Update(ctx context.Context, in *proto.ProductProcessRouteInfo) (*proto.CommonResponse, error) {
+	resp := &proto.CommonResponse{
+		Code: proto.Code_Success,
+	}
+	err := logic.UpdateProductProcessRoute(model.PBToProductProcessRoute(in))
+	if err != nil {
+		resp.Code = proto.Code_InternalServerError
+		resp.Message = err.Error()
+	}
+
+	return resp, nil
+}

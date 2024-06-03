@@ -55,6 +55,7 @@ func AutoMigrate() {
 		&MaterialSupplier{},
 		&AvailableMaterial{},
 		&MaterialTray{},
+		&MaterialTrayBindingRecord{},
 
 		&ProductInfo{},
 		&ProductOrderAttribute{},

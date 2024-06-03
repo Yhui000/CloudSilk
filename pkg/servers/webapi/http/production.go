@@ -11,6 +11,40 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// OnlineProductInfo godoc
+// @Summary 设定产品信息状态为上线装配
+// @Description 设定产品信息状态为上线装配
+// @Tags WebAPI
+// @Accept  json
+// @Produce  json
+// @Param authorization header string true "jwt token"
+// @Param account body proto.OnlineProductInfoRequest true "OnlineProductInfoRequest"
+// @Success 200 {object} proto.CommonResponse
+// @Router /api/mom/webapi/production/onlineproductinfo [post]
+func OnlineProductInfo(c *gin.Context) {
+	transID := middleware.GetTransID(c)
+	req := &proto.OnlineProductInfoRequest{}
+	resp := &proto.CommonResponse{Code: 20000}
+
+	var err error
+	if err = c.BindJSON(req); err != nil {
+		resp.Code = 1
+		resp.Message = err.Error()
+		c.JSON(http.StatusOK, resp)
+		log.Warnf(context.Background(), "TransID:%s,请求上线装配接口参数无效:%v", transID, err)
+		return
+	}
+
+	if err = middleware.Validate.Struct(req); err != nil {
+		resp.Code = 1
+		resp.Message = err.Error()
+		c.JSON(http.StatusOK, resp)
+		return
+	}
+
+	c.JSON(http.StatusOK, logic.OnlineProductInfo(req))
+}
+
 // EnterProductionStation godoc
 // @Summary 请求进站接口
 // @Description 请求进站接口
@@ -20,7 +54,7 @@ import (
 // @Param authorization header string true "jwt token"
 // @Param account body proto.EnterProductionStationRequest true "EnterProductionStationRequest"
 // @Success 200 {object} proto.EnterProductionStationResponse
-// @Router /api/mom/webapi/production/enterProductionStation [post]
+// @Router /api/mom/webapi/production/enterproductionstation [post]
 func EnterProductionStation(c *gin.Context) {
 	transID := middleware.GetTransID(c)
 	req := &proto.EnterProductionStationRequest{}
@@ -42,13 +76,7 @@ func EnterProductionStation(c *gin.Context) {
 		return
 	}
 
-	resp, err = logic.EnterProductionStation(req)
-	if err != nil {
-		resp.Code = 1
-		resp.Message = err.Error()
-	}
-
-	c.JSON(http.StatusOK, resp)
+	c.JSON(http.StatusOK, logic.EnterProductionStation(req))
 }
 
 // ExitProductionStation godoc
@@ -60,7 +88,7 @@ func EnterProductionStation(c *gin.Context) {
 // @Param authorization header string true "jwt token"
 // @Param account body proto.ExitProductionStationRequest true "ExitProductionStationRequest"
 // @Success 200 {object} proto.CommonResponse
-// @Router /api/mom/webapi/production/exitProductionStation [post]
+// @Router /api/mom/webapi/production/exitproductionstation [post]
 func ExitProductionStation(c *gin.Context) {
 	transID := middleware.GetTransID(c)
 	req := &proto.ExitProductionStationRequest{}
@@ -81,12 +109,10 @@ func ExitProductionStation(c *gin.Context) {
 		return
 	}
 
-	resp, err := logic.ExitProductionStation(req)
+	_, err := logic.ExitProductionStation(req)
 	if err != nil {
 		resp.Code = 400
 		resp.Message = err.Error()
-		c.JSON(http.StatusOK, resp)
-		return
 	}
 
 	c.JSON(http.StatusOK, resp)
@@ -101,7 +127,7 @@ func ExitProductionStation(c *gin.Context) {
 // @Param authorization header string true "jwt token"
 // @Param account body proto.CreateProductTestRecordRequest true "CreateProductTestRecordRequest"
 // @Success 200 {object} proto.CommonResponse
-// @Router /api/mom/webapi/production/createProductTestRecord [post]
+// @Router /api/mom/webapi/production/createproducttestrecord [post]
 func CreateProductTestRecord(c *gin.Context) {
 	transID := middleware.GetTransID(c)
 	req := &proto.CreateProductTestRecordRequest{}
@@ -142,7 +168,7 @@ func CreateProductTestRecord(c *gin.Context) {
 // @Param authorization header string true "jwt token"
 // @Param account body proto.CheckProductProcessRouteFailureRequest true "CheckProductProcessRouteFailureRequest"
 // @Success 200 {object} proto.CommonResponse
-// @Router /api/mom/webapi/production/checkProductProcessRouteFailure [post]
+// @Router /api/mom/webapi/production/checkproductprocessroutefailure [post]
 func CheckProductProcessRouteFailure(c *gin.Context) {
 	transID := middleware.GetTransID(c)
 	req := &proto.CheckProductProcessRouteFailureRequest{}
@@ -177,8 +203,9 @@ func CheckProductProcessRouteFailure(c *gin.Context) {
 func RegisterProductionRouter(r *gin.Engine) {
 	g := r.Group("/api/mom/webapi/production")
 
-	g.POST("enterProductionStation", EnterProductionStation)
-	g.POST("exitProductionStation", ExitProductionStation)
-	g.POST("createProductTestRecord", CreateProductTestRecord)
-	g.POST("checkProductProcessRouteFailure", CheckProductProcessRouteFailure)
+	g.POST("onlineproductinfo", OnlineProductInfo)
+	g.POST("enterproductionstation", EnterProductionStation)
+	g.POST("exitproductionstation", ExitProductionStation)
+	g.POST("createproducttestrecord", CreateProductTestRecord)
+	g.POST("checkproductprocessroutefailure", CheckProductProcessRouteFailure)
 }

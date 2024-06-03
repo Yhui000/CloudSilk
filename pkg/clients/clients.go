@@ -29,6 +29,7 @@ func Init(serviceMode string) {
 		productProvider := new(ppp.ProductInfoProvider)
 		ProductInfoClient.Get = productProvider.Get
 		ProductInfoClient.Query = productProvider.Query
+		ProductInfoClient.Update = productProvider.Update
 
 		productionStationProvider := new(ptbpp.ProductionStationProvider)
 		ProductionStationClient.Get = productionStationProvider.Get
@@ -52,6 +53,11 @@ func Init(serviceMode string) {
 
 		materialTrayProvider := new(mpp.MaterialTrayProvider)
 		MaterialTrayClient.Get = materialTrayProvider.Get
+		MaterialTrayClient.Update = materialTrayProvider.Update
+
+		materialTrayBindingRecordProvider := new(mpp.MaterialTrayBindingRecordProvider)
+		MaterialTrayBindingRecordClient.Add = materialTrayBindingRecordProvider.Add
+		MaterialTrayBindingRecordClient.Get = materialTrayBindingRecordProvider.Get
 
 		productPackageRecordProvider := new(ppp.ProductPackageRecordProvider)
 		ProductPackageRecordClient.Get = productPackageRecordProvider.Get
@@ -62,15 +68,21 @@ func Init(serviceMode string) {
 
 		productOrderProvider := new(ppp.ProductOrderProvider)
 		ProductOrderClient.GetDetail = productOrderProvider.GetDetail
+		ProductOrderClient.Update = productOrderProvider.Update
 
 		productRhythmRecordProvider := new(ppp.ProductRhythmRecordProvider)
 		ProductRhythmRecordClient.Add = productRhythmRecordProvider.Add
 		ProductRhythmRecordClient.Get = productRhythmRecordProvider.Get
+		ProductRhythmRecordClient.Update = productRhythmRecordProvider.Update
 
 		productProcessRouteProvider := new(ppp.ProductProcessRouteProvider)
 		ProductProcessRouteClient.Add = productProcessRouteProvider.Add
 		ProductProcessRouteClient.Get = productProcessRouteProvider.Get
 		ProductProcessRouteClient.Query = productProcessRouteProvider.Query
+		ProductProcessRouteClient.Update = productProcessRouteProvider.Update
+
+		productionProcessProvider := new(ptpp.ProductionProcessProvider)
+		ProductionProcessClient.GetDetail = productionProcessProvider.GetDetail
 
 		productionProcessSopProvider := new(ptpp.ProductionProcessSopProvider)
 		ProductionProcessSopClient.Get = productionProcessSopProvider.Get
@@ -100,6 +112,7 @@ func Init(serviceMode string) {
 		productionStationOutputProvider := new(ptpp.ProductionStationOutputProvider)
 		ProductionStationOutputClient.Add = productionStationOutputProvider.Add
 		ProductionStationOutputClient.Get = productionStationOutputProvider.Get
+		ProductionStationOutputClient.Update = productionStationOutputProvider.Update
 
 		productOrderAttributeProvider := new(ppp.ProductOrderAttributeProvider)
 		ProductOrderAttributeClient.Query = productOrderAttributeProvider.Query
@@ -123,6 +136,7 @@ func Init(serviceMode string) {
 		config.SetConsumerService(ProductAttributeClient)
 		config.SetConsumerService(ProductionCrosswayClient)
 		config.SetConsumerService(MaterialTrayClient)
+		config.SetConsumerService(MaterialTrayBindingRecordClient)
 		config.SetConsumerService(ProductPackageRecordClient)
 		config.SetConsumerService(ProductInfoClient)
 		config.SetConsumerService(ProductOrderClient)

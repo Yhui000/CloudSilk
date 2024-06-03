@@ -9,6 +9,7 @@ import "product_order.proto";
 
 service MaterialTray{
     rpc Get(GetMaterialTrayRequest)returns(GetMaterialTrayDetailResponse){}
+    rpc Update(MaterialTrayInfo)returns(CommonResponse){}
 }
 
 message GetMaterialTrayRequest{

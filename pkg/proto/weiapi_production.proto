@@ -6,16 +6,12 @@ option go_package = "./;proto";
 message OnlineProductInfoRequest{
     //产线代号
     string productionLine=1;
+    //产品工单号
     string productOrderNo=2;
-    string materialNo=3;
     //产品序列号
     string productSerialNo=4;
     //托盘号
     string trayNo=5;
-    string currentState=6;
-    string assembleTrayNo=7;
-    string materialTrayNo=8;
-    string productionProcess=9;
 }
 
 message EnterProductionStationRequest{

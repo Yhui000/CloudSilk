@@ -54,6 +54,13 @@ definitions:
       productionProcessStepID:
         type: string
     type: object
+  proto.BindMaterialTrayRequest:
+    properties:
+      materialTray:
+        type: string
+      productSerialNo:
+        type: string
+    type: object
   proto.CheckProductProcessRouteFailureRequest:
     properties:
       handleMethod:
@@ -519,6 +526,17 @@ definitions:
       data:
         items:
           $ref: '#/definitions/proto.MaterialSupplierInfo'
+        type: array
+      message:
+        type: string
+    type: object
+  proto.GetAllMaterialTrayBindingRecordResponse:
+    properties:
+      code:
+        $ref: '#/definitions/proto.Code'
+      data:
+        items:
+          $ref: '#/definitions/proto.MaterialTrayBindingRecordInfo'
         type: array
       message:
         type: string
@@ -1353,6 +1371,15 @@ definitions:
       message:
         type: string
     type: object
+  proto.GetMaterialTrayBindingRecordDetailResponse:
+    properties:
+      code:
+        $ref: '#/definitions/proto.Code'
+      data:
+        $ref: '#/definitions/proto.MaterialTrayBindingRecordInfo'
+      message:
+        type: string
+    type: object
   proto.GetMaterialTrayDetailResponse:
     properties:
       code:
@@ -2140,6 +2167,40 @@ definitions:
         description: 备注
         type: string
     type: object
+  proto.MaterialTrayBindingRecordInfo:
+    properties:
+      createTime:
+        description: 发料时间
+        type: string
+      createUserID:
+        description: 发料人员ID
+        type: string
+      currentState:
+        description: 当前状态
+        type: string
+      id:
+        type: string
+      lastUpdateTime:
+        description: 状态变更时间
+        type: string
+      materialTray:
+        allOf:
+        - $ref: '#/definitions/proto.MaterialTrayInfo'
+        description: 状态变更时间
+      materialTrayID:
+        description: 使用托盘ID
+        type: string
+      productInfo:
+        allOf:
+        - $ref: '#/definitions/proto.ProductInfoInfo'
+        description: 隶属产线ID
+      productInfoID:
+        description: 绑定产品ID
+        type: string
+      remark:
+        description: 备注
+        type: string
+    type: object
   proto.MaterialTrayInfo:
     properties:
       code:
@@ -2181,6 +2242,21 @@ definitions:
         type: string
       trayType:
         description: 托盘类型
+        type: string
+    type: object
+  proto.OnlineProductInfoRequest:
+    properties:
+      productOrderNo:
+        description: 产品工单号
+        type: string
+      productSerialNo:
+        description: 产品序列号
+        type: string
+      productionLine:
+        description: 产线代号
+        type: string
+      trayNo:
+        description: 托盘号
         type: string
     type: object
   proto.OperationTraceInfo:
@@ -4861,6 +4937,23 @@ definitions:
       data:
         items:
           $ref: '#/definitions/proto.MaterialSupplierInfo'
+        type: array
+      message:
+        type: string
+      pages:
+        type: integer
+      records:
+        type: integer
+      total:
+        type: integer
+    type: object
+  proto.QueryMaterialTrayBindingRecordResponse:
+    properties:
+      code:
+        $ref: '#/definitions/proto.Code'
+      data:
+        items:
+          $ref: '#/definitions/proto.MaterialTrayBindingRecordInfo'
         type: array
       message:
         type: string
@@ -7913,6 +8006,175 @@ paths:
       summary: 更新
       tags:
       - 物料托盘管理
+  /api/mom/material/materialtraybindingrecord/add:
+    post:
+      consumes:
+      - application/json
+      description: 新增
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      - description: Add MaterialTrayBindingRecord
+        in: body
+        name: account
+        required: true
+        schema:
+          $ref: '#/definitions/proto.MaterialTrayBindingRecordInfo'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.CommonResponse'
+      summary: 新增
+      tags:
+      - 物料托盘绑定记录
+  /api/mom/material/materialtraybindingrecord/all:
+    get:
+      consumes:
+      - application/json
+      description: 查询所有
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.GetAllMaterialTrayBindingRecordResponse'
+      summary: 查询所有
+      tags:
+      - 物料托盘绑定记录
+  /api/mom/material/materialtraybindingrecord/delete:
+    delete:
+      consumes:
+      - application/json
+      description: 删除
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      - description: Delete MaterialTrayBindingRecord
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/proto.DelRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.CommonResponse'
+      summary: 删除
+      tags:
+      - 物料托盘绑定记录
+  /api/mom/material/materialtraybindingrecord/detail:
+    get:
+      consumes:
+      - application/json
+      description: 查询明细
+      parameters:
+      - description: ID
+        in: query
+        name: id
+        required: true
+        type: string
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.GetMaterialTrayBindingRecordDetailResponse'
+      summary: 查询明细
+      tags:
+      - 物料托盘绑定记录
+  /api/mom/material/materialtraybindingrecord/query:
+    get:
+      consumes:
+      - application/json
+      description: 分页查询
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      - description: 从1开始
+        in: query
+        name: pageIndex
+        type: integer
+      - description: 默认每页10条
+        in: query
+        name: pageSize
+        type: integer
+      - description: 排序字段
+        in: query
+        name: orderField
+        type: string
+      - description: 是否倒序排序
+        in: query
+        name: desc
+        type: boolean
+      - description: 代号或描述
+        in: query
+        name: code
+        type: string
+      produces:
+      - application/octet-stream
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.QueryMaterialTrayBindingRecordResponse'
+      summary: 分页查询
+      tags:
+      - 物料托盘绑定记录
+  /api/mom/material/materialtraybindingrecord/update:
+    put:
+      consumes:
+      - application/json
+      description: 更新
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      - description: Update MaterialTrayBindingRecord
+        in: body
+        name: account
+        required: true
+        schema:
+          $ref: '#/definitions/proto.MaterialTrayBindingRecordInfo'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.CommonResponse'
+      summary: 更新
+      tags:
+      - 物料托盘绑定记录
   /api/mom/printserver/add:
     post:
       consumes:
@@ -20129,7 +20391,34 @@ paths:
       summary: 查询产线工位信息
       tags:
       - WebAPI
-  /api/mom/webapi/production/checkProductProcessRouteFailure:
+  /api/mom/webapi/material/bindmaterialtray:
+    post:
+      consumes:
+      - application/json
+      description: 绑定物料托盘
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      - description: BindMaterialTrayRequest
+        in: body
+        name: account
+        required: true
+        schema:
+          $ref: '#/definitions/proto.BindMaterialTrayRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.CommonResponse'
+      summary: 绑定物料托盘
+      tags:
+      - WebAPI
+  /api/mom/webapi/production/checkproductprocessroutefailure:
     post:
       consumes:
       - application/json
@@ -20156,7 +20445,7 @@ paths:
       summary: 设置失败后续处理接口
       tags:
       - WebAPI
-  /api/mom/webapi/production/createProductTestRecord:
+  /api/mom/webapi/production/createproducttestrecord:
     post:
       consumes:
       - application/json
@@ -20183,7 +20472,7 @@ paths:
       summary: 创建产品测试记录
       tags:
       - WebAPI
-  /api/mom/webapi/production/enterProductionStation:
+  /api/mom/webapi/production/enterproductionstation:
     post:
       consumes:
       - application/json
@@ -20210,7 +20499,7 @@ paths:
       summary: 请求进站接口
       tags:
       - WebAPI
-  /api/mom/webapi/production/exitProductionStation:
+  /api/mom/webapi/production/exitproductionstation:
     post:
       consumes:
       - application/json
@@ -20235,6 +20524,33 @@ paths:
           schema:
             $ref: '#/definitions/proto.CommonResponse'
       summary: 请求出站接口
+      tags:
+      - WebAPI
+  /api/mom/webapi/production/onlineproductinfo:
+    post:
+      consumes:
+      - application/json
+      description: 设定产品信息状态为上线装配
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      - description: OnlineProductInfoRequest
+        in: body
+        name: account
+        required: true
+        schema:
+          $ref: '#/definitions/proto.OnlineProductInfoRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.CommonResponse'
+      summary: 设定产品信息状态为上线装配
       tags:
       - WebAPI
 swagger: "2.0"
