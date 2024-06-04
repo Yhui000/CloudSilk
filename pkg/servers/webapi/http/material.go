@@ -7,7 +7,7 @@ import (
 	"github.com/CloudSilk/CloudSilk/pkg/proto"
 	"github.com/CloudSilk/CloudSilk/pkg/servers/webapi/logic"
 	"github.com/CloudSilk/pkg/utils/log"
-	"github.com/CloudSilk/pkg/utils/middleware"
+	ucmiddleware "github.com/CloudSilk/usercenter/utils/middleware"
 	"github.com/gin-gonic/gin"
 )
 
@@ -22,7 +22,7 @@ import (
 // @Success 200 {object} proto.CommonResponse
 // @Router /api/mom/webapi/material/bindmaterialtray [post]
 func BindMaterialTray(c *gin.Context) {
-	transID := middleware.GetTransID(c)
+	transID := ucmiddleware.GetTransID(c)
 	req := &proto.BindMaterialTrayRequest{}
 	resp := &proto.CommonResponse{Code: 20000}
 
@@ -35,7 +35,7 @@ func BindMaterialTray(c *gin.Context) {
 		return
 	}
 
-	if err = middleware.Validate.Struct(req); err != nil {
+	if err = ucmiddleware.Validate.Struct(req); err != nil {
 		resp.Code = 400
 		resp.Message = err.Error()
 		c.JSON(http.StatusOK, resp)

@@ -2507,8 +2507,20 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "代号或描述",
-                        "name": "code",
+                        "description": "产线ID",
+                        "name": "productionLineID",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "发料时间开始",
+                        "name": "createTime0",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "发料时间结束",
+                        "name": "createTime1",
                         "in": "query"
                     }
                 ],

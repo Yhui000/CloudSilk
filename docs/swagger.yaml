@@ -8134,9 +8134,17 @@ paths:
         in: query
         name: desc
         type: boolean
-      - description: 代号或描述
+      - description: 产线ID
         in: query
-        name: code
+        name: productionLineID
+        type: string
+      - description: 发料时间开始
+        in: query
+        name: createTime0
+        type: string
+      - description: 发料时间结束
+        in: query
+        name: createTime1
         type: string
       produces:
       - application/octet-stream

@@ -4,9 +4,9 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/CloudSilk/CloudSilk/pkg/servers/material/logic"
 	"github.com/CloudSilk/CloudSilk/pkg/model"
 	"github.com/CloudSilk/CloudSilk/pkg/proto"
+	"github.com/CloudSilk/CloudSilk/pkg/servers/material/logic"
 	"github.com/CloudSilk/pkg/utils/log"
 	"github.com/CloudSilk/pkg/utils/middleware"
 	"github.com/gin-gonic/gin"
@@ -104,7 +104,9 @@ func UpdateMaterialTrayBindingRecord(c *gin.Context) {
 // @Param pageSize query int false "默认每页10条"
 // @Param orderField query string false "排序字段"
 // @Param desc query bool false "是否倒序排序"
-// @Param code query string false "代号或描述"
+// @Param productionLineID query string false "产线ID"
+// @Param createTime0 query string false "发料时间开始"
+// @Param createTime1 query string false "发料时间结束"
 // @Success 200 {object} proto.QueryMaterialTrayBindingRecordResponse
 // @Router /api/mom/material/materialtraybindingrecord/query [get]
 func QueryMaterialTrayBindingRecord(c *gin.Context) {

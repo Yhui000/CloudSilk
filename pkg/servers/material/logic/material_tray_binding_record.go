@@ -17,7 +17,14 @@ func UpdateMaterialTrayBindingRecord(m *model.MaterialTrayBindingRecord) error {
 }
 
 func QueryMaterialTrayBindingRecord(req *proto.QueryMaterialTrayBindingRecordRequest, resp *proto.QueryMaterialTrayBindingRecordResponse, preload bool) {
-	db := model.DB.DB().Model(&model.MaterialTrayBindingRecord{}).Preload("MaterialTray").Preload("ProductInfo")
+	db := model.DB.DB().Model(&model.MaterialTrayBindingRecord{}).Preload("MaterialTray").Preload("ProductInfo").Preload("ProductInfo.ProductOrder")
+	if req.ProductionLineID != "" {
+		db = db.Joins("JOIN material_trays ON material_tray_binding_records.material_tray_id=material_trays.id").
+			Where("material_trays.production_line_id = ?", req.ProductionLineID)
+	}
+	if req.CreateTime0 != "" && req.CreateTime1 != "" {
+		db = db.Where("material_tray_binding_records.create_time BETWEEN ? AND ?", req.CreateTime0, req.CreateTime1)
+	}
 
 	orderStr, err := utils.GenerateOrderString(req.SortConfig, "created_at desc")
 	if err != nil {

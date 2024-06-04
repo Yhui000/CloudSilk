@@ -46,6 +46,15 @@ message QueryMaterialTrayBindingRecordRequest{
     int64 pageSize=2;
     // @inject_tag: uri:"sortConfig" form:"sortConfig"
     string sortConfig=3;
+    // 产线ID
+    // @inject_tag: uri:"productionLineID" form:"productionLineID"
+    string productionLineID=4;
+    // 发料时间开始
+    // @inject_tag: uri:"createTime0" form:"createTime0"
+    string createTime0=5;
+    // 发料时间结束
+    // @inject_tag: uri:"createTime1" form:"createTime1"
+    string createTime1=6;
 }
 
 message QueryMaterialTrayBindingRecordResponse{

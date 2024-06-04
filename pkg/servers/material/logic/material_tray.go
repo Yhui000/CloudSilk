@@ -35,7 +35,10 @@ func UpdateMaterialTray(m *model.MaterialTray) error {
 }
 
 func QueryMaterialTray(req *proto.QueryMaterialTrayRequest, resp *proto.QueryMaterialTrayResponse, preload bool) {
-	db := model.DB.DB().Model(&model.MaterialTray{})
+	db := model.DB.DB().Model(&model.MaterialTray{}).Preload("ProductInfo")
+	if req.Code != "" {
+		db = db.Where("`code` LIKE ? OR `description` LIKE ?", "%"+req.Code+"%", "%"+req.Code+"%")
+	}
 
 	orderStr, err := utils.GenerateOrderString(req.SortConfig, "created_at desc")
 	if err != nil {
