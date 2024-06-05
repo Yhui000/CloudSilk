@@ -4,8 +4,9 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/CloudSilk/CloudSilk/pkg/servers/webapi/logic"
 	"github.com/CloudSilk/CloudSilk/pkg/proto"
+	"github.com/CloudSilk/CloudSilk/pkg/servers/webapi/logic"
+	webproto "github.com/CloudSilk/CloudSilk/pkg/servers/webapi/proto"
 	"github.com/CloudSilk/pkg/utils/log"
 	"github.com/CloudSilk/pkg/utils/middleware"
 	"github.com/gin-gonic/gin"
@@ -48,7 +49,7 @@ func GetAllProductionLine(c *gin.Context) {
 // @Router /api/mom/webapi/infrastructure/retrieveProductionStation [post]
 func RetrieveProductionStation(c *gin.Context) {
 	transID := middleware.GetTransID(c)
-	req := &proto.RetrieveProductionStationRequest{}
+	req := &webproto.RetrieveProductionStationRequest{}
 	resp := &proto.GetAllProductionStationResponse{Code: 200}
 
 	if err := c.BindJSON(req); err != nil {
@@ -90,7 +91,7 @@ func RetrieveProductionStation(c *gin.Context) {
 // @Router /api/mom/webapi/infrastructure/retrieveProductAttribute [post]
 func RetrieveProductAttribute(c *gin.Context) {
 	transID := middleware.GetTransID(c)
-	req := &proto.RetrieveProductAttributeRequest{}
+	req := &webproto.RetrieveProductAttributeRequest{}
 	resp := &proto.GetAllProductAttributeResponse{Code: 200}
 
 	if err := c.BindJSON(req); err != nil {
@@ -132,7 +133,7 @@ func RetrieveProductAttribute(c *gin.Context) {
 // @Router /api/mom/webapi/infrastructure/retrieveProductionCrossway [post]
 func RetrieveProductionCrossway(c *gin.Context) {
 	transID := middleware.GetTransID(c)
-	req := &proto.RetrieveProductionCrosswayRequest{}
+	req := &webproto.RetrieveProductionCrosswayRequest{}
 	resp := &proto.GetAllProductionCrosswayResponse{Code: 200}
 
 	if err := c.BindJSON(req); err != nil {

@@ -6,12 +6,13 @@ import (
 
 	"github.com/CloudSilk/CloudSilk/pkg/clients"
 	"github.com/CloudSilk/CloudSilk/pkg/proto"
+	webproto "github.com/CloudSilk/CloudSilk/pkg/servers/webapi/proto"
 	modelcode "github.com/CloudSilk/pkg/model"
 	usercenter "github.com/CloudSilk/usercenter/proto"
 	"gorm.io/gorm"
 )
 
-func TryLogin(req *proto.LoginRequest, resp *proto.ServiceResponse) {
+func TryLogin(req *webproto.LoginRequest, resp *webproto.ServiceResponse) {
 	var user *usercenter.UserProfile
 	var token string
 	if req.CardNo == "" {
@@ -81,7 +82,7 @@ func TryLogin(req *proto.LoginRequest, resp *proto.ServiceResponse) {
 			return
 		}
 		if _productionStation.Code != modelcode.Success {
-			resp.Code = _productionStation.Code
+			resp.Code = int32(_productionStation.Code)
 			resp.Message = _productionStation.Message
 			return
 		}
@@ -110,7 +111,7 @@ func TryLogin(req *proto.LoginRequest, resp *proto.ServiceResponse) {
 			}
 			_resp, _ := clients.ProductionStationSignupClient.Add(context.Background(), productionStationSignup)
 			if _resp.Code != modelcode.Success {
-				resp.Code = _resp.Code
+				resp.Code = int32(_resp.Code)
 				resp.Message = _resp.Message
 				return
 			}
@@ -128,19 +129,19 @@ func TryLogin(req *proto.LoginRequest, resp *proto.ServiceResponse) {
 		productionStationSignup.Duration = int32(now.Sub(loginTime).Minutes())
 
 		if _resp, _ := clients.ProductionStationSignupClient.Update(context.Background(), productionStationSignup); _resp.Code != modelcode.Success {
-			resp.Code = _resp.Code
+			resp.Code = int32(_resp.Code)
 			resp.Message = _resp.Message
 			return
 		}
 		if _resp, _ := clients.ProductionStationClient.Update(context.Background(), productionStation); _resp.Code != modelcode.Success {
-			resp.Code = _resp.Code
+			resp.Code = int32(_resp.Code)
 			resp.Message = _resp.Message
 			return
 		}
 	}
 
 	resp.Message = token
-	resp.Data = &proto.Data{
+	resp.Data = &webproto.Data{
 		Id:          user.Id,
 		Name:        user.UserName,
 		ChineseName: user.ChineseName,
@@ -150,7 +151,7 @@ func TryLogin(req *proto.LoginRequest, resp *proto.ServiceResponse) {
 	}
 }
 
-func TryLogout(req *proto.LogoutRequest, resp *proto.CommonResponse) {
+func TryLogout(req *webproto.LogoutRequest, resp *proto.CommonResponse) {
 	if req.Name == "" {
 		resp.Code = modelcode.BadRequest
 		resp.Message = "Name不能为空"

@@ -6,13 +6,14 @@ import (
 
 	"github.com/CloudSilk/CloudSilk/pkg/clients"
 	"github.com/CloudSilk/CloudSilk/pkg/proto"
+	webproto "github.com/CloudSilk/CloudSilk/pkg/servers/webapi/proto"
 	"github.com/CloudSilk/CloudSilk/pkg/types"
 	modelcode "github.com/CloudSilk/pkg/model"
 	"gorm.io/gorm"
 )
 
 // 绑定物料托盘，写入产品信息
-func BindMaterialTray(req *proto.BindMaterialTrayRequest) error {
+func BindMaterialTray(req *webproto.BindMaterialTrayRequest) error {
 	if req.MaterialTray == "" {
 		return fmt.Errorf("MaterialTray不能为空")
 	}

@@ -6,6 +6,8 @@ import (
 
 	"github.com/CloudSilk/CloudSilk/pkg/proto"
 	"github.com/CloudSilk/CloudSilk/pkg/servers/webapi/logic"
+	webproto "github.com/CloudSilk/CloudSilk/pkg/servers/webapi/proto"
+	"github.com/CloudSilk/CloudSilk/pkg/types"
 	"github.com/CloudSilk/pkg/utils/log"
 	"github.com/CloudSilk/pkg/utils/middleware"
 	"github.com/gin-gonic/gin"
@@ -23,7 +25,7 @@ import (
 // @Router /api/mom/webapi/production/onlineproductinfo [post]
 func OnlineProductInfo(c *gin.Context) {
 	transID := middleware.GetTransID(c)
-	req := &proto.OnlineProductInfoRequest{}
+	req := &webproto.OnlineProductInfoRequest{}
 	resp := &proto.CommonResponse{Code: 20000}
 
 	var err error
@@ -57,8 +59,8 @@ func OnlineProductInfo(c *gin.Context) {
 // @Router /api/mom/webapi/production/enterproductionstation [post]
 func EnterProductionStation(c *gin.Context) {
 	transID := middleware.GetTransID(c)
-	req := &proto.EnterProductionStationRequest{}
-	resp := &proto.EnterProductionStationResponse{Code: 0}
+	req := &webproto.EnterProductionStationRequest{}
+	resp := &webproto.EnterProductionStationResponse{Code: 0}
 
 	var err error
 	if err = c.BindJSON(req); err != nil {
@@ -79,6 +81,38 @@ func EnterProductionStation(c *gin.Context) {
 	c.JSON(http.StatusOK, logic.EnterProductionStation(req))
 }
 
+// GetProductionStationExhibition godoc
+// @Summary 获取工站的当前生产工单工序信息
+// @Description 获取工站的当前生产工单工序信息
+// @Tags WebAPI
+// @Accept  json
+// @Produce  json
+// @Param productionStation query string true "生产工站代号"
+// @Param authorization header string true "jwt token"
+// @Success 200 {object} proto.GetProductAttributeValuateRuleDetailResponse
+// @Router /api/mom/webapi/production/getproductionstationexhibition [get]
+func GetProductionStationExhibition(c *gin.Context) {
+	resp := &webproto.GetProductionStationExhibitionResponse{
+		Code: types.ServiceResponseCodeSuccess,
+	}
+	productionStationCode := c.Query("productionStation")
+	if productionStationCode == "" {
+		resp.Code = types.ServiceResponseCodeFailure
+		c.JSON(http.StatusOK, resp)
+		return
+	}
+	var err error
+
+	data, err := logic.GetProductionStationExhibition(productionStationCode)
+	if err != nil {
+		resp.Code = types.ServiceResponseCodeFailure
+		resp.Message = err.Error()
+	} else {
+		resp.Data = data
+	}
+	c.JSON(http.StatusOK, resp)
+}
+
 // ExitProductionStation godoc
 // @Summary 请求出站接口
 // @Description 请求出站接口
@@ -91,7 +125,7 @@ func EnterProductionStation(c *gin.Context) {
 // @Router /api/mom/webapi/production/exitproductionstation [post]
 func ExitProductionStation(c *gin.Context) {
 	transID := middleware.GetTransID(c)
-	req := &proto.ExitProductionStationRequest{}
+	req := &webproto.ExitProductionStationRequest{}
 	resp := &proto.CommonResponse{Code: 200}
 
 	if err := c.BindJSON(req); err != nil {
@@ -130,7 +164,7 @@ func ExitProductionStation(c *gin.Context) {
 // @Router /api/mom/webapi/production/createproducttestrecord [post]
 func CreateProductTestRecord(c *gin.Context) {
 	transID := middleware.GetTransID(c)
-	req := &proto.CreateProductTestRecordRequest{}
+	req := &webproto.CreateProductTestRecordRequest{}
 	resp := &proto.CommonResponse{Code: 200}
 
 	if err := c.BindJSON(req); err != nil {
@@ -171,7 +205,7 @@ func CreateProductTestRecord(c *gin.Context) {
 // @Router /api/mom/webapi/production/checkproductprocessroutefailure [post]
 func CheckProductProcessRouteFailure(c *gin.Context) {
 	transID := middleware.GetTransID(c)
-	req := &proto.CheckProductProcessRouteFailureRequest{}
+	req := &webproto.CheckProductProcessRouteFailureRequest{}
 	resp := &proto.CommonResponse{Code: 200}
 
 	if err := c.BindJSON(req); err != nil {
@@ -205,6 +239,7 @@ func RegisterProductionRouter(r *gin.Engine) {
 
 	g.POST("onlineproductinfo", OnlineProductInfo)
 	g.POST("enterproductionstation", EnterProductionStation)
+	g.GET("getproductionstationexhibition", GetProductionStationExhibition)
 	g.POST("exitproductionstation", ExitProductionStation)
 	g.POST("createproducttestrecord", CreateProductTestRecord)
 	g.POST("checkproductprocessroutefailure", CheckProductProcessRouteFailure)

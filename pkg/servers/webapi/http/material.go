@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/CloudSilk/CloudSilk/pkg/proto"
+	webproto "github.com/CloudSilk/CloudSilk/pkg/servers/webapi/proto"
 	"github.com/CloudSilk/CloudSilk/pkg/servers/webapi/logic"
 	"github.com/CloudSilk/pkg/utils/log"
 	ucmiddleware "github.com/CloudSilk/usercenter/utils/middleware"
@@ -23,7 +24,7 @@ import (
 // @Router /api/mom/webapi/material/bindmaterialtray [post]
 func BindMaterialTray(c *gin.Context) {
 	transID := ucmiddleware.GetTransID(c)
-	req := &proto.BindMaterialTrayRequest{}
+	req := &webproto.BindMaterialTrayRequest{}
 	resp := &proto.CommonResponse{Code: 20000}
 
 	var err error

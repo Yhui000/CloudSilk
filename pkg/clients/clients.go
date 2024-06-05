@@ -109,6 +109,9 @@ func Init(serviceMode string) {
 		productOrderProcessProvider := new(ppp.ProductOrderProcessProvider)
 		ProductOrderProcessClient.Query = productOrderProcessProvider.Query
 
+		productOrderBomProvider := new(ppp.ProductOrderBomProvider)
+		ProductOrderBomClient.Query = productOrderBomProvider.Query
+
 		productionStationOutputProvider := new(ptpp.ProductionStationOutputProvider)
 		ProductionStationOutputClient.Add = productionStationOutputProvider.Add
 		ProductionStationOutputClient.Get = productionStationOutputProvider.Get

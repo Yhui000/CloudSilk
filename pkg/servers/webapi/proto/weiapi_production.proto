@@ -1,7 +1,7 @@
 syntax="proto3";
 
-package proto;
-option go_package = "./;proto";
+package webproto;
+option go_package = "./;webproto";
 
 message OnlineProductInfoRequest{
     //产线代号
@@ -82,4 +82,47 @@ message CheckProductProcessRouteFailureRequest{
     string productSerialNo=2;
     //默认为1，1表示重试，2表示返工，3表示忽略跳过
     int32 handleMethod=3;
+}
+
+message GetProductionStationExhibitionResponse{
+    int32 code=1;
+    string message=2;
+    GetProductionStationExhibitionData data=3;
+}
+
+message GetProductionStationExhibitionData{
+    string productOrderNo=1;
+    string salesOrderNo=2;
+    string itemNo=3;
+    string orderTime=4;
+    int32 orderQTY=5;
+    string productCategory=6;
+    string productModel=7;
+    string materialNo=8;
+    string materialDescription=9;
+    string currentState=10;
+    string propertyBrief=11;
+    int32 startedQTY=12;
+    int32 finishedQTY=13;
+    string remark=14;
+    repeated ProductOrderBomInfo productOrderBoms=15;
+    ProductionProcessInfo productionProcess=16;
+}
+
+message ProductOrderBomInfo{
+    string ItemNo=1;
+    string MaterialNo=2;
+    string MaterialDescription=3;
+    float PieceQTY=4;
+    float RequireQTY=5;
+    string Unit=6;
+    string Remark=7;
+}
+
+message ProductionProcessInfo{
+    string Code=1;
+    string Description=2;
+    string SopLink=3;
+    int32 CountOfProcessing=4;
+    int32 CountOfProcessed=5;
 }

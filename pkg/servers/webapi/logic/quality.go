@@ -7,13 +7,14 @@ import (
 
 	"github.com/CloudSilk/CloudSilk/pkg/clients"
 	"github.com/CloudSilk/CloudSilk/pkg/proto"
+	webproto "github.com/CloudSilk/CloudSilk/pkg/servers/webapi/proto"
 	"github.com/CloudSilk/CloudSilk/pkg/tool"
 	"gorm.io/gorm"
 )
 
 // 获取测试项接口数据
-func GetTestProjectWithParameter(req *proto.GetTestProjectWithParameterRequest) (*proto.GetTestProjectWithParameterResponse, error) {
-	response := &proto.GetTestProjectWithParameterResponse{}
+func GetTestProjectWithParameter(req *webproto.GetTestProjectWithParameterRequest) (*webproto.GetTestProjectWithParameterResponse, error) {
+	response := &webproto.GetTestProjectWithParameterResponse{}
 	if req.ProductionStation == "" {
 		return nil, fmt.Errorf("ProductionStation不能为空")
 	}
@@ -136,12 +137,12 @@ func GetTestProjectWithParameter(req *proto.GetTestProjectWithParameterRequest) 
 		return nil, err
 	}
 
-	testProjects := make([]*proto.TestProjectInfo, 0)
-	inputParameters := []*proto.ParameterInfo{}
-	outputParameters := []*proto.ParameterInfo{}
+	testProjects := make([]*webproto.TestProjectInfo, 0)
+	inputParameters := []*webproto.ParameterInfo{}
+	outputParameters := []*webproto.ParameterInfo{}
 	for _, _productionProcessStep := range _productionProcessSteps.Data {
 		for _, v := range _productionProcessStep.ProcessStepType.ProcessStepTypeParameters {
-			parameter := &proto.ParameterInfo{
+			parameter := &webproto.ParameterInfo{
 				Code:          v.Code,
 				Description:   v.Description,
 				StandardValue: v.DefaultValue,
@@ -157,14 +158,14 @@ func GetTestProjectWithParameter(req *proto.GetTestProjectWithParameterRequest) 
 			}
 		}
 
-		testProjects = append(testProjects, &proto.TestProjectInfo{
+		testProjects = append(testProjects, &webproto.TestProjectInfo{
 			Id:          _productionProcessStep.Id,
 			Code:        _productionProcessStep.Code,
 			Description: _productionProcessStep.Description,
 		})
 	}
 	response.Code = 1
-	response.Data = &proto.TestProjectWithParameterInfo{
+	response.Data = &webproto.TestProjectWithParameterInfo{
 		TestProjects:     testProjects,
 		InputParameters:  inputParameters,
 		OutputParameters: outputParameters,

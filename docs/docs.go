@@ -4613,7 +4613,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/proto.ProductOrderBomInfo"
+                            "$ref": "#/definitions/github_com_CloudSilk_CloudSilk_pkg_proto.ProductOrderBomInfo"
                         }
                     }
                 ],
@@ -4834,7 +4834,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/proto.ProductOrderBomInfo"
+                            "$ref": "#/definitions/github_com_CloudSilk_CloudSilk_pkg_proto.ProductOrderBomInfo"
                         }
                     }
                 ],
@@ -13233,7 +13233,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/proto.ProductionProcessInfo"
+                            "$ref": "#/definitions/github_com_CloudSilk_CloudSilk_pkg_proto.ProductionProcessInfo"
                         }
                     }
                 ],
@@ -13448,7 +13448,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/proto.ProductionProcessInfo"
+                            "$ref": "#/definitions/github_com_CloudSilk_CloudSilk_pkg_proto.ProductionProcessInfo"
                         }
                     }
                 ],
@@ -21280,6 +21280,45 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/mom/webapi/production/getproductionstationexhibition": {
+            "get": {
+                "description": "获取工站的当前生产工单工序信息",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "WebAPI"
+                ],
+                "summary": "获取工站的当前生产工单工序信息",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "生产工站代号",
+                        "name": "productionStation",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/proto.GetProductAttributeValuateRuleDetailResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/mom/webapi/production/onlineproductinfo": {
             "post": {
                 "description": "设定产品信息状态为上线装配",
@@ -21323,6 +21362,167 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "github_com_CloudSilk_CloudSilk_pkg_proto.ProductOrderBomInfo": {
+            "type": "object",
+            "properties": {
+                "controlType": {
+                    "description": "管控类型",
+                    "type": "integer"
+                },
+                "createTime": {
+                    "description": "创建时间",
+                    "type": "string"
+                },
+                "createUserID": {
+                    "description": "创建人员ID",
+                    "type": "string"
+                },
+                "createUserName": {
+                    "type": "string"
+                },
+                "enableControl": {
+                    "description": "是否管控",
+                    "type": "boolean"
+                },
+                "id": {
+                    "description": "ID",
+                    "type": "string"
+                },
+                "itemNo": {
+                    "description": "项目号",
+                    "type": "string"
+                },
+                "materialDescription": {
+                    "description": "物料描述",
+                    "type": "string"
+                },
+                "materialNo": {
+                    "description": "物料号",
+                    "type": "string"
+                },
+                "pieceQTY": {
+                    "description": "单件数量",
+                    "type": "number"
+                },
+                "productOrderID": {
+                    "description": "隶属工单ID",
+                    "type": "string"
+                },
+                "productOrderNo": {
+                    "type": "string"
+                },
+                "productionProcess": {
+                    "description": "需求工序",
+                    "type": "string"
+                },
+                "remark": {
+                    "description": "备注",
+                    "type": "string"
+                },
+                "requireQTY": {
+                    "description": "需求数量",
+                    "type": "number"
+                },
+                "unit": {
+                    "description": "单位",
+                    "type": "string"
+                },
+                "warehouse": {
+                    "description": "物料仓库",
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_CloudSilk_CloudSilk_pkg_proto.ProductionProcessInfo": {
+            "type": "object",
+            "properties": {
+                "attributeExpressions": {
+                    "description": "特性表达式",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/proto.AttributeExpressionInfo"
+                    }
+                },
+                "availableStationIDs": {
+                    "description": "支持工站",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "code": {
+                    "description": "代号",
+                    "type": "string"
+                },
+                "description": {
+                    "description": "描述",
+                    "type": "string"
+                },
+                "enable": {
+                    "description": "是否启用",
+                    "type": "boolean"
+                },
+                "enableControl": {
+                    "description": "是否管控",
+                    "type": "boolean"
+                },
+                "enableReport": {
+                    "description": "是否报工",
+                    "type": "boolean"
+                },
+                "id": {
+                    "description": "ID",
+                    "type": "string"
+                },
+                "identifier": {
+                    "description": "识别码",
+                    "type": "string"
+                },
+                "initialValue": {
+                    "description": "默认匹配",
+                    "type": "boolean"
+                },
+                "processType": {
+                    "description": "工序类型",
+                    "type": "integer"
+                },
+                "productState": {
+                    "description": "产品状态",
+                    "type": "string"
+                },
+                "productionLine": {
+                    "$ref": "#/definitions/proto.ProductionLineInfo"
+                },
+                "productionLineID": {
+                    "description": "生产产线ID",
+                    "type": "string"
+                },
+                "productionProcessAvailableStations": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/proto.ProductionProcessAvailableStationInfo"
+                    }
+                },
+                "productionProcessSteps": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/proto.AvailableProcessInfo"
+                    }
+                },
+                "remark": {
+                    "description": "备注",
+                    "type": "string"
+                },
+                "sortIndex": {
+                    "description": "顺序",
+                    "type": "integer"
+                },
+                "vehicleType": {
+                    "description": "载具类型",
+                    "type": "integer"
+                }
+            }
+        },
         "proto.AttributeExpressionInfo": {
             "type": "object",
             "properties": {
@@ -21391,7 +21591,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "productionProcess": {
-                    "$ref": "#/definitions/proto.ProductionProcessInfo"
+                    "$ref": "#/definitions/github_com_CloudSilk_CloudSilk_pkg_proto.ProductionProcessInfo"
                 },
                 "productionProcessID": {
                     "type": "string"
@@ -22431,7 +22631,7 @@ const docTemplate = `{
                 "data": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/proto.ProductOrderBomInfo"
+                        "$ref": "#/definitions/github_com_CloudSilk_CloudSilk_pkg_proto.ProductOrderBomInfo"
                     }
                 },
                 "message": {
@@ -22907,7 +23107,7 @@ const docTemplate = `{
                 "data": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/proto.ProductionProcessInfo"
+                        "$ref": "#/definitions/github_com_CloudSilk_CloudSilk_pkg_proto.ProductionProcessInfo"
                     }
                 },
                 "message": {
@@ -23673,7 +23873,7 @@ const docTemplate = `{
                     "$ref": "#/definitions/proto.Code"
                 },
                 "data": {
-                    "$ref": "#/definitions/proto.ProductOrderBomInfo"
+                    "$ref": "#/definitions/github_com_CloudSilk_CloudSilk_pkg_proto.ProductOrderBomInfo"
                 },
                 "message": {
                     "type": "string"
@@ -24065,7 +24265,7 @@ const docTemplate = `{
                     "$ref": "#/definitions/proto.Code"
                 },
                 "data": {
-                    "$ref": "#/definitions/proto.ProductionProcessInfo"
+                    "$ref": "#/definitions/github_com_CloudSilk_CloudSilk_pkg_proto.ProductionProcessInfo"
                 },
                 "message": {
                     "type": "string"
@@ -24867,7 +25067,7 @@ const docTemplate = `{
                     "description": "生产工序",
                     "allOf": [
                         {
-                            "$ref": "#/definitions/proto.ProductionProcessInfo"
+                            "$ref": "#/definitions/github_com_CloudSilk_CloudSilk_pkg_proto.ProductionProcessInfo"
                         }
                     ]
                 },
@@ -25760,77 +25960,6 @@ const docTemplate = `{
                 }
             }
         },
-        "proto.ProductOrderBomInfo": {
-            "type": "object",
-            "properties": {
-                "controlType": {
-                    "description": "管控类型",
-                    "type": "integer"
-                },
-                "createTime": {
-                    "description": "创建时间",
-                    "type": "string"
-                },
-                "createUserID": {
-                    "description": "创建人员ID",
-                    "type": "string"
-                },
-                "createUserName": {
-                    "type": "string"
-                },
-                "enableControl": {
-                    "description": "是否管控",
-                    "type": "boolean"
-                },
-                "id": {
-                    "description": "ID",
-                    "type": "string"
-                },
-                "itemNo": {
-                    "description": "项目号",
-                    "type": "string"
-                },
-                "materialDescription": {
-                    "description": "物料描述",
-                    "type": "string"
-                },
-                "materialNo": {
-                    "description": "物料号",
-                    "type": "string"
-                },
-                "pieceQTY": {
-                    "description": "单件数量",
-                    "type": "number"
-                },
-                "productOrderID": {
-                    "description": "隶属工单ID",
-                    "type": "string"
-                },
-                "productOrderNo": {
-                    "type": "string"
-                },
-                "productionProcess": {
-                    "description": "需求工序",
-                    "type": "string"
-                },
-                "remark": {
-                    "description": "备注",
-                    "type": "string"
-                },
-                "requireQTY": {
-                    "description": "需求数量",
-                    "type": "number"
-                },
-                "unit": {
-                    "description": "单位",
-                    "type": "string"
-                },
-                "warehouse": {
-                    "description": "物料仓库",
-                    "type": "string"
-                }
-            }
-        },
         "proto.ProductOrderInfo": {
             "type": "object",
             "properties": {
@@ -25965,7 +26094,7 @@ const docTemplate = `{
                     "description": "工单BOM",
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/proto.ProductOrderBomInfo"
+                        "$ref": "#/definitions/github_com_CloudSilk_CloudSilk_pkg_proto.ProductOrderBomInfo"
                     }
                 },
                 "productOrderLabels": {
@@ -26339,7 +26468,7 @@ const docTemplate = `{
                     "description": "生产工序",
                     "allOf": [
                         {
-                            "$ref": "#/definitions/proto.ProductionProcessInfo"
+                            "$ref": "#/definitions/github_com_CloudSilk_CloudSilk_pkg_proto.ProductionProcessInfo"
                         }
                     ]
                 },
@@ -26835,7 +26964,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "currentProcess": {
-                    "$ref": "#/definitions/proto.ProductionProcessInfo"
+                    "$ref": "#/definitions/github_com_CloudSilk_CloudSilk_pkg_proto.ProductionProcessInfo"
                 },
                 "currentProcessID": {
                     "description": "当前工序ID",
@@ -26850,7 +26979,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "lastProcess": {
-                    "$ref": "#/definitions/proto.ProductionProcessInfo"
+                    "$ref": "#/definitions/github_com_CloudSilk_CloudSilk_pkg_proto.ProductionProcessInfo"
                 },
                 "lastProcessID": {
                     "description": "上步工序ID",
@@ -27297,7 +27426,7 @@ const docTemplate = `{
                     }
                 },
                 "productionProcess": {
-                    "$ref": "#/definitions/proto.ProductionProcessInfo"
+                    "$ref": "#/definitions/github_com_CloudSilk_CloudSilk_pkg_proto.ProductionProcessInfo"
                 },
                 "productionProcessID": {
                     "description": "生产工序ID",
@@ -27570,7 +27699,7 @@ const docTemplate = `{
                 "productionProcesses": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/proto.ProductionProcessInfo"
+                        "$ref": "#/definitions/github_com_CloudSilk_CloudSilk_pkg_proto.ProductionProcessInfo"
                     }
                 },
                 "productionStations": {
@@ -27619,96 +27748,6 @@ const docTemplate = `{
                 }
             }
         },
-        "proto.ProductionProcessInfo": {
-            "type": "object",
-            "properties": {
-                "attributeExpressions": {
-                    "description": "特性表达式",
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/proto.AttributeExpressionInfo"
-                    }
-                },
-                "availableStationIDs": {
-                    "description": "支持工站",
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "code": {
-                    "description": "代号",
-                    "type": "string"
-                },
-                "description": {
-                    "description": "描述",
-                    "type": "string"
-                },
-                "enable": {
-                    "description": "是否启用",
-                    "type": "boolean"
-                },
-                "enableControl": {
-                    "description": "是否管控",
-                    "type": "boolean"
-                },
-                "enableReport": {
-                    "description": "是否报工",
-                    "type": "boolean"
-                },
-                "id": {
-                    "description": "ID",
-                    "type": "string"
-                },
-                "identifier": {
-                    "description": "识别码",
-                    "type": "string"
-                },
-                "initialValue": {
-                    "description": "默认匹配",
-                    "type": "boolean"
-                },
-                "processType": {
-                    "description": "工序类型",
-                    "type": "integer"
-                },
-                "productState": {
-                    "description": "产品状态",
-                    "type": "string"
-                },
-                "productionLine": {
-                    "$ref": "#/definitions/proto.ProductionLineInfo"
-                },
-                "productionLineID": {
-                    "description": "生产产线ID",
-                    "type": "string"
-                },
-                "productionProcessAvailableStations": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/proto.ProductionProcessAvailableStationInfo"
-                    }
-                },
-                "productionProcessSteps": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/proto.AvailableProcessInfo"
-                    }
-                },
-                "remark": {
-                    "description": "备注",
-                    "type": "string"
-                },
-                "sortIndex": {
-                    "description": "顺序",
-                    "type": "integer"
-                },
-                "vehicleType": {
-                    "description": "载具类型",
-                    "type": "integer"
-                }
-            }
-        },
         "proto.ProductionProcessSopInfo": {
             "type": "object",
             "properties": {
@@ -27739,6 +27778,9 @@ const docTemplate = `{
                 "productionLineID": {
                     "description": "生产工线ID",
                     "type": "string"
+                },
+                "productionProcess": {
+                    "$ref": "#/definitions/github_com_CloudSilk_CloudSilk_pkg_proto.ProductionProcessInfo"
                 },
                 "productionProcessID": {
                     "description": "生产工序ID",
@@ -27900,7 +27942,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "productionProcess": {
-                    "$ref": "#/definitions/proto.ProductionProcessInfo"
+                    "$ref": "#/definitions/github_com_CloudSilk_CloudSilk_pkg_proto.ProductionProcessInfo"
                 },
                 "productionProcessID": {
                     "description": "生产工序ID",
@@ -28074,7 +28116,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "productionProcess": {
-                    "$ref": "#/definitions/proto.ProductionProcessInfo"
+                    "$ref": "#/definitions/github_com_CloudSilk_CloudSilk_pkg_proto.ProductionProcessInfo"
                 },
                 "productionProcessID": {
                     "description": "生产工序ID",
@@ -29020,7 +29062,7 @@ const docTemplate = `{
                 "data": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/proto.ProductOrderBomInfo"
+                        "$ref": "#/definitions/github_com_CloudSilk_CloudSilk_pkg_proto.ProductOrderBomInfo"
                     }
                 },
                 "message": {
@@ -29748,7 +29790,7 @@ const docTemplate = `{
                 "data": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/proto.ProductionProcessInfo"
+                        "$ref": "#/definitions/github_com_CloudSilk_CloudSilk_pkg_proto.ProductionProcessInfo"
                     }
                 },
                 "message": {
@@ -30536,7 +30578,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "code": {
-                    "$ref": "#/definitions/proto.Code"
+                    "type": "integer"
                 },
                 "data": {
                     "$ref": "#/definitions/proto.Data"
