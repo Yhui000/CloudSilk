@@ -6,13 +6,12 @@ import (
 
 	"github.com/CloudSilk/CloudSilk/pkg/clients"
 	"github.com/CloudSilk/CloudSilk/pkg/proto"
-	webproto "github.com/CloudSilk/CloudSilk/pkg/servers/webapi/proto"
 	modelcode "github.com/CloudSilk/pkg/model"
 	usercenter "github.com/CloudSilk/usercenter/proto"
 	"gorm.io/gorm"
 )
 
-func TryLogin(req *webproto.LoginRequest, resp *webproto.ServiceResponse) {
+func TryLogin(req *proto.LoginRequest, resp *proto.ServiceResponse) {
 	var user *usercenter.UserProfile
 	var token string
 	if req.CardNo == "" {
@@ -141,7 +140,7 @@ func TryLogin(req *webproto.LoginRequest, resp *webproto.ServiceResponse) {
 	}
 
 	resp.Message = token
-	resp.Data = &webproto.Data{
+	resp.Data = &proto.Data{
 		Id:          user.Id,
 		Name:        user.UserName,
 		ChineseName: user.ChineseName,
@@ -151,7 +150,7 @@ func TryLogin(req *webproto.LoginRequest, resp *webproto.ServiceResponse) {
 	}
 }
 
-func TryLogout(req *webproto.LogoutRequest, resp *proto.CommonResponse) {
+func TryLogout(req *proto.LogoutRequest, resp *proto.CommonResponse) {
 	if req.Name == "" {
 		resp.Code = modelcode.BadRequest
 		resp.Message = "Name不能为空"

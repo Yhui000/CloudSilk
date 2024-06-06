@@ -6,8 +6,6 @@ import (
 
 	"github.com/CloudSilk/CloudSilk/pkg/proto"
 	"github.com/CloudSilk/CloudSilk/pkg/servers/webapi/logic"
-	webproto "github.com/CloudSilk/CloudSilk/pkg/servers/webapi/proto"
-	"github.com/CloudSilk/CloudSilk/pkg/types"
 	"github.com/CloudSilk/pkg/utils/log"
 	"github.com/CloudSilk/pkg/utils/middleware"
 	"github.com/gin-gonic/gin"
@@ -25,7 +23,7 @@ import (
 // @Router /api/mom/webapi/production/onlineproductinfo [post]
 func OnlineProductInfo(c *gin.Context) {
 	transID := middleware.GetTransID(c)
-	req := &webproto.OnlineProductInfoRequest{}
+	req := &proto.OnlineProductInfoRequest{}
 	resp := &proto.CommonResponse{Code: 20000}
 
 	var err error
@@ -59,8 +57,8 @@ func OnlineProductInfo(c *gin.Context) {
 // @Router /api/mom/webapi/production/enterproductionstation [post]
 func EnterProductionStation(c *gin.Context) {
 	transID := middleware.GetTransID(c)
-	req := &webproto.EnterProductionStationRequest{}
-	resp := &webproto.EnterProductionStationResponse{Code: 0}
+	req := &proto.EnterProductionStationRequest{}
+	resp := &proto.EnterProductionStationResponse{Code: 0}
 
 	var err error
 	if err = c.BindJSON(req); err != nil {
@@ -91,27 +89,27 @@ func EnterProductionStation(c *gin.Context) {
 // @Param authorization header string true "jwt token"
 // @Success 200 {object} proto.GetProductAttributeValuateRuleDetailResponse
 // @Router /api/mom/webapi/production/getproductionstationexhibition [get]
-func GetProductionStationExhibition(c *gin.Context) {
-	resp := &webproto.GetProductionStationExhibitionResponse{
-		Code: types.ServiceResponseCodeSuccess,
-	}
-	productionStationCode := c.Query("productionStation")
-	if productionStationCode == "" {
-		resp.Code = types.ServiceResponseCodeFailure
-		c.JSON(http.StatusOK, resp)
-		return
-	}
-	var err error
+// func GetProductionStationExhibition(c *gin.Context) {
+// 	resp := &proto.GetProductionStationExhibitionResponse{
+// 		Code: types.ServiceResponseCodeSuccess,
+// 	}
+// 	productionStationCode := c.Query("productionStation")
+// 	if productionStationCode == "" {
+// 		resp.Code = types.ServiceResponseCodeFailure
+// 		c.JSON(http.StatusOK, resp)
+// 		return
+// 	}
+// 	var err error
 
-	data, err := logic.GetProductionStationExhibition(productionStationCode)
-	if err != nil {
-		resp.Code = types.ServiceResponseCodeFailure
-		resp.Message = err.Error()
-	} else {
-		resp.Data = data
-	}
-	c.JSON(http.StatusOK, resp)
-}
+// 	data, err := logic.GetProductionStationExhibition(productionStationCode)
+// 	if err != nil {
+// 		resp.Code = types.ServiceResponseCodeFailure
+// 		resp.Message = err.Error()
+// 	} else {
+// 		resp.Data = data
+// 	}
+// 	c.JSON(http.StatusOK, resp)
+// }
 
 // ExitProductionStation godoc
 // @Summary 请求出站接口
@@ -125,7 +123,7 @@ func GetProductionStationExhibition(c *gin.Context) {
 // @Router /api/mom/webapi/production/exitproductionstation [post]
 func ExitProductionStation(c *gin.Context) {
 	transID := middleware.GetTransID(c)
-	req := &webproto.ExitProductionStationRequest{}
+	req := &proto.ExitProductionStationRequest{}
 	resp := &proto.CommonResponse{Code: 200}
 
 	if err := c.BindJSON(req); err != nil {
@@ -164,7 +162,7 @@ func ExitProductionStation(c *gin.Context) {
 // @Router /api/mom/webapi/production/createproducttestrecord [post]
 func CreateProductTestRecord(c *gin.Context) {
 	transID := middleware.GetTransID(c)
-	req := &webproto.CreateProductTestRecordRequest{}
+	req := &proto.CreateProductTestRecordRequest{}
 	resp := &proto.CommonResponse{Code: 200}
 
 	if err := c.BindJSON(req); err != nil {
@@ -205,7 +203,7 @@ func CreateProductTestRecord(c *gin.Context) {
 // @Router /api/mom/webapi/production/checkproductprocessroutefailure [post]
 func CheckProductProcessRouteFailure(c *gin.Context) {
 	transID := middleware.GetTransID(c)
-	req := &webproto.CheckProductProcessRouteFailureRequest{}
+	req := &proto.CheckProductProcessRouteFailureRequest{}
 	resp := &proto.CommonResponse{Code: 200}
 
 	if err := c.BindJSON(req); err != nil {
@@ -239,7 +237,7 @@ func RegisterProductionRouter(r *gin.Engine) {
 
 	g.POST("onlineproductinfo", OnlineProductInfo)
 	g.POST("enterproductionstation", EnterProductionStation)
-	g.GET("getproductionstationexhibition", GetProductionStationExhibition)
+	// g.GET("getproductionstationexhibition", GetProductionStationExhibition)
 	g.POST("exitproductionstation", ExitProductionStation)
 	g.POST("createproducttestrecord", CreateProductTestRecord)
 	g.POST("checkproductprocessroutefailure", CheckProductProcessRouteFailure)

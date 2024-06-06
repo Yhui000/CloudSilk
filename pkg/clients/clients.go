@@ -59,6 +59,9 @@ func Init(serviceMode string) {
 		MaterialTrayBindingRecordClient.Add = materialTrayBindingRecordProvider.Add
 		MaterialTrayBindingRecordClient.Get = materialTrayBindingRecordProvider.Get
 
+		materialChannelLayerProvider := new(mpp.MaterialChannelLayerProvider)
+		MaterialChannelLayerClient.Get = materialChannelLayerProvider.Get
+
 		productPackageRecordProvider := new(ppp.ProductPackageRecordProvider)
 		ProductPackageRecordClient.Get = productPackageRecordProvider.Get
 
@@ -140,6 +143,7 @@ func Init(serviceMode string) {
 		config.SetConsumerService(ProductionCrosswayClient)
 		config.SetConsumerService(MaterialTrayClient)
 		config.SetConsumerService(MaterialTrayBindingRecordClient)
+		config.SetConsumerService(MaterialChannelLayerClient)
 		config.SetConsumerService(ProductPackageRecordClient)
 		config.SetConsumerService(ProductInfoClient)
 		config.SetConsumerService(ProductOrderClient)

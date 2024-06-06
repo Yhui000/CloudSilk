@@ -1,121 +1,4 @@
 definitions:
-  github_com_CloudSilk_CloudSilk_pkg_proto.ProductOrderBomInfo:
-    properties:
-      controlType:
-        description: 管控类型
-        type: integer
-      createTime:
-        description: 创建时间
-        type: string
-      createUserID:
-        description: 创建人员ID
-        type: string
-      createUserName:
-        type: string
-      enableControl:
-        description: 是否管控
-        type: boolean
-      id:
-        description: ID
-        type: string
-      itemNo:
-        description: 项目号
-        type: string
-      materialDescription:
-        description: 物料描述
-        type: string
-      materialNo:
-        description: 物料号
-        type: string
-      pieceQTY:
-        description: 单件数量
-        type: number
-      productOrderID:
-        description: 隶属工单ID
-        type: string
-      productOrderNo:
-        type: string
-      productionProcess:
-        description: 需求工序
-        type: string
-      remark:
-        description: 备注
-        type: string
-      requireQTY:
-        description: 需求数量
-        type: number
-      unit:
-        description: 单位
-        type: string
-      warehouse:
-        description: 物料仓库
-        type: string
-    type: object
-  github_com_CloudSilk_CloudSilk_pkg_proto.ProductionProcessInfo:
-    properties:
-      attributeExpressions:
-        description: 特性表达式
-        items:
-          $ref: '#/definitions/proto.AttributeExpressionInfo'
-        type: array
-      availableStationIDs:
-        description: 支持工站
-        items:
-          type: string
-        type: array
-      code:
-        description: 代号
-        type: string
-      description:
-        description: 描述
-        type: string
-      enable:
-        description: 是否启用
-        type: boolean
-      enableControl:
-        description: 是否管控
-        type: boolean
-      enableReport:
-        description: 是否报工
-        type: boolean
-      id:
-        description: ID
-        type: string
-      identifier:
-        description: 识别码
-        type: string
-      initialValue:
-        description: 默认匹配
-        type: boolean
-      processType:
-        description: 工序类型
-        type: integer
-      productState:
-        description: 产品状态
-        type: string
-      productionLine:
-        $ref: '#/definitions/proto.ProductionLineInfo'
-      productionLineID:
-        description: 生产产线ID
-        type: string
-      productionProcessAvailableStations:
-        items:
-          $ref: '#/definitions/proto.ProductionProcessAvailableStationInfo'
-        type: array
-      productionProcessSteps:
-        items:
-          $ref: '#/definitions/proto.AvailableProcessInfo'
-        type: array
-      remark:
-        description: 备注
-        type: string
-      sortIndex:
-        description: 顺序
-        type: integer
-      vehicleType:
-        description: 载具类型
-        type: integer
-    type: object
   proto.AttributeExpressionInfo:
     properties:
       attributeValue:
@@ -163,7 +46,7 @@ definitions:
       id:
         type: string
       productionProcess:
-        $ref: '#/definitions/github_com_CloudSilk_CloudSilk_pkg_proto.ProductionProcessInfo'
+        $ref: '#/definitions/proto.ProductionProcessInfo'
       productionProcessID:
         type: string
       productionProcessStep:
@@ -862,7 +745,7 @@ definitions:
         $ref: '#/definitions/proto.Code'
       data:
         items:
-          $ref: '#/definitions/github_com_CloudSilk_CloudSilk_pkg_proto.ProductOrderBomInfo'
+          $ref: '#/definitions/proto.ProductOrderBomInfo'
         type: array
       message:
         type: string
@@ -1170,7 +1053,7 @@ definitions:
         $ref: '#/definitions/proto.Code'
       data:
         items:
-          $ref: '#/definitions/github_com_CloudSilk_CloudSilk_pkg_proto.ProductionProcessInfo'
+          $ref: '#/definitions/proto.ProductionProcessInfo'
         type: array
       message:
         type: string
@@ -1664,7 +1547,7 @@ definitions:
       code:
         $ref: '#/definitions/proto.Code'
       data:
-        $ref: '#/definitions/github_com_CloudSilk_CloudSilk_pkg_proto.ProductOrderBomInfo'
+        $ref: '#/definitions/proto.ProductOrderBomInfo'
       message:
         type: string
     type: object
@@ -1916,7 +1799,7 @@ definitions:
       code:
         $ref: '#/definitions/proto.Code'
       data:
-        $ref: '#/definitions/github_com_CloudSilk_CloudSilk_pkg_proto.ProductionProcessInfo'
+        $ref: '#/definitions/proto.ProductionProcessInfo'
       message:
         type: string
     type: object
@@ -2462,7 +2345,7 @@ definitions:
         type: array
       productionProcess:
         allOf:
-        - $ref: '#/definitions/github_com_CloudSilk_CloudSilk_pkg_proto.ProductionProcessInfo'
+        - $ref: '#/definitions/proto.ProductionProcessInfo'
         description: 生产工序
       productionProcessID:
         description: 生产工序ID
@@ -3096,6 +2979,58 @@ definitions:
         description: 值
         type: string
     type: object
+  proto.ProductOrderBomInfo:
+    properties:
+      controlType:
+        description: 管控类型
+        type: integer
+      createTime:
+        description: 创建时间
+        type: string
+      createUserID:
+        description: 创建人员ID
+        type: string
+      createUserName:
+        type: string
+      enableControl:
+        description: 是否管控
+        type: boolean
+      id:
+        description: ID
+        type: string
+      itemNo:
+        description: 项目号
+        type: string
+      materialDescription:
+        description: 物料描述
+        type: string
+      materialNo:
+        description: 物料号
+        type: string
+      pieceQTY:
+        description: 单件数量
+        type: number
+      productOrderID:
+        description: 隶属工单ID
+        type: string
+      productOrderNo:
+        type: string
+      productionProcess:
+        description: 需求工序
+        type: string
+      remark:
+        description: 备注
+        type: string
+      requireQTY:
+        description: 需求数量
+        type: number
+      unit:
+        description: 单位
+        type: string
+      warehouse:
+        description: 物料仓库
+        type: string
+    type: object
   proto.ProductOrderInfo:
     properties:
       actualFinishTime:
@@ -3195,7 +3130,7 @@ definitions:
       productOrderBoms:
         description: 工单BOM
         items:
-          $ref: '#/definitions/github_com_CloudSilk_CloudSilk_pkg_proto.ProductOrderBomInfo'
+          $ref: '#/definitions/proto.ProductOrderBomInfo'
         type: array
       productOrderLabels:
         description: 产品工单标签
@@ -3465,7 +3400,7 @@ definitions:
         type: string
       productionProcess:
         allOf:
-        - $ref: '#/definitions/github_com_CloudSilk_CloudSilk_pkg_proto.ProductionProcessInfo'
+        - $ref: '#/definitions/proto.ProductionProcessInfo'
         description: 生产工序
       productionProcessID:
         description: 生产工序ID
@@ -3821,7 +3756,7 @@ definitions:
         description: 创建时间
         type: string
       currentProcess:
-        $ref: '#/definitions/github_com_CloudSilk_CloudSilk_pkg_proto.ProductionProcessInfo'
+        $ref: '#/definitions/proto.ProductionProcessInfo'
       currentProcessID:
         description: 当前工序ID
         type: string
@@ -3832,7 +3767,7 @@ definitions:
         description: ID
         type: string
       lastProcess:
-        $ref: '#/definitions/github_com_CloudSilk_CloudSilk_pkg_proto.ProductionProcessInfo'
+        $ref: '#/definitions/proto.ProductionProcessInfo'
       lastProcessID:
         description: 上步工序ID
         type: string
@@ -4154,7 +4089,7 @@ definitions:
           $ref: '#/definitions/proto.ProductTestConclusionInfo'
         type: array
       productionProcess:
-        $ref: '#/definitions/github_com_CloudSilk_CloudSilk_pkg_proto.ProductionProcessInfo'
+        $ref: '#/definitions/proto.ProductionProcessInfo'
       productionProcessID:
         description: 生产工序ID
         type: string
@@ -4351,7 +4286,7 @@ definitions:
         type: array
       productionProcesses:
         items:
-          $ref: '#/definitions/github_com_CloudSilk_CloudSilk_pkg_proto.ProductionProcessInfo'
+          $ref: '#/definitions/proto.ProductionProcessInfo'
         type: array
       productionStations:
         description: 工站
@@ -4384,6 +4319,71 @@ definitions:
       productionStationID:
         type: string
     type: object
+  proto.ProductionProcessInfo:
+    properties:
+      attributeExpressions:
+        description: 特性表达式
+        items:
+          $ref: '#/definitions/proto.AttributeExpressionInfo'
+        type: array
+      availableStationIDs:
+        description: 支持工站
+        items:
+          type: string
+        type: array
+      code:
+        description: 代号
+        type: string
+      description:
+        description: 描述
+        type: string
+      enable:
+        description: 是否启用
+        type: boolean
+      enableControl:
+        description: 是否管控
+        type: boolean
+      enableReport:
+        description: 是否报工
+        type: boolean
+      id:
+        description: ID
+        type: string
+      identifier:
+        description: 识别码
+        type: string
+      initialValue:
+        description: 默认匹配
+        type: boolean
+      processType:
+        description: 工序类型
+        type: integer
+      productState:
+        description: 产品状态
+        type: string
+      productionLine:
+        $ref: '#/definitions/proto.ProductionLineInfo'
+      productionLineID:
+        description: 生产产线ID
+        type: string
+      productionProcessAvailableStations:
+        items:
+          $ref: '#/definitions/proto.ProductionProcessAvailableStationInfo'
+        type: array
+      productionProcessSteps:
+        items:
+          $ref: '#/definitions/proto.AvailableProcessInfo'
+        type: array
+      remark:
+        description: 备注
+        type: string
+      sortIndex:
+        description: 顺序
+        type: integer
+      vehicleType:
+        description: 载具类型
+        type: integer
+    type: object
   proto.ProductionProcessSopInfo:
     properties:
       code:
@@ -4408,7 +4408,7 @@ definitions:
         description: 生产工线ID
         type: string
       productionProcess:
-        $ref: '#/definitions/github_com_CloudSilk_CloudSilk_pkg_proto.ProductionProcessInfo'
+        $ref: '#/definitions/proto.ProductionProcessInfo'
       productionProcessID:
         description: 生产工序ID
         type: string
@@ -4525,7 +4525,7 @@ definitions:
         description: 产品信息ID
         type: string
       productionProcess:
-        $ref: '#/definitions/github_com_CloudSilk_CloudSilk_pkg_proto.ProductionProcessInfo'
+        $ref: '#/definitions/proto.ProductionProcessInfo'
       productionProcessID:
         description: 生产工序ID
         type: string
@@ -4651,7 +4651,7 @@ definitions:
         description: 产品信息ID
         type: string
       productionProcess:
-        $ref: '#/definitions/github_com_CloudSilk_CloudSilk_pkg_proto.ProductionProcessInfo'
+        $ref: '#/definitions/proto.ProductionProcessInfo'
       productionProcessID:
         description: 生产工序ID
         type: string
@@ -5278,7 +5278,7 @@ definitions:
         $ref: '#/definitions/proto.Code'
       data:
         items:
-          $ref: '#/definitions/github_com_CloudSilk_CloudSilk_pkg_proto.ProductOrderBomInfo'
+          $ref: '#/definitions/proto.ProductOrderBomInfo'
         type: array
       message:
         type: string
@@ -5754,7 +5754,7 @@ definitions:
         $ref: '#/definitions/proto.Code'
       data:
         items:
-          $ref: '#/definitions/github_com_CloudSilk_CloudSilk_pkg_proto.ProductionProcessInfo'
+          $ref: '#/definitions/proto.ProductionProcessInfo'
         type: array
       message:
         type: string
@@ -9529,7 +9529,7 @@ paths:
         name: account
         required: true
         schema:
-          $ref: '#/definitions/github_com_CloudSilk_CloudSilk_pkg_proto.ProductOrderBomInfo'
+          $ref: '#/definitions/proto.ProductOrderBomInfo'
       produces:
       - application/json
       responses:
@@ -9675,7 +9675,7 @@ paths:
         name: account
         required: true
         schema:
-          $ref: '#/definitions/github_com_CloudSilk_CloudSilk_pkg_proto.ProductOrderBomInfo'
+          $ref: '#/definitions/proto.ProductOrderBomInfo'
       produces:
       - application/json
       responses:
@@ -15222,7 +15222,7 @@ paths:
         name: account
         required: true
         schema:
-          $ref: '#/definitions/github_com_CloudSilk_CloudSilk_pkg_proto.ProductionProcessInfo'
+          $ref: '#/definitions/proto.ProductionProcessInfo'
       produces:
       - application/json
       responses:
@@ -15364,7 +15364,7 @@ paths:
         name: account
         required: true
         schema:
-          $ref: '#/definitions/github_com_CloudSilk_CloudSilk_pkg_proto.ProductionProcessInfo'
+          $ref: '#/definitions/proto.ProductionProcessInfo'
       produces:
       - application/json
       responses:
@@ -20534,32 +20534,6 @@ paths:
           schema:
             $ref: '#/definitions/proto.CommonResponse'
       summary: 请求出站接口
-      tags:
-      - WebAPI
-  /api/mom/webapi/production/getproductionstationexhibition:
-    get:
-      consumes:
-      - application/json
-      description: 获取工站的当前生产工单工序信息
-      parameters:
-      - description: 生产工站代号
-        in: query
-        name: productionStation
-        required: true
-        type: string
-      - description: jwt token
-        in: header
-        name: authorization
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/proto.GetProductAttributeValuateRuleDetailResponse'
-      summary: 获取工站的当前生产工单工序信息
       tags:
       - WebAPI
   /api/mom/webapi/production/onlineproductinfo:

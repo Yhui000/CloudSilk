@@ -1,7 +1,7 @@
 syntax="proto3";
 
-package webproto;
-option go_package = "./;webproto";
+package proto;
+option go_package = "./;proto";
 
 message GetTestProjectWithParameterRequest{
     //工位代号

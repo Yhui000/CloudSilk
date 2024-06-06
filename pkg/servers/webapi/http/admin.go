@@ -6,7 +6,6 @@ import (
 
 	"github.com/CloudSilk/CloudSilk/pkg/proto"
 	"github.com/CloudSilk/CloudSilk/pkg/servers/webapi/logic"
-	webproto "github.com/CloudSilk/CloudSilk/pkg/servers/webapi/proto"
 	"github.com/CloudSilk/pkg/utils/log"
 	"github.com/CloudSilk/pkg/utils/middleware"
 	"github.com/gin-gonic/gin"
@@ -23,8 +22,8 @@ import (
 // @Router /api/mom/webapi/admin/login [post]
 func TryLogin(c *gin.Context) {
 	transID := middleware.GetTransID(c)
-	req := &webproto.LoginRequest{}
-	resp := &webproto.ServiceResponse{Code: 200}
+	req := &proto.LoginRequest{}
+	resp := &proto.ServiceResponse{Code: 200}
 
 	if err := c.BindJSON(req); err != nil {
 		resp.Code = 400
@@ -56,7 +55,7 @@ func TryLogin(c *gin.Context) {
 // @Router /api/mom/webapi/admin/logout [post]
 func TryLogout(c *gin.Context) {
 	transID := middleware.GetTransID(c)
-	req := &webproto.LogoutRequest{}
+	req := &proto.LogoutRequest{}
 	resp := &proto.CommonResponse{Code: 200}
 
 	if err := c.BindJSON(req); err != nil {

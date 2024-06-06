@@ -6,7 +6,6 @@ import (
 
 	"github.com/CloudSilk/CloudSilk/pkg/clients"
 	"github.com/CloudSilk/CloudSilk/pkg/proto"
-	webproto "github.com/CloudSilk/CloudSilk/pkg/servers/webapi/proto"
 	modelcode "github.com/CloudSilk/pkg/model"
 	"gorm.io/gorm"
 )
@@ -51,7 +50,7 @@ func GetAllProductionLine() ([]*proto.ProductionLineInfo, error) {
 }
 
 // RetrieveProductionStation 查询产线工位信息
-func RetrieveProductionStation(req *webproto.RetrieveProductionStationRequest) ([]*proto.ProductionStationInfo, error) {
+func RetrieveProductionStation(req *proto.RetrieveProductionStationRequest) ([]*proto.ProductionStationInfo, error) {
 	if req.ProductionLine == "" {
 		return nil, fmt.Errorf("ProductionLine不能为空")
 	}
@@ -87,7 +86,7 @@ func RetrieveProductionStation(req *webproto.RetrieveProductionStationRequest) (
 }
 
 // RetrieveProductAttribute 查询产品特性信息
-func RetrieveProductAttribute(req *webproto.RetrieveProductAttributeRequest) ([]*proto.ProductAttributeInfo, error) {
+func RetrieveProductAttribute(req *proto.RetrieveProductAttributeRequest) ([]*proto.ProductAttributeInfo, error) {
 	if req.Code == "" {
 		return nil, fmt.Errorf("Code不能为空")
 	}
@@ -114,7 +113,7 @@ func RetrieveProductAttribute(req *webproto.RetrieveProductAttributeRequest) ([]
 }
 
 // RetrieveProductionCrossway 查询产线路口信息
-func RetrieveProductionCrossway(req *webproto.RetrieveProductionCrosswayRequest) ([]*proto.ProductionCrosswayInfo, error) {
+func RetrieveProductionCrossway(req *proto.RetrieveProductionCrosswayRequest) ([]*proto.ProductionCrosswayInfo, error) {
 	if req.ProductionLine == "" {
 		return nil, fmt.Errorf("ProductionLine不能为空")
 	}
