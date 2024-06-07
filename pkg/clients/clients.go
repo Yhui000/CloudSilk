@@ -112,6 +112,9 @@ func Init(serviceMode string) {
 		productOrderProcessProvider := new(ppp.ProductOrderProcessProvider)
 		ProductOrderProcessClient.Query = productOrderProcessProvider.Query
 
+		productOrderProcessStepProvider := new(ppp.ProductOrderProcessStepProvider)
+		ProductOrderProcessStepClient.Query = productOrderProcessStepProvider.Query
+
 		productOrderBomProvider := new(ppp.ProductOrderBomProvider)
 		ProductOrderBomClient.Query = productOrderBomProvider.Query
 
@@ -132,6 +135,9 @@ func Init(serviceMode string) {
 
 		productTestRecordProvider := new(ppp.ProductTestRecordProvider)
 		ProductTestRecordClient.Add = productTestRecordProvider.Add
+
+		productWorkRecordProvider := new(ppp.ProductWorkRecordProvider)
+		ProductWorkRecordClient.Query = productWorkRecordProvider.Query
 	} else {
 		if os.Getenv("MES_DISABLE_AUTH") != "true" {
 			config.SetConsumerService(UserClient)
@@ -158,10 +164,12 @@ func Init(serviceMode string) {
 		config.SetConsumerService(SystemEventTriggerParameterClient)
 		config.SetConsumerService(ProductReworkRecordClient)
 		config.SetConsumerService(ProductOrderProcessClient)
+		config.SetConsumerService(ProductOrderProcessStepClient)
 		config.SetConsumerService(ProductionStationOutputClient)
 		config.SetConsumerService(ProductOrderAttributeClient)
 		config.SetConsumerService(ProcessStepParameterClient)
 		config.SetConsumerService(ProductionProcessStepClient)
 		config.SetConsumerService(ProductTestRecordClient)
+		config.SetConsumerService(ProductWorkRecordClient)
 	}
 }

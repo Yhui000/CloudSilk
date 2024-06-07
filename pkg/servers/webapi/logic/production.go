@@ -834,6 +834,14 @@ func GetProductionProcessStepWithParameter(req *proto.GetProductionProcessStepWi
 			}
 		}
 		if match {
+			processStepTypeParameters := []map[string]interface{}{}
+			for _, v := range v.ProcessStepType.ProcessStepTypeParameters {
+				processStepTypeParameters = append(processStepTypeParameters, map[string]interface{}{
+					"code":        v.Code,
+					"description": v.Description,
+					"value":       v.DefaultValue,
+				})
+			}
 			productionProcessSteps = append(productionProcessSteps, map[string]interface{}{
 				"id":                  v.Id,
 				"sortIndex":           v.SortIndex,
@@ -842,10 +850,55 @@ func GetProductionProcessStepWithParameter(req *proto.GetProductionProcessStepWi
 				"processStepType":     v.ProcessStepType.Code,
 				"processStepTypeDesc": v.ProcessStepType.Description,
 				"remark":              v.Remark,
-				"parameters":          []map[string]interface{}{},
+				"parameters":          processStepTypeParameters,
+				"workResult":          "",
 			})
 			break
 		}
+	}
+
+	_productOrderProcess, _ := clients.ProductOrderProcessStepClient.Query(context.Background(), &proto.QueryProductOrderProcessStepRequest{
+		PageSize:            1000,
+		ProductionProcessID: productionProcess.Id,
+		ProductOrderID:      productOrder.Id,
+	})
+	if _productOrderProcess.Code != modelcode.Success {
+		return nil, fmt.Errorf(_productOrderProcess.Message)
+	}
+	productOrderProcess := []map[string]interface{}{}
+	for _, v := range _productOrderProcess.Data {
+		productOrderProcessStepTypeParameters := []map[string]interface{}{}
+		for _, vv := range v.ProductOrderProcessStepTypeParameters {
+			productOrderProcessStepTypeParameters = append(productOrderProcessStepTypeParameters, map[string]interface{}{
+				// "Code": vv.Code,
+				// "Code": vv.Code,
+				"value": vv.Value,
+			})
+		}
+		productOrderProcess = append(productOrderProcess, map[string]interface{}{
+			"id":                                    v.Id,
+			"sortIndex":                             v.SortIndex,
+			"code":                                  "",
+			"workDescription":                       v.WorkDescription,
+			"processStepType":                       v.ProcessStepType.Code,
+			"processStepTypeDesc":                   v.ProcessStepType.Description,
+			"workGraphic":                           v.WorkGraphic,
+			"remark":                                v.Remark,
+			"workResult":                            "",
+			"productOrderProcessStepTypeParameters": productOrderProcessStepTypeParameters,
+		})
+	}
+
+	_productWorkRecord, _ := clients.ProductWorkRecordClient.Query(context.Background(), &proto.QueryProductWorkRecordRequest{ProductInfoID: productInfo.Id})
+	if _productWorkRecord.Code != modelcode.Success {
+		return nil, fmt.Errorf(_productWorkRecord.Message)
+	}
+	productWorkRecords := []map[string]interface{}{}
+	for _, v := range _productWorkRecord.Data {
+		productWorkRecords = append(productWorkRecords, map[string]interface{}{
+			"productionProcessStepID": v.ProductionProcessStepID,
+			"isQualified":             v.IsQualified,
+		})
 	}
 
 	return nil, nil
