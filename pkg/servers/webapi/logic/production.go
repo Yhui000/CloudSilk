@@ -780,10 +780,10 @@ func GetProductionProcessStepWithParameter(req *proto.GetProductionProcessStepWi
 	productOrder := _productOrder.Data
 
 	productOrderBoms := []*proto.ProductOrderBomInfo{}
-	materialNoArray := []string{}
+	// materialNoArray := []string{}
 	for _, v := range productOrder.ProductOrderBoms {
 		if v.ProductionProcess == productionProcess.Identifier || v.ProductionProcess == productionProcess.Code {
-			materialNoArray = append(materialNoArray, v.MaterialNo)
+			// materialNoArray = append(materialNoArray, v.MaterialNo)
 			productOrderBoms = append(productOrderBoms, &proto.ProductOrderBomInfo{
 				MaterialNo:          v.MaterialNo,
 				MaterialDescription: v.MaterialDescription,
@@ -799,10 +799,11 @@ func GetProductionProcessStepWithParameter(req *proto.GetProductionProcessStepWi
 	}
 
 	//TODO
-	_materialChannelLayer, _ := clients.MaterialChannelLayerClient.Get(context.Background(), &proto.GetMaterialChannelLayerRequest{ProductionStationID: productionStation.Id})
-	if _materialChannelLayer.Code != modelcode.Success {
-		return nil, fmt.Errorf(_materialChannelLayer.Message)
+	_materialChannelLayers, _ := clients.MaterialChannelLayerClient.Get(context.Background(), &proto.GetMaterialChannelLayerRequest{ProductionStationID: productionStation.Id})
+	if _materialChannelLayers.Code != modelcode.Success {
+		return nil, fmt.Errorf(_materialChannelLayers.Message)
 	}
+	materialChannelLayers := _materialChannelLayers.Data
 
 	_productionProcessStep, _ := clients.ProductionProcessStepClient.Query(context.Background(), &proto.QueryProductionProcessStepRequest{
 		SortConfig:          `{"sort_index": ""}`,
@@ -901,7 +902,70 @@ func GetProductionProcessStepWithParameter(req *proto.GetProductionProcessStepWi
 		})
 	}
 
-	return nil, nil
+	for i, v := range productionProcessSteps {
+		for _, vv := range productWorkRecords {
+			if vv["productionProcessStepID"] == v["id"] {
+				workResult := ""
+				if vv["isQualified"] == "true" {
+					workResult = "PASS"
+				}
+				productionProcessSteps[i]["workResult"] = workResult
+				break
+			}
+		}
+	}
+
+	var materialTray, assembleTray string
+	_materialTray, _ := clients.MaterialTrayClient.Get(context.Background(), &proto.GetMaterialTrayRequest{ProductInfoID: productInfo.Id, TrayType: types.MaterialTrayTypeMaterialTray})
+	if _materialTray.Code != modelcode.Success && _materialTray.Message != gorm.ErrRecordNotFound.Error() {
+		return nil, fmt.Errorf(_materialTray.Message)
+	}
+	if _materialTray.Data != nil {
+		materialTray = _materialTray.Data.Identifier
+	}
+	_assembleTray, _ := clients.MaterialTrayClient.Get(context.Background(), &proto.GetMaterialTrayRequest{ProductInfoID: productInfo.Id, TrayType: types.MaterialTrayTypeAssembleTray})
+	if _assembleTray.Code != modelcode.Success && _assembleTray.Message != gorm.ErrRecordNotFound.Error() {
+		return nil, fmt.Errorf(_assembleTray.Message)
+	}
+	if _assembleTray.Data != nil {
+		assembleTray = _assembleTray.Data.Identifier
+	}
+
+	var productOrderAttributes []map[string]interface{}
+	for _, v := range productOrder.ProductOrderAttributes {
+		productOrderAttributes = append(productOrderAttributes, map[string]interface{}{
+			"ID":               v.Id,
+			"Code":             v.ProductAttribute.Code,
+			"CodeDescription":  v.ProductAttribute.Description,
+			"Value":            v.Value,
+			"ValueDescription": v.Description,
+		})
+	}
+
+	return map[string]interface{}{
+		"productOrder": map[string]interface{}{
+			"id":                  productOrder.Id,
+			"productOrderNo":      productOrder.ProductOrderNo,
+			"productModel":        productOrder.ProductModel.Code,
+			"materialNo":          productOrder.ProductModel.MaterialNo,
+			"materialDescription": productOrder.ProductModel.MaterialDescription,
+			"selectedOptions":     productOrder.SelectedOptions,
+			"propertyBrief":       productOrder.PropertyBrief,
+			"standardWorkTime":    productOrder.StandardWorkTime,
+			"remark":              productOrder.Remark,
+			"orderQTY":            productOrder.OrderQTY,
+		},
+		"productInfo": map[string]interface{}{
+			"id":              productInfo.Id,
+			"productSerialNo": productInfo.ProductSerialNo,
+			"materialTray":    materialTray,
+			"assembleTray":    assembleTray,
+		},
+		"productOrderBoms":       productOrderBoms,
+		"materialChannelLayers":  materialChannelLayers,
+		"productionProcessSteps": append(productionProcessSteps, productOrderProcess...),
+		"productOrderAttributes": productOrderAttributes,
+	}, nil
 }
 
 // 请求出站

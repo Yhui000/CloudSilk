@@ -78,6 +78,9 @@ func GetMaterialTray(req *proto.GetMaterialTrayRequest) (*model.MaterialTray, er
 	if req.ProductInfoID != "" {
 		r["product_info_id"] = req.ProductInfoID
 	}
+	if req.TrayType != "" {
+		r["tray_type"] = req.TrayType
+	}
 
 	err := model.DB.DB().Preload("ProductionLine").Preload("ProductInfo").Preload(clause.Associations).First(m, r).Error
 	return m, err

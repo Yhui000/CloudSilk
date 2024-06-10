@@ -508,6 +508,17 @@ definitions:
       message:
         type: string
     type: object
+  proto.GetAllMaterialChannelLayerResponse:
+    properties:
+      code:
+        $ref: '#/definitions/proto.Code'
+      data:
+        items:
+          $ref: '#/definitions/proto.MaterialChannelLayerInfo'
+        type: array
+      message:
+        type: string
+    type: object
   proto.GetAllMaterialInfoResponse:
     properties:
       code:
@@ -1353,6 +1364,15 @@ definitions:
       message:
         type: string
     type: object
+  proto.GetMaterialChannelLayerDetailResponse:
+    properties:
+      code:
+        $ref: '#/definitions/proto.Code'
+      data:
+        $ref: '#/definitions/proto.MaterialChannelLayerInfo'
+      message:
+        type: string
+    type: object
   proto.GetMaterialInfoDetailResponse:
     properties:
       code:
@@ -1821,6 +1841,18 @@ definitions:
       message:
         type: string
     type: object
+  proto.GetProductionProcessStepWithParameterRequest:
+    properties:
+      productSerialNo:
+        description: 产品序列号
+        type: string
+      productionStation:
+        description: 生产工站代号
+        type: string
+      trayNo:
+        description: 载具识别码
+        type: string
+    type: object
   proto.GetProductionRhythmDetailResponse:
     properties:
       code:
@@ -2108,6 +2140,33 @@ definitions:
       remark:
         description: 备注
         type: string
+    type: object
+  proto.MaterialChannelLayerInfo:
+    properties:
+      code:
+        description: 代号
+        type: string
+      id:
+        type: string
+      lightRegisterAddress:
+        description: 亮灯寄存器地址
+        type: integer
+      productionStation:
+        allOf:
+        - $ref: '#/definitions/proto.ProductionStationInfo'
+        description: 隶属工站
+      productionStationID:
+        description: 隶属工站ID
+        type: string
+      remark:
+        description: 备注
+        type: string
+      sortIndex:
+        description: 顺序
+        type: integer
+      statusRegisterAddress:
+        description: 状态寄存器地址
+        type: integer
     type: object
   proto.MaterialInfoInfo:
     properties:
@@ -3456,8 +3515,7 @@ definitions:
         description: ID
         type: string
       processStepType:
-        description: 作业类型
-        type: string
+        $ref: '#/definitions/proto.ProcessStepTypeInfo'
       processStepTypeID:
         description: 作业类型ID
         type: string
@@ -4905,6 +4963,23 @@ definitions:
       data:
         items:
           $ref: '#/definitions/proto.MaterialCategoryInfo'
+        type: array
+      message:
+        type: string
+      pages:
+        type: integer
+      records:
+        type: integer
+      total:
+        type: integer
+    type: object
+  proto.QueryMaterialChannelLayerResponse:
+    properties:
+      code:
+        $ref: '#/definitions/proto.Code'
+      data:
+        items:
+          $ref: '#/definitions/proto.MaterialChannelLayerInfo'
         type: array
       message:
         type: string
@@ -7501,6 +7576,175 @@ paths:
       summary: 更新
       tags:
       - 物料类别管理
+  /api/mom/material/materialchannellayer/add:
+    post:
+      consumes:
+      - application/json
+      description: 新增
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      - description: Add MaterialChannelLayer
+        in: body
+        name: account
+        required: true
+        schema:
+          $ref: '#/definitions/proto.MaterialChannelLayerInfo'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.CommonResponse'
+      summary: 新增
+      tags:
+      - 料架通道管理
+  /api/mom/material/materialchannellayer/all:
+    get:
+      consumes:
+      - application/json
+      description: 查询所有
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.GetAllMaterialChannelLayerResponse'
+      summary: 查询所有
+      tags:
+      - 料架通道管理
+  /api/mom/material/materialchannellayer/delete:
+    delete:
+      consumes:
+      - application/json
+      description: 删除
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      - description: Delete MaterialChannelLayer
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/proto.DelRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.CommonResponse'
+      summary: 删除
+      tags:
+      - 料架通道管理
+  /api/mom/material/materialchannellayer/detail:
+    get:
+      consumes:
+      - application/json
+      description: 查询明细
+      parameters:
+      - description: ID
+        in: query
+        name: id
+        required: true
+        type: string
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.GetMaterialChannelLayerDetailResponse'
+      summary: 查询明细
+      tags:
+      - 料架通道管理
+  /api/mom/material/materialchannellayer/query:
+    get:
+      consumes:
+      - application/json
+      description: 分页查询
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      - description: 从1开始
+        in: query
+        name: pageIndex
+        type: integer
+      - description: 默认每页10条
+        in: query
+        name: pageSize
+        type: integer
+      - description: 排序字段
+        in: query
+        name: orderField
+        type: string
+      - description: 是否倒序排序
+        in: query
+        name: desc
+        type: boolean
+      - description: 代号或描述
+        in: query
+        name: code
+        type: string
+      produces:
+      - application/octet-stream
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.QueryMaterialChannelLayerResponse'
+      summary: 分页查询
+      tags:
+      - 料架通道管理
+  /api/mom/material/materialchannellayer/update:
+    put:
+      consumes:
+      - application/json
+      description: 更新
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      - description: Update MaterialChannelLayer
+        in: body
+        name: account
+        required: true
+        schema:
+          $ref: '#/definitions/proto.MaterialChannelLayerInfo'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.CommonResponse'
+      summary: 更新
+      tags:
+      - 料架通道管理
   /api/mom/material/materialinfo/add:
     post:
       consumes:
@@ -20534,6 +20778,33 @@ paths:
           schema:
             $ref: '#/definitions/proto.CommonResponse'
       summary: 请求出站接口
+      tags:
+      - WebAPI
+  /api/mom/webapi/production/getproductionprocessstepwithparameter:
+    post:
+      consumes:
+      - application/json
+      description: 获取作业步骤和作业参数
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      - description: GetProductionProcessStepWithParameterRequest
+        in: body
+        name: account
+        required: true
+        schema:
+          $ref: '#/definitions/proto.GetProductionProcessStepWithParameterRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.CommonResponse'
+      summary: 获取作业步骤和作业参数
       tags:
       - WebAPI
   /api/mom/webapi/production/onlineproductinfo:

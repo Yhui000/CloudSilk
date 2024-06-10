@@ -232,6 +232,47 @@ func CheckProductProcessRouteFailure(c *gin.Context) {
 	c.JSON(http.StatusOK, resp)
 }
 
+// GetProductionProcessStepWithParameter godoc
+// @Summary 获取作业步骤和作业参数
+// @Description 获取作业步骤和作业参数
+// @Tags WebAPI
+// @Accept  json
+// @Produce  json
+// @Param authorization header string true "jwt token"
+// @Param account body proto.GetProductionProcessStepWithParameterRequest true "GetProductionProcessStepWithParameterRequest"
+// @Success 200 {object} proto.CommonResponse
+// @Router /api/mom/webapi/production/getproductionprocessstepwithparameter [post]
+func GetProductionProcessStepWithParameter(c *gin.Context) {
+	transID := middleware.GetTransID(c)
+	req := &proto.GetProductionProcessStepWithParameterRequest{}
+	resp := map[string]interface{}{"code": 0}
+
+	if err := c.BindJSON(req); err != nil {
+		resp["code"] = 1
+		resp["message"] = err.Error()
+		c.JSON(http.StatusOK, resp)
+		log.Warnf(context.Background(), "TransID:%s,获取作业步骤和作业参数接口参数无效:%v", transID, err)
+		return
+	}
+
+	if err := middleware.Validate.Struct(req); err != nil {
+		resp["code"] = 1
+		resp["message"] = err.Error()
+		c.JSON(http.StatusOK, resp)
+		return
+	}
+
+	data, err := logic.GetProductionProcessStepWithParameter(req)
+	if err != nil {
+		resp["code"] = 1
+		resp["message"] = err.Error()
+	} else {
+		resp["data"] = data
+	}
+
+	c.JSON(http.StatusOK, resp)
+}
+
 func RegisterProductionRouter(r *gin.Engine) {
 	g := r.Group("/api/mom/webapi/production")
 
@@ -241,4 +282,5 @@ func RegisterProductionRouter(r *gin.Engine) {
 	g.POST("exitproductionstation", ExitProductionStation)
 	g.POST("createproducttestrecord", CreateProductTestRecord)
 	g.POST("checkproductprocessroutefailure", CheckProductProcessRouteFailure)
+	g.POST("getproductionprocessstepwithparameter", GetProductionProcessStepWithParameter)
 }
