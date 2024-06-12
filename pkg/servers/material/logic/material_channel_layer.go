@@ -48,13 +48,14 @@ func GetMaterialChannelLayerByID(id string) (*model.MaterialChannelLayer, error)
 	return m, err
 }
 
-func GetMaterialChannelLayer(req *proto.GetMaterialChannelLayerRequest) ([]*model.MaterialChannelLayer, error) {
-	var m []*model.MaterialChannelLayer
+func GetMaterialChannel(req *proto.GetMaterialChannelRequest) ([]*model.MaterialChannel, error) {
+	var m []*model.MaterialChannel
 	err := model.DB.DB().
-		Preload("ProductionStation").
-		Preload("MaterialChannels").
-		Preload(clause.Associations).
-		Where("production_station_id=?", req.ProductionStationID).Group("light_register_address").Find(m).Error
+		Preload("MaterialChannelLayer").
+		Preload("MaterialInfo").
+		Joins("JOIN material_channel_layers ON material_channels.material_channel_layer_id=material_channel_layers.id").
+		Where("material_channel_layers.production_station_id=?", req.ProductionStationID).Find(&m).Error
+
 	return m, err
 }
 

@@ -12,16 +12,16 @@ type MaterialChannelLayerProvider struct {
 	proto.UnimplementedMaterialChannelLayerServer
 }
 
-func (u *MaterialChannelLayerProvider) Get(ctx context.Context, in *proto.GetMaterialChannelLayerRequest) (*proto.GetAllMaterialChannelLayerResponse, error) {
-	resp := &proto.GetAllMaterialChannelLayerResponse{
+func (u *MaterialChannelLayerProvider) GetMaterialChannel(ctx context.Context, in *proto.GetMaterialChannelRequest) (*proto.GetAllMaterialChannelResponse, error) {
+	resp := &proto.GetAllMaterialChannelResponse{
 		Code: proto.Code_Success,
 	}
-	f, err := logic.GetMaterialChannelLayer(in)
+	f, err := logic.GetMaterialChannel(in)
 	if err != nil {
 		resp.Code = proto.Code_InternalServerError
 		resp.Message = err.Error()
 	} else {
-		resp.Data = model.MaterialChannelLayersToPB(f)
+		resp.Data = model.MaterialChannelsToPB(f)
 	}
 	return resp, nil
 }

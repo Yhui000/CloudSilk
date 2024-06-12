@@ -60,7 +60,7 @@ func Init(serviceMode string) {
 		MaterialTrayBindingRecordClient.Get = materialTrayBindingRecordProvider.Get
 
 		materialChannelLayerProvider := new(mpp.MaterialChannelLayerProvider)
-		MaterialChannelLayerClient.Get = materialChannelLayerProvider.Get
+		MaterialChannelLayerClient.GetMaterialChannel = materialChannelLayerProvider.GetMaterialChannel
 
 		productPackageRecordProvider := new(ppp.ProductPackageRecordProvider)
 		ProductPackageRecordClient.Get = productPackageRecordProvider.Get

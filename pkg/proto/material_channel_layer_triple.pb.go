@@ -28,7 +28,7 @@ const _ = grpc_go.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type MaterialChannelLayerClient interface {
-	Get(ctx context.Context, in *GetMaterialChannelLayerRequest, opts ...grpc_go.CallOption) (*GetAllMaterialChannelLayerResponse, common.ErrorWithAttachment)
+	GetMaterialChannel(ctx context.Context, in *GetMaterialChannelRequest, opts ...grpc_go.CallOption) (*GetAllMaterialChannelResponse, common.ErrorWithAttachment)
 }
 
 type materialChannelLayerClient struct {
@@ -36,7 +36,7 @@ type materialChannelLayerClient struct {
 }
 
 type MaterialChannelLayerClientImpl struct {
-	Get func(ctx context.Context, in *GetMaterialChannelLayerRequest) (*GetAllMaterialChannelLayerResponse, error)
+	GetMaterialChannel func(ctx context.Context, in *GetMaterialChannelRequest) (*GetAllMaterialChannelResponse, error)
 }
 
 func (c *MaterialChannelLayerClientImpl) GetDubboStub(cc *triple.TripleConn) MaterialChannelLayerClient {
@@ -51,17 +51,17 @@ func NewMaterialChannelLayerClient(cc *triple.TripleConn) MaterialChannelLayerCl
 	return &materialChannelLayerClient{cc}
 }
 
-func (c *materialChannelLayerClient) Get(ctx context.Context, in *GetMaterialChannelLayerRequest, opts ...grpc_go.CallOption) (*GetAllMaterialChannelLayerResponse, common.ErrorWithAttachment) {
-	out := new(GetAllMaterialChannelLayerResponse)
+func (c *materialChannelLayerClient) GetMaterialChannel(ctx context.Context, in *GetMaterialChannelRequest, opts ...grpc_go.CallOption) (*GetAllMaterialChannelResponse, common.ErrorWithAttachment) {
+	out := new(GetAllMaterialChannelResponse)
 	interfaceKey := ctx.Value(constant.InterfaceKey).(string)
-	return out, c.cc.Invoke(ctx, "/"+interfaceKey+"/Get", in, out)
+	return out, c.cc.Invoke(ctx, "/"+interfaceKey+"/GetMaterialChannel", in, out)
 }
 
 // MaterialChannelLayerServer is the server API for MaterialChannelLayer service.
 // All implementations must embed UnimplementedMaterialChannelLayerServer
 // for forward compatibility
 type MaterialChannelLayerServer interface {
-	Get(context.Context, *GetMaterialChannelLayerRequest) (*GetAllMaterialChannelLayerResponse, error)
+	GetMaterialChannel(context.Context, *GetMaterialChannelRequest) (*GetAllMaterialChannelResponse, error)
 	mustEmbedUnimplementedMaterialChannelLayerServer()
 }
 
@@ -70,8 +70,8 @@ type UnimplementedMaterialChannelLayerServer struct {
 	proxyImpl protocol.Invoker
 }
 
-func (UnimplementedMaterialChannelLayerServer) Get(context.Context, *GetMaterialChannelLayerRequest) (*GetAllMaterialChannelLayerResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Get not implemented")
+func (UnimplementedMaterialChannelLayerServer) GetMaterialChannel(context.Context, *GetMaterialChannelRequest) (*GetAllMaterialChannelResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetMaterialChannel not implemented")
 }
 func (s *UnimplementedMaterialChannelLayerServer) XXX_SetProxyImpl(impl protocol.Invoker) {
 	s.proxyImpl = impl
@@ -101,8 +101,8 @@ func RegisterMaterialChannelLayerServer(s grpc_go.ServiceRegistrar, srv Material
 	s.RegisterService(&MaterialChannelLayer_ServiceDesc, srv)
 }
 
-func _MaterialChannelLayer_Get_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc_go.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetMaterialChannelLayerRequest)
+func _MaterialChannelLayer_GetMaterialChannel_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc_go.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetMaterialChannelRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -114,7 +114,7 @@ func _MaterialChannelLayer_Get_Handler(srv interface{}, ctx context.Context, dec
 	for k, v := range md {
 		invAttachment[k] = v
 	}
-	invo := invocation.NewRPCInvocation("Get", args, invAttachment)
+	invo := invocation.NewRPCInvocation("GetMaterialChannel", args, invAttachment)
 	if interceptor == nil {
 		result := base.XXX_GetProxyImpl().Invoke(ctx, invo)
 		return result, result.Error()
@@ -138,8 +138,8 @@ var MaterialChannelLayer_ServiceDesc = grpc_go.ServiceDesc{
 	HandlerType: (*MaterialChannelLayerServer)(nil),
 	Methods: []grpc_go.MethodDesc{
 		{
-			MethodName: "Get",
-			Handler:    _MaterialChannelLayer_Get_Handler,
+			MethodName: "GetMaterialChannel",
+			Handler:    _MaterialChannelLayer_GetMaterialChannel_Handler,
 		},
 	},
 	Streams:  []grpc_go.StreamDesc{},

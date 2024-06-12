@@ -5,13 +5,10 @@ option go_package="./;proto";
 
 import "mom_common.proto";
 import "production_line.proto";
+import "material_info.proto";
 
 service MaterialChannelLayer{
-    rpc Get(GetMaterialChannelLayerRequest)returns(GetAllMaterialChannelLayerResponse);
-}
-
-message GetMaterialChannelLayerRequest{
-    string ProductionStationID=1;
+    rpc GetMaterialChannels(GetMaterialChannelRequest)returns(GetAllMaterialChannelResponse);
 }
 
 message MaterialChannelLayerInfo{
@@ -60,4 +57,44 @@ message GetMaterialChannelLayerDetailResponse{
     Code code=1;
     string message=2;
     MaterialChannelLayerInfo data=3;
+}
+
+message MaterialChannelInfo{
+    string id=1;
+    //顺序
+    int32 sortIndex=2;
+    //代号
+    string code=3;
+    //描述
+    string description=4;
+    //尺寸
+    string size=5;
+    //规格
+    float spec=6;
+    //启用监控
+    bool enableMonitor=7;
+    //当前状态
+    string currentState=8;
+    //状态变更时间
+    string lastUpdateTime=9;
+    //备注
+    string remark=10;
+    //物料通道层ID
+    string materialChannelLayerID=11;
+    //物料通道层
+    MaterialChannelLayerInfo materialChannelLayer=12;
+    //物料信息ID
+    string materialInfoID=13;
+    //物料通道层
+    MaterialInfoInfo materialInfo=14;
+}
+
+message GetMaterialChannelRequest{
+    string productionStationID=1;
+}
+
+message GetAllMaterialChannelResponse{
+    Code code=1;
+    string message=2;
+    repeated MaterialChannelInfo data=3;
 }

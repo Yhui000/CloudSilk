@@ -3,6 +3,7 @@ package logic
 import (
 	"context"
 	"fmt"
+	"math"
 	"strings"
 	"time"
 
@@ -780,10 +781,10 @@ func GetProductionProcessStepWithParameter(req *proto.GetProductionProcessStepWi
 	productOrder := _productOrder.Data
 
 	productOrderBoms := []*proto.ProductOrderBomInfo{}
-	// materialNoArray := []string{}
+	materialNoArray := []string{}
 	for _, v := range productOrder.ProductOrderBoms {
 		if v.ProductionProcess == productionProcess.Identifier || v.ProductionProcess == productionProcess.Code {
-			// materialNoArray = append(materialNoArray, v.MaterialNo)
+			materialNoArray = append(materialNoArray, v.MaterialNo)
 			productOrderBoms = append(productOrderBoms, &proto.ProductOrderBomInfo{
 				MaterialNo:          v.MaterialNo,
 				MaterialDescription: v.MaterialDescription,
@@ -798,12 +799,31 @@ func GetProductionProcessStepWithParameter(req *proto.GetProductionProcessStepWi
 		}
 	}
 
-	//TODO
-	_materialChannelLayers, _ := clients.MaterialChannelLayerClient.Get(context.Background(), &proto.GetMaterialChannelLayerRequest{ProductionStationID: productionStation.Id})
-	if _materialChannelLayers.Code != modelcode.Success {
-		return nil, fmt.Errorf(_materialChannelLayers.Message)
+	_materialChannels, _ := clients.MaterialChannelLayerClient.GetMaterialChannel(context.Background(), &proto.GetMaterialChannelRequest{ProductionStationID: productionStation.Id})
+	if _materialChannels.Code != modelcode.Success {
+		return nil, fmt.Errorf(_materialChannels.Message)
 	}
-	materialChannelLayers := _materialChannelLayers.Data
+
+	materialChannelLayers := []map[string]interface{}{}
+	materialChannelGroup := map[int32][]*proto.MaterialChannelInfo{}
+	for _, v := range _materialChannels.Data {
+		materialChannelGroup[v.MaterialChannelLayer.LightRegisterAddress] = append(materialChannelGroup[v.MaterialChannelLayer.LightRegisterAddress], v)
+	}
+	for k, _materialChannels := range materialChannelGroup {
+		var lightRegisterValue int32
+		for _, v := range _materialChannels {
+			for _, materialNo := range materialNoArray {
+				if materialNo == v.MaterialInfo.MaterialNo {
+					lightRegisterValue += int32(math.Pow(2, float64(v.SortIndex)-1))
+					break
+				}
+			}
+		}
+		materialChannelLayers = append(materialChannelLayers, map[string]interface{}{
+			"lightRegisterAddress": k,
+			"lightRegisterValue":   lightRegisterValue,
+		})
+	}
 
 	_productionProcessStep, _ := clients.ProductionProcessStepClient.Query(context.Background(), &proto.QueryProductionProcessStepRequest{
 		SortConfig:          `{"sort_index": ""}`,
@@ -1354,186 +1374,46 @@ func ExitProductionStation(req *proto.ExitProductionStationRequest) (*proto.Comm
 	return &proto.CommonResponse{Code: 0}, nil
 }
 
-// 创建产品测试记录
-func CreateProductTestRecord(req *proto.CreateProductTestRecordRequest) (*proto.CommonResponse, error) {
-	if req.TestStartTime == "" {
-		return CommonFailureResponse("TestStartTime不能为空")
-	}
-	if req.TestEndTime == "" {
-		return CommonFailureResponse("TestEndTime不能为空")
-	}
-	if req.TestData == "" {
-		return CommonFailureResponse("TestData不能为空")
-	}
-	if req.ProductionStation == "" {
-		return CommonFailureResponse("ProductionStation不能为空")
-	}
-	if req.ProductSerialNo == "" {
-		return CommonFailureResponse("ProductSerialNo不能为空")
-	}
-	if req.TestProject == "" {
-		return CommonFailureResponse("TestProject不能为空")
-	}
-	timeNow := time.Now()
-	timeNowStr := timeNow.Format("2006-01-02 15:04:05")
-	req.ProductSerialNo = strings.Trim(strings.Trim(req.ProductSerialNo, "\000"), "\r")
-	_productInfo, err := clients.ProductInfoClient.Get(context.Background(), &proto.GetProductInfoRequest{ProductSerialNo: req.ProductSerialNo})
-	if err == gorm.ErrRecordNotFound {
-		return CommonFailureResponse("无效的产品信息")
-	} else if err != nil {
-		return nil, err
-	}
-	productInfo := _productInfo.Data
-
-	_productionProcessStep, err := clients.ProductionProcessStepClient.Get(context.Background(), &proto.GetProductionProcessStepRequest{Code: req.TestProject})
-	if err == gorm.ErrRecordNotFound {
-		return CommonFailureResponse("无效的测试项目")
-	} else if err != nil {
-		return nil, err
-	}
-	productionProcessStep := _productionProcessStep.Data
-
-	if productInfo.ProductionProcessID == "" && productionProcessStep.ProcessControl {
-		return CommonFailureResponse("无法获取产品的当前工序")
-	}
-	_ProductionProcess, err := clients.ProductionProcessClient.GetDetail(context.Background(), &proto.GetDetailRequest{Id: productInfo.ProductionProcessID})
-	if err != nil && err != gorm.ErrRecordNotFound {
-		return nil, err
-	}
-	productionProcess := _ProductionProcess.Data
-	if productionProcessStep.ProcessControl {
-		if productionProcess == nil {
-			return CommonFailureResponse("读取产品的当前工序失败")
-		}
-
-		var hasProductionStation bool
-		for _, v := range productionProcess.ProductionProcessAvailableStations {
-			if v.ProductionStation.Code == req.ProductionStation {
-				hasProductionStation = true
-				break
-			}
-		}
-		if productionProcess.EnableControl && !hasProductionStation {
-			return CommonFailureResponse("非法操作，产品的当前工序不支持在此工位进行")
-		}
-	}
-
-	_productionStation, err := clients.ProductionStationClient.Get(context.Background(), &proto.GetProductionStationRequest{Code: req.ProductionStation})
-	if err == gorm.ErrRecordNotFound {
-		return CommonFailureResponse("无效的产线工位")
-	} else if err != nil {
-		return nil, err
-	}
-	productionStation := _productionStation.Data
-
-	testEndTime, err := time.Parse("2006-01-02 15:04:05", req.TestEndTime)
-	if err != nil {
-		return nil, err
-	}
-	testStartTime, err := time.Parse("2006-01-02 15:04:05", req.TestStartTime)
-	if err != nil {
-		return nil, err
-	}
-
-	productTestRecord := &proto.ProductTestRecordInfo{
-		ProductionProcessStepID: productionProcessStep.Id,
-		ProductInfoID:           productInfo.Id,
-		ProductionProcessID:     productionProcess.Id,
-		ProductionStationID:     productionStation.Id,
-		TestUserID:              productionStation.CurrentUserID,
-		TestData:                req.TestData,
-		TestEndTime:             req.TestEndTime,
-		TestStartTime:           req.TestStartTime,
-		Duration:                int32(testEndTime.Sub(testStartTime).Seconds()),
-		IsQualified:             req.IsQualified,
-	}
-	if _, err := clients.ProductTestRecordClient.Add(context.Background(), productTestRecord); err != nil {
-		return nil, err
-	}
-
-	if productionProcess != nil && productionProcess.Identifier != "" {
-		//创建系统事件上报测试数据
-		_systemEvent, err := clients.SystemEventClient.Get(context.Background(), &proto.GetSystemEventRequest{Code: types.SystemEventProductInfoTested, Enable: true})
-		switch err {
-		case nil:
-			systemEvent := _systemEvent.Data
-			systemEventTrigger := &proto.SystemEventTriggerInfo{
-				SystemEventID: systemEvent.Id,
-				CreateTime:    timeNowStr,
-				EventNo:       uuid.NewString(),
-				CurrentState:  types.SystemEventTriggerStateWaitExecute,
-			}
-
-			for _, _systemEventParameter := range systemEvent.SystemEventParameters {
-				value := _systemEventParameter.Value
-				if _systemEventParameter.Name == "TestData" {
-					value = productTestRecord.TestData
-				}
-				value = strings.ReplaceAll(value, "{ProductSerialNo}", productInfo.ProductSerialNo)
-				value = strings.ReplaceAll(value, "{ProductionStation}", productionStation.Code)
-				value = strings.ReplaceAll(value, "{ProductionProcessIdentifier}", productionProcess.Identifier)
-				value = strings.ReplaceAll(value, "{ProductionProcess}", productionProcess.Code)
-
-				systemEventTrigger.SystemEventTriggerParameters = append(systemEventTrigger.SystemEventTriggerParameters, &proto.SystemEventTriggerParameterInfo{
-					DataType:    _systemEventParameter.DataType,
-					Name:        _systemEventParameter.Name,
-					Description: _systemEventParameter.Description,
-					Value:       value,
-				})
-			}
-
-			if _, err := clients.SystemEventTriggerClient.Add(context.Background(), systemEventTrigger); err != nil {
-				return nil, err
-			}
-		case gorm.ErrRecordNotFound:
-		default:
-			return nil, err
-		}
-	}
-
-	return &proto.CommonResponse{Code: types.ServiceResponseCodeSuccess, Message: "创建成功"}, nil
-}
-
 // 设置失败后续处理
-func CheckProductProcessRouteFailure(req *proto.CheckProductProcessRouteFailureRequest) (*proto.CommonResponse, error) {
+func CheckProductProcessRouteFailure(req *proto.CheckProductProcessRouteFailureRequest) error {
 	if req.ProductionStation == "" {
-		return CommonFailureResponse("ProductionStation不能为空")
+		return fmt.Errorf("ProductionStation不能为空")
 	}
 	if req.ProductSerialNo == "" {
-		return CommonFailureResponse("ProductSerialNo不能为空")
+		return fmt.Errorf("ProductSerialNo不能为空")
 	}
 
 	timeNow := time.Now()
 	timeNowStr := timeNow.Format("2006-01-02 15:04:05")
-	_productionStation, err := clients.ProductionStationClient.Get(context.Background(), &proto.GetProductionStationRequest{Code: req.ProductionStation})
-	if err == gorm.ErrRecordNotFound {
-		return CommonFailureResponse("无效的工站代号")
-	} else if err != nil {
-		return nil, err
+	_productionStation, _ := clients.ProductionStationClient.Get(context.Background(), &proto.GetProductionStationRequest{Code: req.ProductionStation})
+	if _productionStation.Message == gorm.ErrRecordNotFound.Error() {
+		return fmt.Errorf("无效的工站代号")
+	} else if _productionStation.Code != modelcode.Success {
+		return fmt.Errorf(_productionStation.Message)
 	}
 	productionStation := _productionStation.Data
 
-	_productInfo, err := clients.ProductInfoClient.Get(context.Background(), &proto.GetProductInfoRequest{ProductSerialNo: req.ProductSerialNo})
-	if err == gorm.ErrRecordNotFound {
-		return CommonFailureResponse("无效的产品序列号")
-	} else if err != nil {
-		return nil, err
+	_productInfo, _ := clients.ProductInfoClient.Get(context.Background(), &proto.GetProductInfoRequest{ProductSerialNo: req.ProductSerialNo})
+	if _productInfo.Message == gorm.ErrRecordNotFound.Error() {
+		return fmt.Errorf("无效的产品序列号")
+	} else if _productInfo.Code != modelcode.Success {
+		return fmt.Errorf(_productInfo.Message)
 	}
 	productInfo := _productInfo.Data
 
 	if productInfo.ProductionProcessID == "" {
-		return CommonFailureResponse("数据错误，此产品的当前工序为空")
+		return fmt.Errorf("数据错误，此产品的当前工序为空")
 	}
 
-	_productProcessRoute, err := clients.ProductProcessRouteClient.Get(context.Background(), &proto.GetProductProcessRouteRequest{
+	_productProcessRoute, _ := clients.ProductProcessRouteClient.Get(context.Background(), &proto.GetProductProcessRouteRequest{
 		CurrentProcessID: productInfo.ProductionProcessID,
 		ProductInfoID:    productInfo.Id,
 		CurrentStates:    []string{types.ProductProcessRouteStateChecking},
 	})
-	if err == gorm.ErrRecordNotFound {
-		return CommonFailureResponse("状态错误，此产品的当前工艺状态不是" + types.ProductProcessRouteStateChecking)
-	} else if err != nil {
-		return nil, err
+	if _productProcessRoute.Message == gorm.ErrRecordNotFound.Error() {
+		return fmt.Errorf("状态错误，此产品的当前工艺状态不是" + types.ProductProcessRouteStateChecking)
+	} else if _productProcessRoute.Code != modelcode.Success {
+		return fmt.Errorf(_productProcessRoute.Message)
 	}
 	lastProductProcessRoute := _productProcessRoute.Data
 
@@ -1560,8 +1440,8 @@ func CheckProductProcessRouteFailure(req *proto.CheckProductProcessRouteFailureR
 			ReworkTime:          timeNowStr,
 			ReworkReason:        lastProductProcessRoute.Remark,
 		}
-		if _, err := clients.ProductReworkRecordClient.Add(context.Background(), productReworkRecord); err != nil {
-			return nil, err
+		if resp, _ := clients.ProductReworkRecordClient.Add(context.Background(), productReworkRecord); resp.Code != modelcode.Success {
+			return fmt.Errorf(resp.Message)
 		}
 
 		productInfo.CurrentState = types.ProductStateReworking
@@ -1569,30 +1449,30 @@ func CheckProductProcessRouteFailure(req *proto.CheckProductProcessRouteFailureR
 		lastProductProcessRoute.CurrentState = types.ProductProcessRouteStateProcessed
 
 		//切换到下个工艺
-		_productProcessRoutes, err := clients.ProductProcessRouteClient.Query(context.Background(), &proto.QueryProductProcessRouteRequest{
+		_productProcessRoutes, _ := clients.ProductProcessRouteClient.Query(context.Background(), &proto.QueryProductProcessRouteRequest{
 			PageSize:      1,
 			SortConfig:    `{"route_index": "asc"}`,
 			ProductInfoID: productInfo.Id,
 			RouteIndex:    lastProductProcessRoute.RouteIndex,
 			CurrentState:  types.ProductProcessRouteStateWaitProcess,
 		})
-		if err != nil {
-			return nil, err
+		if _productProcessRoutes.Code != modelcode.Success {
+			return fmt.Errorf(_productProcessRoutes.Message)
 		}
 		var nextProductProcessRoute *proto.ProductProcessRouteInfo
 		if len(_productProcessRoutes.Data) > 0 {
 			nextProductProcessRoute = _productProcessRoutes.Data[0]
 		}
 		if nextProductProcessRoute == nil {
-			_productOrderProcesses, err := clients.ProductOrderProcessClient.Query(context.Background(), &proto.QueryProductOrderProcessRequest{
+			_productOrderProcesses, _ := clients.ProductOrderProcessClient.Query(context.Background(), &proto.QueryProductOrderProcessRequest{
 				PageSize:       1,
 				SortConfig:     `{"route_index": "asc"}`,
 				ProductOrderID: productInfo.ProductOrderID,
 				Enable:         true,
 				SortIndex:      lastProductProcessRoute.RouteIndex,
 			})
-			if err != nil {
-				return nil, err
+			if _productOrderProcesses.Code != modelcode.Success {
+				return fmt.Errorf(_productOrderProcesses.Message)
 			}
 			if len(_productOrderProcesses.Data) == 0 {
 				productOrderProcess := _productOrderProcesses.Data[0]
@@ -1605,8 +1485,8 @@ func CheckProductProcessRouteFailure(req *proto.CheckProductProcessRouteFailureR
 					RouteIndex:       productOrderProcess.SortIndex,
 					ProductInfoID:    productInfo.Id,
 				}
-				if _, err := clients.ProductProcessRouteClient.Add(context.Background(), nextProductProcessRoute); err != nil {
-					return nil, err
+				if resp, _ := clients.ProductProcessRouteClient.Add(context.Background(), nextProductProcessRoute); resp.Code != modelcode.Success {
+					return fmt.Errorf(resp.Message)
 				}
 			}
 
@@ -1620,17 +1500,20 @@ func CheckProductProcessRouteFailure(req *proto.CheckProductProcessRouteFailureR
 				}
 				productInfo.ProductionProcessID = nextProductProcessRoute.CurrentProcessID
 				//TODO: 计算预计下线时间
-				_productProcessRoutes, err := clients.ProductProcessRouteClient.Query(context.Background(), &proto.QueryProductProcessRouteRequest{
+				_productProcessRoutes, _ := clients.ProductProcessRouteClient.Query(context.Background(), &proto.QueryProductProcessRouteRequest{
 					ProductInfoID: productInfo.Id,
 					CurrentState:  types.ProductProcessRouteStateWaitProcess,
 				})
-				if err != nil {
-					return nil, err
+				if _productProcessRoutes.Code != modelcode.Success {
+					return fmt.Errorf(_productProcessRoutes.Message)
 				}
 				remainingRoutes := int32(_productProcessRoutes.Total)
 				productInfo.RemainingRoutes = remainingRoutes
 				if remainingRoutes > 0 {
 					productInfo.EstimateTime = timeNow.Add(time.Duration(remainingRoutes*productInfo.ProductOrder.StandardWorkTime) * time.Second).Format("2006-01-02 15:04:05")
+				}
+				if resp, _ := clients.ProductProcessRouteClient.Update(context.Background(), nextProductProcessRoute); resp.Code != modelcode.Success {
+					return fmt.Errorf(resp.Message)
 				}
 			} else {
 				productInfo.CurrentState = types.ProductStateCompleted
@@ -1639,12 +1522,149 @@ func CheckProductProcessRouteFailure(req *proto.CheckProductProcessRouteFailureR
 			}
 		}
 	default:
-		return CommonFailureResponse("无效的处理方式")
+		return fmt.Errorf("无效的处理方式")
 	}
 
-	return &proto.CommonResponse{Code: types.ServiceResponseCodeSuccess, Message: "处理完成"}, nil
+	if resp, _ := clients.ProductInfoClient.Update(context.Background(), productInfo); resp.Code != modelcode.Success {
+		return fmt.Errorf(resp.Message)
+	}
+	if resp, _ := clients.ProductProcessRouteClient.Update(context.Background(), lastProductProcessRoute); resp.Code != modelcode.Success {
+		return fmt.Errorf(resp.Message)
+	}
+
+	return nil
 }
 
-func CommonFailureResponse(message string) (*proto.CommonResponse, error) {
-	return &proto.CommonResponse{Code: types.ServiceResponseCodeFailure, Message: message}, nil
+// 创建产品作业记录
+func CreateProductWorkRecord() {
+
 }
+
+// 创建产品测试记录
+// func CreateProductTestRecord(req *proto.CreateProductTestRecordRequest) error {
+// 	if req.TestStartTime == "" {
+// 		return fmt.Errorf("TestStartTime不能为空")
+// 	}
+// 	if req.TestEndTime == "" {
+// 		return fmt.Errorf("TestEndTime不能为空")
+// 	}
+// 	if req.TestData == "" {
+// 		return fmt.Errorf("TestData不能为空")
+// 	}
+// 	if req.ProductionStation == "" {
+// 		return fmt.Errorf("ProductionStation不能为空")
+// 	}
+// 	if req.ProductSerialNo == "" {
+// 		return fmt.Errorf("ProductSerialNo不能为空")
+// 	}
+// 	if req.TestProject == "" {
+// 		return fmt.Errorf("TestProject不能为空")
+// 	}
+// 	timeNow := time.Now()
+// 	timeNowStr := timeNow.Format("2006-01-02 15:04:05")
+// 	req.ProductSerialNo = strings.Trim(strings.Trim(req.ProductSerialNo, "\000"), "\r")
+// 	_productInfo, err := clients.ProductInfoClient.Get(context.Background(), &proto.GetProductInfoRequest{ProductSerialNo: req.ProductSerialNo})
+// 	if err == gorm.ErrRecordNotFound {
+// 		return fmt.Errorf("无效的产品信息")
+// 	} else if err != nil {
+// 		return nil, err
+// 	}
+// 	productInfo := _productInfo.Data
+// 	_productionProcessStep, err := clients.ProductionProcessStepClient.Get(context.Background(), &proto.GetProductionProcessStepRequest{Code: req.TestProject})
+// 	if err == gorm.ErrRecordNotFound {
+// 		return fmt.Errorf("无效的测试项目")
+// 	} else if err != nil {
+// 		return nil, err
+// 	}
+// 	productionProcessStep := _productionProcessStep.Data
+// 	if productInfo.ProductionProcessID == "" && productionProcessStep.ProcessControl {
+// 		return fmt.Errorf("无法获取产品的当前工序")
+// 	}
+// 	_ProductionProcess, err := clients.ProductionProcessClient.GetDetail(context.Background(), &proto.GetDetailRequest{Id: productInfo.ProductionProcessID})
+// 	if err != nil && err != gorm.ErrRecordNotFound {
+// 		return nil, err
+// 	}
+// 	productionProcess := _ProductionProcess.Data
+// 	if productionProcessStep.ProcessControl {
+// 		if productionProcess == nil {
+// 			return fmt.Errorf("读取产品的当前工序失败")
+// 		}
+// 		var hasProductionStation bool
+// 		for _, v := range productionProcess.ProductionProcessAvailableStations {
+// 			if v.ProductionStation.Code == req.ProductionStation {
+// 				hasProductionStation = true
+// 				break
+// 			}
+// 		}
+// 		if productionProcess.EnableControl && !hasProductionStation {
+// 			return fmt.Errorf("非法操作，产品的当前工序不支持在此工位进行")
+// 		}
+// 	}
+// 	_productionStation, err := clients.ProductionStationClient.Get(context.Background(), &proto.GetProductionStationRequest{Code: req.ProductionStation})
+// 	if err == gorm.ErrRecordNotFound {
+// 		return fmt.Errorf("无效的产线工位")
+// 	} else if err != nil {
+// 		return nil, err
+// 	}
+// 	productionStation := _productionStation.Data
+// 	testEndTime, err := time.Parse("2006-01-02 15:04:05", req.TestEndTime)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	testStartTime, err := time.Parse("2006-01-02 15:04:05", req.TestStartTime)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	productTestRecord := &proto.ProductTestRecordInfo{
+// 		ProductionProcessStepID: productionProcessStep.Id,
+// 		ProductInfoID:           productInfo.Id,
+// 		ProductionProcessID:     productionProcess.Id,
+// 		ProductionStationID:     productionStation.Id,
+// 		TestUserID:              productionStation.CurrentUserID,
+// 		TestData:                req.TestData,
+// 		TestEndTime:             req.TestEndTime,
+// 		TestStartTime:           req.TestStartTime,
+// 		Duration:                int32(testEndTime.Sub(testStartTime).Seconds()),
+// 		IsQualified:             req.IsQualified,
+// 	}
+// 	if _, err := clients.ProductTestRecordClient.Add(context.Background(), productTestRecord); err != nil {
+// 		return nil, err
+// 	}
+// 	if productionProcess != nil && productionProcess.Identifier != "" {
+// 		//创建系统事件上报测试数据
+// 		_systemEvent, err := clients.SystemEventClient.Get(context.Background(), &proto.GetSystemEventRequest{Code: types.SystemEventProductInfoTested, Enable: true})
+// 		switch err {
+// 		case nil:
+// 			systemEvent := _systemEvent.Data
+// 			systemEventTrigger := &proto.SystemEventTriggerInfo{
+// 				SystemEventID: systemEvent.Id,
+// 				CreateTime:    timeNowStr,
+// 				EventNo:       uuid.NewString(),
+// 				CurrentState:  types.SystemEventTriggerStateWaitExecute,
+// 			}
+// 			for _, _systemEventParameter := range systemEvent.SystemEventParameters {
+// 				value := _systemEventParameter.Value
+// 				if _systemEventParameter.Name == "TestData" {
+// 					value = productTestRecord.TestData
+// 				}
+// 				value = strings.ReplaceAll(value, "{ProductSerialNo}", productInfo.ProductSerialNo)
+// 				value = strings.ReplaceAll(value, "{ProductionStation}", productionStation.Code)
+// 				value = strings.ReplaceAll(value, "{ProductionProcessIdentifier}", productionProcess.Identifier)
+// 				value = strings.ReplaceAll(value, "{ProductionProcess}", productionProcess.Code)
+// 				systemEventTrigger.SystemEventTriggerParameters = append(systemEventTrigger.SystemEventTriggerParameters, &proto.SystemEventTriggerParameterInfo{
+// 					DataType:    _systemEventParameter.DataType,
+// 					Name:        _systemEventParameter.Name,
+// 					Description: _systemEventParameter.Description,
+// 					Value:       value,
+// 				})
+// 			}
+// 			if _, err := clients.SystemEventTriggerClient.Add(context.Background(), systemEventTrigger); err != nil {
+// 				return nil, err
+// 			}
+// 		case gorm.ErrRecordNotFound:
+// 		default:
+// 			return nil, err
+// 		}
+// 	}
+// 	return &proto.CommonResponse{Code: types.ServiceResponseCodeSuccess, Message: "创建成功"}, nil
+// }

@@ -75,11 +75,16 @@ func GetProductProcessRouteByID(id string) (*model.ProductProcessRoute, error) {
 
 func GetProductProcessRoute(req *proto.GetProductProcessRouteRequest) (*model.ProductProcessRoute, error) {
 	m := &model.ProductProcessRoute{}
-	err := model.DB.DB().First(m, map[string]interface{}{
-		"product_info_id":    req.ProductInfoID,
-		"current_process_id": req.CurrentProcessID,
-		"current_state":      req.CurrentStates,
-	}).Error
+	err := model.DB.DB().
+		Preload("LastProcess").
+		Preload("CurrentProcess").
+		Preload("ProductionStation").
+		Preload("ProductInfo").
+		First(m, map[string]interface{}{
+			"product_info_id":    req.ProductInfoID,
+			"current_process_id": req.CurrentProcessID,
+			"current_state":      req.CurrentStates,
+		}).Error
 
 	return m, err
 }
