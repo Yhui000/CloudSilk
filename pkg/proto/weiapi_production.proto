@@ -113,6 +113,40 @@ message GetProductionProcessStepWithParameterData{
     repeated ProductOrderAttributeInfo productOrderAttributes=6;
 }
 
+message CreateProductProcessRecordRequest{
+    //产品序列号
+    string productSerialNo=1;
+    //工位代号
+    string productionStation=2;
+    //工艺代号
+    string productionProcess=3;
+    //作业类型
+    string processStepType=4;
+    //作业描述
+    string workDescription=5;
+    //作业数据
+    string workData=6;
+    //作业结果
+    string workResult=7;
+}
+
+message CreateProductWorkRecordRequest{
+    //产品序列号
+    string ProductSerialNo=1;
+    //产线工位
+    string ProductionStation=2;
+    //作业步骤
+    string ProductionProcessStep=3;
+    //起始时间
+    string WorkStartTime=4;
+    //结束时间
+    string WorkEndTime=5;
+    //作业数据
+    string WorkData=6;
+    //是否合格
+    bool IsQualified=7;
+}
+
 // message GetProductionStationExhibitionResponse{
 //     int32 code=1;
 //     string message=2;

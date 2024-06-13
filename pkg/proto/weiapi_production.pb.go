@@ -941,6 +941,210 @@ func (x *GetProductionProcessStepWithParameterData) GetProductOrderAttributes() 
 	return nil
 }
 
+type CreateProductProcessRecordRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// 产品序列号
+	ProductSerialNo string `protobuf:"bytes,1,opt,name=productSerialNo,proto3" json:"productSerialNo"`
+	// 工位代号
+	ProductionStation string `protobuf:"bytes,2,opt,name=productionStation,proto3" json:"productionStation"`
+	// 工艺代号
+	ProductionProcess string `protobuf:"bytes,3,opt,name=productionProcess,proto3" json:"productionProcess"`
+	// 作业类型
+	ProcessStepType string `protobuf:"bytes,4,opt,name=processStepType,proto3" json:"processStepType"`
+	// 作业描述
+	WorkDescription string `protobuf:"bytes,5,opt,name=workDescription,proto3" json:"workDescription"`
+	// 作业数据
+	WorkData string `protobuf:"bytes,6,opt,name=workData,proto3" json:"workData"`
+	// 作业结果
+	WorkResult string `protobuf:"bytes,7,opt,name=workResult,proto3" json:"workResult"`
+}
+
+func (x *CreateProductProcessRecordRequest) Reset() {
+	*x = CreateProductProcessRecordRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_weiapi_production_proto_msgTypes[11]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *CreateProductProcessRecordRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateProductProcessRecordRequest) ProtoMessage() {}
+
+func (x *CreateProductProcessRecordRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_weiapi_production_proto_msgTypes[11]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateProductProcessRecordRequest.ProtoReflect.Descriptor instead.
+func (*CreateProductProcessRecordRequest) Descriptor() ([]byte, []int) {
+	return file_weiapi_production_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *CreateProductProcessRecordRequest) GetProductSerialNo() string {
+	if x != nil {
+		return x.ProductSerialNo
+	}
+	return ""
+}
+
+func (x *CreateProductProcessRecordRequest) GetProductionStation() string {
+	if x != nil {
+		return x.ProductionStation
+	}
+	return ""
+}
+
+func (x *CreateProductProcessRecordRequest) GetProductionProcess() string {
+	if x != nil {
+		return x.ProductionProcess
+	}
+	return ""
+}
+
+func (x *CreateProductProcessRecordRequest) GetProcessStepType() string {
+	if x != nil {
+		return x.ProcessStepType
+	}
+	return ""
+}
+
+func (x *CreateProductProcessRecordRequest) GetWorkDescription() string {
+	if x != nil {
+		return x.WorkDescription
+	}
+	return ""
+}
+
+func (x *CreateProductProcessRecordRequest) GetWorkData() string {
+	if x != nil {
+		return x.WorkData
+	}
+	return ""
+}
+
+func (x *CreateProductProcessRecordRequest) GetWorkResult() string {
+	if x != nil {
+		return x.WorkResult
+	}
+	return ""
+}
+
+type CreateProductWorkRecordRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// 产品序列号
+	ProductSerialNo string `protobuf:"bytes,1,opt,name=ProductSerialNo,proto3" json:"ProductSerialNo"`
+	// 产线工位
+	ProductionStation string `protobuf:"bytes,2,opt,name=ProductionStation,proto3" json:"ProductionStation"`
+	// 作业步骤
+	ProductionProcessStep string `protobuf:"bytes,3,opt,name=ProductionProcessStep,proto3" json:"ProductionProcessStep"`
+	// 起始时间
+	WorkStartTime string `protobuf:"bytes,4,opt,name=WorkStartTime,proto3" json:"WorkStartTime"`
+	// 结束时间
+	WorkEndTime string `protobuf:"bytes,5,opt,name=WorkEndTime,proto3" json:"WorkEndTime"`
+	// 作业数据
+	WorkData string `protobuf:"bytes,6,opt,name=WorkData,proto3" json:"WorkData"`
+	// 是否合格
+	IsQualified bool `protobuf:"varint,7,opt,name=IsQualified,proto3" json:"IsQualified"`
+}
+
+func (x *CreateProductWorkRecordRequest) Reset() {
+	*x = CreateProductWorkRecordRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_weiapi_production_proto_msgTypes[12]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *CreateProductWorkRecordRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateProductWorkRecordRequest) ProtoMessage() {}
+
+func (x *CreateProductWorkRecordRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_weiapi_production_proto_msgTypes[12]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateProductWorkRecordRequest.ProtoReflect.Descriptor instead.
+func (*CreateProductWorkRecordRequest) Descriptor() ([]byte, []int) {
+	return file_weiapi_production_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *CreateProductWorkRecordRequest) GetProductSerialNo() string {
+	if x != nil {
+		return x.ProductSerialNo
+	}
+	return ""
+}
+
+func (x *CreateProductWorkRecordRequest) GetProductionStation() string {
+	if x != nil {
+		return x.ProductionStation
+	}
+	return ""
+}
+
+func (x *CreateProductWorkRecordRequest) GetProductionProcessStep() string {
+	if x != nil {
+		return x.ProductionProcessStep
+	}
+	return ""
+}
+
+func (x *CreateProductWorkRecordRequest) GetWorkStartTime() string {
+	if x != nil {
+		return x.WorkStartTime
+	}
+	return ""
+}
+
+func (x *CreateProductWorkRecordRequest) GetWorkEndTime() string {
+	if x != nil {
+		return x.WorkEndTime
+	}
+	return ""
+}
+
+func (x *CreateProductWorkRecordRequest) GetWorkData() string {
+	if x != nil {
+		return x.WorkData
+	}
+	return ""
+}
+
+func (x *CreateProductWorkRecordRequest) GetIsQualified() bool {
+	if x != nil {
+		return x.IsQualified
+	}
+	return false
+}
+
 var File_weiapi_production_proto protoreflect.FileDescriptor
 
 var file_weiapi_production_proto_rawDesc = []byte{
@@ -1127,8 +1331,48 @@ var file_weiapi_production_proto_rawDesc = []byte{
 	0x0b, 0x32, 0x20, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x50, 0x72, 0x6f, 0x64, 0x75, 0x63,
 	0x74, 0x4f, 0x72, 0x64, 0x65, 0x72, 0x41, 0x74, 0x74, 0x72, 0x69, 0x62, 0x75, 0x74, 0x65, 0x49,
 	0x6e, 0x66, 0x6f, 0x52, 0x16, 0x70, 0x72, 0x6f, 0x64, 0x75, 0x63, 0x74, 0x4f, 0x72, 0x64, 0x65,
-	0x72, 0x41, 0x74, 0x74, 0x72, 0x69, 0x62, 0x75, 0x74, 0x65, 0x73, 0x42, 0x0a, 0x5a, 0x08, 0x2e,
-	0x2f, 0x3b, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x72, 0x41, 0x74, 0x74, 0x72, 0x69, 0x62, 0x75, 0x74, 0x65, 0x73, 0x22, 0xb9, 0x02, 0x0a, 0x21,
+	0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x50, 0x72, 0x6f, 0x64, 0x75, 0x63, 0x74, 0x50, 0x72, 0x6f,
+	0x63, 0x65, 0x73, 0x73, 0x52, 0x65, 0x63, 0x6f, 0x72, 0x64, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
+	0x74, 0x12, 0x28, 0x0a, 0x0f, 0x70, 0x72, 0x6f, 0x64, 0x75, 0x63, 0x74, 0x53, 0x65, 0x72, 0x69,
+	0x61, 0x6c, 0x4e, 0x6f, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0f, 0x70, 0x72, 0x6f, 0x64,
+	0x75, 0x63, 0x74, 0x53, 0x65, 0x72, 0x69, 0x61, 0x6c, 0x4e, 0x6f, 0x12, 0x2c, 0x0a, 0x11, 0x70,
+	0x72, 0x6f, 0x64, 0x75, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x53, 0x74, 0x61, 0x74, 0x69, 0x6f, 0x6e,
+	0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x11, 0x70, 0x72, 0x6f, 0x64, 0x75, 0x63, 0x74, 0x69,
+	0x6f, 0x6e, 0x53, 0x74, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x2c, 0x0a, 0x11, 0x70, 0x72, 0x6f,
+	0x64, 0x75, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x50, 0x72, 0x6f, 0x63, 0x65, 0x73, 0x73, 0x18, 0x03,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x11, 0x70, 0x72, 0x6f, 0x64, 0x75, 0x63, 0x74, 0x69, 0x6f, 0x6e,
+	0x50, 0x72, 0x6f, 0x63, 0x65, 0x73, 0x73, 0x12, 0x28, 0x0a, 0x0f, 0x70, 0x72, 0x6f, 0x63, 0x65,
+	0x73, 0x73, 0x53, 0x74, 0x65, 0x70, 0x54, 0x79, 0x70, 0x65, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09,
+	0x52, 0x0f, 0x70, 0x72, 0x6f, 0x63, 0x65, 0x73, 0x73, 0x53, 0x74, 0x65, 0x70, 0x54, 0x79, 0x70,
+	0x65, 0x12, 0x28, 0x0a, 0x0f, 0x77, 0x6f, 0x72, 0x6b, 0x44, 0x65, 0x73, 0x63, 0x72, 0x69, 0x70,
+	0x74, 0x69, 0x6f, 0x6e, 0x18, 0x05, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0f, 0x77, 0x6f, 0x72, 0x6b,
+	0x44, 0x65, 0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x1a, 0x0a, 0x08, 0x77,
+	0x6f, 0x72, 0x6b, 0x44, 0x61, 0x74, 0x61, 0x18, 0x06, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x77,
+	0x6f, 0x72, 0x6b, 0x44, 0x61, 0x74, 0x61, 0x12, 0x1e, 0x0a, 0x0a, 0x77, 0x6f, 0x72, 0x6b, 0x52,
+	0x65, 0x73, 0x75, 0x6c, 0x74, 0x18, 0x07, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x77, 0x6f, 0x72,
+	0x6b, 0x52, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x22, 0xb4, 0x02, 0x0a, 0x1e, 0x43, 0x72, 0x65, 0x61,
+	0x74, 0x65, 0x50, 0x72, 0x6f, 0x64, 0x75, 0x63, 0x74, 0x57, 0x6f, 0x72, 0x6b, 0x52, 0x65, 0x63,
+	0x6f, 0x72, 0x64, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x28, 0x0a, 0x0f, 0x50, 0x72,
+	0x6f, 0x64, 0x75, 0x63, 0x74, 0x53, 0x65, 0x72, 0x69, 0x61, 0x6c, 0x4e, 0x6f, 0x18, 0x01, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x0f, 0x50, 0x72, 0x6f, 0x64, 0x75, 0x63, 0x74, 0x53, 0x65, 0x72, 0x69,
+	0x61, 0x6c, 0x4e, 0x6f, 0x12, 0x2c, 0x0a, 0x11, 0x50, 0x72, 0x6f, 0x64, 0x75, 0x63, 0x74, 0x69,
+	0x6f, 0x6e, 0x53, 0x74, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x11, 0x50, 0x72, 0x6f, 0x64, 0x75, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x53, 0x74, 0x61, 0x74, 0x69,
+	0x6f, 0x6e, 0x12, 0x34, 0x0a, 0x15, 0x50, 0x72, 0x6f, 0x64, 0x75, 0x63, 0x74, 0x69, 0x6f, 0x6e,
+	0x50, 0x72, 0x6f, 0x63, 0x65, 0x73, 0x73, 0x53, 0x74, 0x65, 0x70, 0x18, 0x03, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x15, 0x50, 0x72, 0x6f, 0x64, 0x75, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x50, 0x72, 0x6f,
+	0x63, 0x65, 0x73, 0x73, 0x53, 0x74, 0x65, 0x70, 0x12, 0x24, 0x0a, 0x0d, 0x57, 0x6f, 0x72, 0x6b,
+	0x53, 0x74, 0x61, 0x72, 0x74, 0x54, 0x69, 0x6d, 0x65, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x0d, 0x57, 0x6f, 0x72, 0x6b, 0x53, 0x74, 0x61, 0x72, 0x74, 0x54, 0x69, 0x6d, 0x65, 0x12, 0x20,
+	0x0a, 0x0b, 0x57, 0x6f, 0x72, 0x6b, 0x45, 0x6e, 0x64, 0x54, 0x69, 0x6d, 0x65, 0x18, 0x05, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x0b, 0x57, 0x6f, 0x72, 0x6b, 0x45, 0x6e, 0x64, 0x54, 0x69, 0x6d, 0x65,
+	0x12, 0x1a, 0x0a, 0x08, 0x57, 0x6f, 0x72, 0x6b, 0x44, 0x61, 0x74, 0x61, 0x18, 0x06, 0x20, 0x01,
+	0x28, 0x09, 0x52, 0x08, 0x57, 0x6f, 0x72, 0x6b, 0x44, 0x61, 0x74, 0x61, 0x12, 0x20, 0x0a, 0x0b,
+	0x49, 0x73, 0x51, 0x75, 0x61, 0x6c, 0x69, 0x66, 0x69, 0x65, 0x64, 0x18, 0x07, 0x20, 0x01, 0x28,
+	0x08, 0x52, 0x0b, 0x49, 0x73, 0x51, 0x75, 0x61, 0x6c, 0x69, 0x66, 0x69, 0x65, 0x64, 0x42, 0x0a,
+	0x5a, 0x08, 0x2e, 0x2f, 0x3b, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74,
+	0x6f, 0x33,
 }
 
 var (
@@ -1143,7 +1387,7 @@ func file_weiapi_production_proto_rawDescGZIP() []byte {
 	return file_weiapi_production_proto_rawDescData
 }
 
-var file_weiapi_production_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
+var file_weiapi_production_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
 var file_weiapi_production_proto_goTypes = []interface{}{
 	(*OnlineProductInfoRequest)(nil),                      // 0: proto.OnlineProductInfoRequest
 	(*EnterProductionStationRequest)(nil),                 // 1: proto.EnterProductionStationRequest
@@ -1156,23 +1400,25 @@ var file_weiapi_production_proto_goTypes = []interface{}{
 	(*GetProductionProcessStepWithParameterRequest)(nil),  // 8: proto.GetProductionProcessStepWithParameterRequest
 	(*GetProductionProcessStepWithParameterResponse)(nil), // 9: proto.GetProductionProcessStepWithParameterResponse
 	(*GetProductionProcessStepWithParameterData)(nil),     // 10: proto.GetProductionProcessStepWithParameterData
-	(*ProductOrderInfo)(nil),                              // 11: proto.ProductOrderInfo
-	(*ProductInfoInfo)(nil),                               // 12: proto.ProductInfoInfo
-	(*ProductOrderBomInfo)(nil),                           // 13: proto.ProductOrderBomInfo
-	(*MaterialChannelLayerInfo)(nil),                      // 14: proto.MaterialChannelLayerInfo
-	(*ProductionProcessStepInfo)(nil),                     // 15: proto.ProductionProcessStepInfo
-	(*ProductOrderAttributeInfo)(nil),                     // 16: proto.ProductOrderAttributeInfo
+	(*CreateProductProcessRecordRequest)(nil),             // 11: proto.CreateProductProcessRecordRequest
+	(*CreateProductWorkRecordRequest)(nil),                // 12: proto.CreateProductWorkRecordRequest
+	(*ProductOrderInfo)(nil),                              // 13: proto.ProductOrderInfo
+	(*ProductInfoInfo)(nil),                               // 14: proto.ProductInfoInfo
+	(*ProductOrderBomInfo)(nil),                           // 15: proto.ProductOrderBomInfo
+	(*MaterialChannelLayerInfo)(nil),                      // 16: proto.MaterialChannelLayerInfo
+	(*ProductionProcessStepInfo)(nil),                     // 17: proto.ProductionProcessStepInfo
+	(*ProductOrderAttributeInfo)(nil),                     // 18: proto.ProductOrderAttributeInfo
 }
 var file_weiapi_production_proto_depIdxs = []int32{
 	3,  // 0: proto.EnterProductionStationResponse.data:type_name -> proto.EnterProductionStationData
 	4,  // 1: proto.EnterProductionStationData.productionProcess:type_name -> proto.EnterProductionStationInfo
 	10, // 2: proto.GetProductionProcessStepWithParameterResponse.data:type_name -> proto.GetProductionProcessStepWithParameterData
-	11, // 3: proto.GetProductionProcessStepWithParameterData.productOrder:type_name -> proto.ProductOrderInfo
-	12, // 4: proto.GetProductionProcessStepWithParameterData.productInfo:type_name -> proto.ProductInfoInfo
-	13, // 5: proto.GetProductionProcessStepWithParameterData.productOrderBoms:type_name -> proto.ProductOrderBomInfo
-	14, // 6: proto.GetProductionProcessStepWithParameterData.materialChannelLayers:type_name -> proto.MaterialChannelLayerInfo
-	15, // 7: proto.GetProductionProcessStepWithParameterData.productionProcessSteps:type_name -> proto.ProductionProcessStepInfo
-	16, // 8: proto.GetProductionProcessStepWithParameterData.productOrderAttributes:type_name -> proto.ProductOrderAttributeInfo
+	13, // 3: proto.GetProductionProcessStepWithParameterData.productOrder:type_name -> proto.ProductOrderInfo
+	14, // 4: proto.GetProductionProcessStepWithParameterData.productInfo:type_name -> proto.ProductInfoInfo
+	15, // 5: proto.GetProductionProcessStepWithParameterData.productOrderBoms:type_name -> proto.ProductOrderBomInfo
+	16, // 6: proto.GetProductionProcessStepWithParameterData.materialChannelLayers:type_name -> proto.MaterialChannelLayerInfo
+	17, // 7: proto.GetProductionProcessStepWithParameterData.productionProcessSteps:type_name -> proto.ProductionProcessStepInfo
+	18, // 8: proto.GetProductionProcessStepWithParameterData.productOrderAttributes:type_name -> proto.ProductOrderAttributeInfo
 	9,  // [9:9] is the sub-list for method output_type
 	9,  // [9:9] is the sub-list for method input_type
 	9,  // [9:9] is the sub-list for extension type_name
@@ -1322,6 +1568,30 @@ func file_weiapi_production_proto_init() {
 				return nil
 			}
 		}
+		file_weiapi_production_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*CreateProductProcessRecordRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_weiapi_production_proto_msgTypes[12].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*CreateProductWorkRecordRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -1329,7 +1599,7 @@ func file_weiapi_production_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_weiapi_production_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   11,
+			NumMessages:   13,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

@@ -48,7 +48,7 @@ func GetMaterialChannelLayerByID(id string) (*model.MaterialChannelLayer, error)
 	return m, err
 }
 
-func GetMaterialChannel(req *proto.GetMaterialChannelRequest) ([]*model.MaterialChannel, error) {
+func GetMaterialChannels(req *proto.GetMaterialChannelRequest) ([]*model.MaterialChannel, error) {
 	var m []*model.MaterialChannel
 	err := model.DB.DB().
 		Preload("MaterialChannelLayer").

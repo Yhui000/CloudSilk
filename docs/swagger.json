@@ -21402,9 +21402,9 @@
                 }
             }
         },
-        "/api/mom/webapi/production/createproducttestrecord": {
+        "/api/mom/webapi/production/createproductprocessrecord": {
             "post": {
-                "description": "创建产品测试记录",
+                "description": "创建产品过程记录",
                 "consumes": [
                     "application/json"
                 ],
@@ -21414,7 +21414,7 @@
                 "tags": [
                     "WebAPI"
                 ],
-                "summary": "创建产品测试记录",
+                "summary": "创建产品过程记录",
                 "parameters": [
                     {
                         "type": "string",
@@ -21424,12 +21424,53 @@
                         "required": true
                     },
                     {
-                        "description": "CreateProductTestRecordRequest",
+                        "description": "CreateProductProcessRecordRequest",
                         "name": "account",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/proto.CreateProductTestRecordRequest"
+                            "$ref": "#/definitions/proto.CreateProductProcessRecordRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/proto.CommonResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/mom/webapi/production/createproductworkrecord": {
+            "post": {
+                "description": "创建产品作业记录",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "WebAPI"
+                ],
+                "summary": "创建产品作业记录",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "CreateProductWorkRecordRequest",
+                        "name": "account",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/proto.CreateProductWorkRecordRequest"
                         }
                     }
                 ],
@@ -21921,28 +21962,68 @@
                 }
             }
         },
-        "proto.CreateProductTestRecordRequest": {
+        "proto.CreateProductProcessRecordRequest": {
             "type": "object",
             "properties": {
-                "isQualified": {
-                    "type": "boolean"
+                "processStepType": {
+                    "description": "作业类型",
+                    "type": "string"
                 },
                 "productSerialNo": {
+                    "description": "产品序列号",
+                    "type": "string"
+                },
+                "productionProcess": {
+                    "description": "工艺代号",
                     "type": "string"
                 },
                 "productionStation": {
+                    "description": "工位代号",
                     "type": "string"
                 },
-                "testData": {
+                "workData": {
+                    "description": "作业数据",
                     "type": "string"
                 },
-                "testEndTime": {
+                "workDescription": {
+                    "description": "作业描述",
                     "type": "string"
                 },
-                "testProject": {
+                "workResult": {
+                    "description": "作业结果",
+                    "type": "string"
+                }
+            }
+        },
+        "proto.CreateProductWorkRecordRequest": {
+            "type": "object",
+            "properties": {
+                "IsQualified": {
+                    "description": "是否合格",
+                    "type": "boolean"
+                },
+                "ProductSerialNo": {
+                    "description": "产品序列号",
                     "type": "string"
                 },
-                "testStartTime": {
+                "ProductionProcessStep": {
+                    "description": "作业步骤",
+                    "type": "string"
+                },
+                "ProductionStation": {
+                    "description": "产线工位",
+                    "type": "string"
+                },
+                "WorkData": {
+                    "description": "作业数据",
+                    "type": "string"
+                },
+                "WorkEndTime": {
+                    "description": "结束时间",
+                    "type": "string"
+                },
+                "WorkStartTime": {
+                    "description": "起始时间",
                     "type": "string"
                 }
             }

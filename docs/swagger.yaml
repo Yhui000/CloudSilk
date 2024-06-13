@@ -222,21 +222,52 @@ definitions:
       message:
         type: string
     type: object
-  proto.CreateProductTestRecordRequest:
+  proto.CreateProductProcessRecordRequest:
     properties:
-      isQualified:
-        type: boolean
+      processStepType:
+        description: 作业类型
+        type: string
       productSerialNo:
+        description: 产品序列号
+        type: string
+      productionProcess:
+        description: 工艺代号
         type: string
       productionStation:
+        description: 工位代号
         type: string
-      testData:
+      workData:
+        description: 作业数据
         type: string
-      testEndTime:
+      workDescription:
+        description: 作业描述
         type: string
-      testProject:
+      workResult:
+        description: 作业结果
         type: string
-      testStartTime:
+    type: object
+  proto.CreateProductWorkRecordRequest:
+    properties:
+      IsQualified:
+        description: 是否合格
+        type: boolean
+      ProductSerialNo:
+        description: 产品序列号
+        type: string
+      ProductionProcessStep:
+        description: 作业步骤
+        type: string
+      ProductionStation:
+        description: 产线工位
+        type: string
+      WorkData:
+        description: 作业数据
+        type: string
+      WorkEndTime:
+        description: 结束时间
+        type: string
+      WorkStartTime:
+        description: 起始时间
         type: string
     type: object
   proto.Data:
@@ -20699,23 +20730,23 @@ paths:
       summary: 设置失败后续处理接口
       tags:
       - WebAPI
-  /api/mom/webapi/production/createproducttestrecord:
+  /api/mom/webapi/production/createproductprocessrecord:
     post:
       consumes:
       - application/json
-      description: 创建产品测试记录
+      description: 创建产品过程记录
       parameters:
       - description: jwt token
         in: header
         name: authorization
         required: true
         type: string
-      - description: CreateProductTestRecordRequest
+      - description: CreateProductProcessRecordRequest
         in: body
         name: account
         required: true
         schema:
-          $ref: '#/definitions/proto.CreateProductTestRecordRequest'
+          $ref: '#/definitions/proto.CreateProductProcessRecordRequest'
       produces:
       - application/json
       responses:
@@ -20723,7 +20754,34 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/proto.CommonResponse'
-      summary: 创建产品测试记录
+      summary: 创建产品过程记录
+      tags:
+      - WebAPI
+  /api/mom/webapi/production/createproductworkrecord:
+    post:
+      consumes:
+      - application/json
+      description: 创建产品作业记录
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      - description: CreateProductWorkRecordRequest
+        in: body
+        name: account
+        required: true
+        schema:
+          $ref: '#/definitions/proto.CreateProductWorkRecordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.CommonResponse'
+      summary: 创建产品作业记录
       tags:
       - WebAPI
   /api/mom/webapi/production/enterproductionstation:

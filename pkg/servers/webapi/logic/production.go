@@ -2,16 +2,19 @@ package logic
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"math"
 	"strings"
 	"time"
 
 	"github.com/CloudSilk/CloudSilk/pkg/clients"
+	"github.com/CloudSilk/CloudSilk/pkg/model"
 	"github.com/CloudSilk/CloudSilk/pkg/proto"
 	"github.com/CloudSilk/CloudSilk/pkg/tool"
 	"github.com/CloudSilk/CloudSilk/pkg/types"
 	modelcode "github.com/CloudSilk/pkg/model"
+	"github.com/CloudSilk/pkg/utils"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
@@ -799,7 +802,7 @@ func GetProductionProcessStepWithParameter(req *proto.GetProductionProcessStepWi
 		}
 	}
 
-	_materialChannels, _ := clients.MaterialChannelLayerClient.GetMaterialChannel(context.Background(), &proto.GetMaterialChannelRequest{ProductionStationID: productionStation.Id})
+	_materialChannels, _ := clients.MaterialChannelLayerClient.GetMaterialChannels(context.Background(), &proto.GetMaterialChannelRequest{ProductionStationID: productionStation.Id})
 	if _materialChannels.Code != modelcode.Success {
 		return nil, fmt.Errorf(_materialChannels.Message)
 	}
@@ -986,6 +989,57 @@ func GetProductionProcessStepWithParameter(req *proto.GetProductionProcessStepWi
 		"productionProcessSteps": append(productionProcessSteps, productOrderProcess...),
 		"productOrderAttributes": productOrderAttributes,
 	}, nil
+}
+
+// 创建产品过程记录
+func CreateProductProcessRecord(req *proto.CreateProductProcessRecordRequest) error {
+	if req.ProductionStation == "" {
+		return fmt.Errorf("ProductionStation不能为空")
+	}
+	if req.ProductSerialNo == "" {
+		return fmt.Errorf("ProductSerialNo不能为空")
+	}
+	if req.ProcessStepType == "" {
+		return fmt.Errorf("ProcessStepType不能为空")
+	}
+	if req.WorkDescription == "" {
+		return fmt.Errorf("WorkDescription不能为空")
+	}
+	if req.WorkData == "" {
+		return fmt.Errorf("WorkData不能为空")
+	}
+	if req.WorkResult == "" {
+		return fmt.Errorf("WorkResult不能为空")
+	}
+
+	productionStation := &model.ProductionStation{}
+	if err := model.DB.DB().Where(&model.ProductionStation{Code: req.ProductionStation}).First(productionStation).Error; err == gorm.ErrRecordNotFound {
+		return fmt.Errorf("无效的工站代号")
+	} else if err != nil {
+		return err
+	}
+
+	productInfo := &model.ProductInfo{}
+	if err := model.DB.DB().Where(&model.ProductInfo{ProductSerialNo: req.ProductSerialNo}).First(productInfo).Error; err == gorm.ErrRecordNotFound {
+		return fmt.Errorf("无效的产品序列号")
+	} else if err != nil {
+		return err
+	}
+
+	if err := model.DB.DB().Create(&model.ProductProcessRecord{
+		ProductInfoID:       productInfo.ID,
+		ProductionProcessID: productInfo.ProductionProcessID,
+		ProductionStationID: productionStation.ID,
+		ProcessStepType:     req.ProcessStepType,
+		WorkDescription:     req.WorkDescription,
+		WorkData:            req.WorkData,
+		WorkResult:          req.WorkResult,
+		WorkTime:            sql.NullTime{Time: time.Now(), Valid: true},
+	}).Error; err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // 请求出站
@@ -1536,8 +1590,105 @@ func CheckProductProcessRouteFailure(req *proto.CheckProductProcessRouteFailureR
 }
 
 // 创建产品作业记录
-func CreateProductWorkRecord() {
+func CreateProductWorkRecord(req *proto.CreateProductWorkRecordRequest) error {
+	if req.WorkStartTime == "" {
+		return fmt.Errorf("WorkStartTime不能为空")
+	}
+	if req.WorkEndTime == "" {
+		return fmt.Errorf("WorkEndTime不能为空")
+	}
+	// if req.IsQualified == "" {
+	// 	return fmt.Errorf("IsQualified不能为空")
+	// }
+	if req.WorkData == "" {
+		return fmt.Errorf("WorkData不能为空")
+	}
+	if req.ProductionStation == "" {
+		return fmt.Errorf("ProductionStation不能为空")
+	}
+	if req.ProductSerialNo == "" {
+		return fmt.Errorf("ProductSerialNo不能为空")
+	}
+	if req.ProductionProcessStep == "" {
+		return fmt.Errorf("ProductionProcessStep不能为空")
+	}
 
+	productInfo := &model.ProductInfo{}
+	if err := model.DB.DB().Where(&model.ProductInfo{ProductSerialNo: req.ProductSerialNo}).First(productInfo).Error; err == gorm.ErrRecordNotFound {
+		return fmt.Errorf("无效的产品信息")
+	} else if err != nil {
+		return err
+	}
+
+	if productInfo.ProductionProcessID == "" {
+		return fmt.Errorf("无法获取产品的当前工序")
+	}
+
+	productionProcess := &model.ProductionProcess{}
+	if err := model.DB.DB().
+		Preload("ProductionProcessAvailableStations").
+		Preload("ProductionProcessAvailableStations.ProductionStation").
+		First(productionProcess, "`id` = ?", productInfo.ProductionProcessID).Error; err == gorm.ErrRecordNotFound {
+		return fmt.Errorf("读取产品的当前工序失败")
+	} else if err != nil {
+		return err
+	}
+
+	var processable bool
+	for _, v := range productionProcess.ProductionProcessAvailableStations {
+		if v.ProductionStation.Code == req.ProductionStation {
+			processable = true
+			break
+		}
+	}
+	if !processable {
+		return fmt.Errorf("非法操作，产品的当前工序不支持在此工位进行")
+	}
+
+	productionProcessStep := &model.ProductionProcessStep{}
+	if err := model.DB.DB().
+		Preload("AvailableProcesses").
+		Where(&model.ProductionProcessStep{Code: req.ProductionProcessStep}).First(productionProcessStep).Error; err == gorm.ErrRecordNotFound {
+		return fmt.Errorf("无效的作业步骤")
+	} else if err != nil {
+		return err
+	}
+
+	var workable bool
+	for _, v := range productionProcessStep.AvailableProcesses {
+		if v.ProductionProcessID == productionProcess.ID {
+			workable = true
+			break
+		}
+	}
+	if !workable {
+		return fmt.Errorf("非法操作，此测试项不支持在此工位进行")
+	}
+
+	productionStation := &model.ProductionStation{}
+	if err := model.DB.DB().Where(&model.ProductionStation{Code: req.ProductionStation}).First(productionStation).Error; err == gorm.ErrRecordNotFound {
+		return fmt.Errorf("无效的产线工位")
+	} else if err != nil {
+		return err
+	}
+
+	workEndTime := utils.ParseTime(req.WorkEndTime)
+	workStartTime := utils.ParseTime(req.WorkStartTime)
+	if err := model.DB.DB().Create(&model.ProductWorkRecord{
+		ProductionProcessStepID: productionProcessStep.ID,
+		ProductInfoID:           productInfo.ID,
+		ProductionStationID:     productionStation.ID,
+		WorkUserID:              *productionStation.CurrentUserID,
+		WorkData:                req.WorkData,
+		WorkEndTime:             sql.NullTime{Time: workEndTime, Valid: true},
+		WorkStartTime:           sql.NullTime{Time: workStartTime, Valid: true},
+		Duration:                int32(workEndTime.Sub(workStartTime).Seconds()),
+		IsQualified:             req.IsQualified,
+	}).Error; err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // 创建产品测试记录
