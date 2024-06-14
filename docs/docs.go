@@ -21176,7 +21176,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/mom/webapi/infrastructure/getAllProductionLine": {
+        "/api/mom/webapi/infrastructure/getallproductionline": {
             "get": {
                 "description": "获取全部产线信息",
                 "consumes": [
@@ -21208,7 +21208,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/mom/webapi/infrastructure/retrieveProductAttribute": {
+        "/api/mom/webapi/infrastructure/retrieveproductattribute": {
             "post": {
                 "description": "查询产品特性信息",
                 "consumes": [
@@ -21249,7 +21249,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/mom/webapi/infrastructure/retrieveProductionCrossway": {
+        "/api/mom/webapi/infrastructure/retrieveproductioncrossway": {
             "post": {
                 "description": "查询产线路口信息",
                 "consumes": [
@@ -21290,7 +21290,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/mom/webapi/infrastructure/retrieveProductionStation": {
+        "/api/mom/webapi/infrastructure/retrieveproductionstation": {
             "post": {
                 "description": "查询产线工位信息",
                 "consumes": [

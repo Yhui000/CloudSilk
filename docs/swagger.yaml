@@ -20574,7 +20574,7 @@ paths:
       summary: 注销
       tags:
       - WebAPI
-  /api/mom/webapi/infrastructure/getAllProductionLine:
+  /api/mom/webapi/infrastructure/getallproductionline:
     get:
       consumes:
       - application/json
@@ -20595,7 +20595,7 @@ paths:
       summary: 获取全部产线信息
       tags:
       - WebAPI
-  /api/mom/webapi/infrastructure/retrieveProductAttribute:
+  /api/mom/webapi/infrastructure/retrieveproductattribute:
     post:
       consumes:
       - application/json
@@ -20622,7 +20622,7 @@ paths:
       summary: 查询产品特性信息
       tags:
       - WebAPI
-  /api/mom/webapi/infrastructure/retrieveProductionCrossway:
+  /api/mom/webapi/infrastructure/retrieveproductioncrossway:
     post:
       consumes:
       - application/json
@@ -20649,7 +20649,7 @@ paths:
       summary: 查询产线路口信息
       tags:
       - WebAPI
-  /api/mom/webapi/infrastructure/retrieveProductionStation:
+  /api/mom/webapi/infrastructure/retrieveproductionstation:
     post:
       consumes:
       - application/json
