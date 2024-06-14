@@ -20,7 +20,7 @@ import (
 // @Produce  json
 // @Param authorization header string true "jwt token"
 // @Success 200 {object} proto.GetAllProductionLineResponse
-// @Router /api/mom/webapi/infrastructure/getAllProductionLine [get]
+// @Router /api/mom/webapi/infrastructure/getallproductionline [get]
 func GetAllProductionLine(c *gin.Context) {
 	resp := map[string]interface{}{"code": 0}
 	// resp := &proto.GetAllProductionLineResponse{
@@ -47,7 +47,7 @@ func GetAllProductionLine(c *gin.Context) {
 // @Param authorization header string true "jwt token"
 // @Param account body proto.RetrieveProductionStationRequest true "RetrieveProductionStation"
 // @Success 200 {object} proto.GetAllProductionStationResponse
-// @Router /api/mom/webapi/infrastructure/retrieveProductionStation [post]
+// @Router /api/mom/webapi/infrastructure/retrieveproductionstation [post]
 func RetrieveProductionStation(c *gin.Context) {
 	transID := middleware.GetTransID(c)
 	req := &proto.RetrieveProductionStationRequest{}
@@ -89,7 +89,7 @@ func RetrieveProductionStation(c *gin.Context) {
 // @Param authorization header string true "jwt token"
 // @Param account body proto.RetrieveProductAttributeRequest true "RetrieveProductAttribute"
 // @Success 200 {object} proto.GetAllProductAttributeResponse
-// @Router /api/mom/webapi/infrastructure/retrieveProductAttribute [post]
+// @Router /api/mom/webapi/infrastructure/retrieveproductattribute [post]
 func RetrieveProductAttribute(c *gin.Context) {
 	transID := middleware.GetTransID(c)
 	req := &proto.RetrieveProductAttributeRequest{}
@@ -131,7 +131,7 @@ func RetrieveProductAttribute(c *gin.Context) {
 // @Param authorization header string true "jwt token"
 // @Param account body proto.RetrieveProductionCrosswayRequest true "RetrieveProductionCrossway"
 // @Success 200 {object} proto.GetAllProductionCrosswayResponse
-// @Router /api/mom/webapi/infrastructure/retrieveProductionCrossway [post]
+// @Router /api/mom/webapi/infrastructure/retrieveproductioncrossway [post]
 func RetrieveProductionCrossway(c *gin.Context) {
 	transID := middleware.GetTransID(c)
 	req := &proto.RetrieveProductionCrosswayRequest{}
@@ -167,8 +167,8 @@ func RetrieveProductionCrossway(c *gin.Context) {
 func RegisterInfrastructureRouter(r *gin.Engine) {
 	g := r.Group("/api/mom/webapi/infrastructure")
 
-	g.GET("getAllProductionLine", GetAllProductionLine)
-	g.POST("retrieveProductionStation", RetrieveProductionStation)
-	g.POST("retrieveProductAttribute", RetrieveProductAttribute)
-	g.POST("retrieveProductionCrossway", RetrieveProductionCrossway)
+	g.GET("getallproductionline", GetAllProductionLine)
+	g.POST("retrieveproductionstation", RetrieveProductionStation)
+	g.POST("retrieveproductattribute", RetrieveProductAttribute)
+	g.POST("retrieveproductioncrossway", RetrieveProductionCrossway)
 }
