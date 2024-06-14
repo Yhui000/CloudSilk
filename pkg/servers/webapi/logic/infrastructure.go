@@ -11,37 +11,37 @@ import (
 )
 
 // GetAllProductionLine 获取全部产线信息
-func GetAllProductionLine() ([]*proto.ProductionLineInfo, error) {
+func GetAllProductionLine() ([]map[string]interface{}, error) {
 	_productionLine, _ := clients.ProductionLineClient.GetAll(context.Background(), &proto.GetAllRequest{})
 	if _productionLine.Code != modelcode.Success {
 		return nil, fmt.Errorf(_productionLine.Message)
 	}
 	productionLines := _productionLine.Data
 
-	data := make([]*proto.ProductionLineInfo, len(productionLines))
+	data := make([]map[string]interface{}, len(productionLines))
 	for pli, pl := range productionLines {
-		productionLine := &proto.ProductionLineInfo{
-			Id:              pl.Id,
-			Code:            pl.Code,
-			Description:     pl.Description,
-			AccountControl:  pl.AccountControl,
-			MaterialControl: pl.MaterialControl,
+		productionLine := map[string]interface{}{
+			"id":              pl.Id,
+			"code":            pl.Code,
+			"description":     pl.Description,
+			"accountControl":  pl.AccountControl,
+			"materialControl": pl.MaterialControl,
 		}
 
-		productionStations := make([]*proto.ProductionStationInfo, len(pl.ProductionStations))
+		productionStations := make([]map[string]interface{}, len(pl.ProductionStations))
 		for psi, ps := range pl.ProductionStations {
-			productionStation := &proto.ProductionStationInfo{
-				Id:              ps.Id,
-				Code:            ps.Code,
-				Description:     ps.Description,
-				StationType:     ps.StationType,
-				AccountControl:  ps.AccountControl,
-				MaterialControl: ps.MaterialControl,
+			productionStation := map[string]interface{}{
+				"id":              ps.Id,
+				"code":            ps.Code,
+				"description":     ps.Description,
+				"stationType":     ps.StationType,
+				"accountControl":  ps.AccountControl,
+				"materialControl": ps.MaterialControl,
 			}
 
 			productionStations[psi] = productionStation
 		}
-		productionLine.ProductionStations = productionStations
+		productionLine["productionStations"] = productionStations
 
 		data[pli] = productionLine
 	}

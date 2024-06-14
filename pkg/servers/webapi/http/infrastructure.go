@@ -6,6 +6,7 @@ import (
 
 	"github.com/CloudSilk/CloudSilk/pkg/proto"
 	"github.com/CloudSilk/CloudSilk/pkg/servers/webapi/logic"
+	"github.com/CloudSilk/CloudSilk/pkg/types"
 	"github.com/CloudSilk/pkg/utils/log"
 	"github.com/CloudSilk/pkg/utils/middleware"
 	"github.com/gin-gonic/gin"
@@ -21,18 +22,19 @@ import (
 // @Success 200 {object} proto.GetAllProductionLineResponse
 // @Router /api/mom/webapi/infrastructure/getAllProductionLine [get]
 func GetAllProductionLine(c *gin.Context) {
-	resp := &proto.GetAllProductionLineResponse{
-		Code: proto.Code_Success,
-	}
+	resp := map[string]interface{}{"code": 0}
+	// resp := &proto.GetAllProductionLineResponse{
+	// 	Code: proto.Code_Success,
+	// }
 	data, err := logic.GetAllProductionLine()
 	if err != nil {
-		resp.Code = 400
-		resp.Message = err.Error()
+		resp["code"] = types.ServiceResponseCodeFailure
+		resp["message"] = err.Error()
 		c.JSON(http.StatusOK, resp)
 		return
 	}
 
-	resp.Data = data
+	resp["data"] = data
 	c.JSON(http.StatusOK, resp)
 }
 
