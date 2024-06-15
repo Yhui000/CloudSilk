@@ -483,8 +483,10 @@ func EnterProductionStation(req *proto.EnterProductionStationRequest) *proto.Ent
 		return &proto.EnterProductionStationResponse{Code: 1, Message: _productionProcessSop.Message}
 	}
 
-	if _productionProcessSop.Data.FileLink != "" {
-		sopLink = _productionProcessSop.Data.FileLink
+	if _productionProcessSop.Data != nil {
+		if _productionProcessSop.Data.FileLink != "" {
+			sopLink = _productionProcessSop.Data.FileLink
+		}
 	}
 
 	if productionProcess.EnableReport {

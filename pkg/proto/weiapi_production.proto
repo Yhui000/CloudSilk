@@ -127,8 +127,6 @@ message CreateProductProcessRecordRequest{
     string productSerialNo=1;
     //工位代号
     string productionStation=2;
-    //工艺代号
-    string productionProcess=3;
     //作业类型
     string processStepType=4;
     //作业描述
