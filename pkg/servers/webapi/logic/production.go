@@ -1917,6 +1917,8 @@ func UpdateProductReworkRecord(req *proto.UpdateProductReworkRecordRequest) (map
 			CurrentState:     types.ProductProcessRouteStateReworking,
 		}).First(lastProductProcessRoute).Error; err == gorm.ErrRecordNotFound {
 			return fmt.Errorf("读取产品当前工艺路线失败")
+		} else if err != nil {
+			return err
 		}
 
 		//上一步工艺完成
@@ -1952,7 +1954,7 @@ func UpdateProductReworkRecord(req *proto.UpdateProductReworkRecordRequest) (map
 			}
 		}
 
-		if err := tx.First(nextProcess, "`id` = ?", nextRouteID).Error; err != gorm.ErrRecordNotFound {
+		if err := tx.First(nextProcess, "`id` = ?", nextRouteID).Error; err == gorm.ErrRecordNotFound {
 			return fmt.Errorf("读取下一步工艺失败")
 		} else if err != nil {
 			return err

@@ -89,7 +89,7 @@ func StartAll(webPath string, port int, singleDB bool) {
 	r := gin.Default()
 	r.Use(utils.Cors())
 	http.RegisterAdminRouter(r)
-	// r.Use(ucmiddleware.AuthRequired)
+	r.Use(ucmiddleware.AuthRequired)
 
 	uchttp.RegisterAuthRouter(r)
 	curdhttp.RegisterRouter(r)
