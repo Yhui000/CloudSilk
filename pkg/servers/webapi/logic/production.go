@@ -1703,8 +1703,8 @@ func RetrieveProductReworkRecord(req *proto.RetrieveProductReworkRecordRequest) 
 	db := model.DB.DB().Preload("ProductInfo").Preload("ProductInfo.ProductOrder").Preload("ProductionStation").
 		Joins("JOIN product_infos ON product_rework_records.product_info_id=product_infos.id").
 		Joins("JOIN production_stations ON product_rework_records.production_station_id=production_stations.id").
-		Joins("JOIN production_line ON production_stations.production_line_id=production_line.id").
-		Where("production_line.code = ?", req.ProductionLine)
+		Joins("JOIN production_lines ON production_stations.production_line_id=production_lines.id").
+		Where("production_lines.code = ?", req.ProductionLine)
 
 	if req.ProductSerialNo != "" {
 		db = db.Where("product_infos.product_serial_no LIKE ?", "%"+req.ProductSerialNo+"%")
