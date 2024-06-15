@@ -1739,19 +1739,19 @@ func RetrieveProductReworkRecord(req *proto.RetrieveProductReworkRecordRequest) 
 
 // 更新产品返工记录
 func UpdateProductReworkRecord(req *proto.UpdateProductReworkRecordRequest) (map[string]interface{}, error) {
-	if req.ProductReworkRecordID != "" {
+	if req.ProductReworkRecordID == "" {
 		return nil, fmt.Errorf("ProductReworkRecordID不能为空")
 	}
-	if req.ProductReworkCauseID != "" {
+	if req.ProductReworkCauseID == "" {
 		return nil, fmt.Errorf("ProductReworkCauseID不能为空")
 	}
-	if req.ProductReworkSolutionID != "" {
+	if req.ProductReworkSolutionID == "" {
 		return nil, fmt.Errorf("ProductReworkSolutionID不能为空")
 	}
-	if req.ProductReworkTypeID != "" {
+	if req.ProductReworkTypeID == "" {
 		return nil, fmt.Errorf("ProductReworkTypeID不能为空")
 	}
-	if req.ProductReworkUserID != "" {
+	if req.ProductReworkUserID == "" {
 		return nil, fmt.Errorf("ProductReworkUserID不能为空")
 	}
 
