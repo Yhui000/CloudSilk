@@ -350,6 +350,88 @@ func CreateProductWorkRecord(c *gin.Context) {
 	c.JSON(http.StatusOK, resp)
 }
 
+// RetrieveProductReworkRecord godoc
+// @Summary 获取产品返工记录
+// @Description 获取产品返工记录
+// @Tags WebAPI
+// @Accept  json
+// @Produce  json
+// @Param authorization header string true "jwt token"
+// @Param account body proto.RetrieveProductReworkRecordRequest true "RetrieveProductReworkRecordRequest"
+// @Success 200 {object} proto.CommonResponse
+// @Router /api/mom/webapi/production/retrieveproductreworkrecord [post]
+func RetrieveProductReworkRecord(c *gin.Context) {
+	transID := middleware.GetTransID(c)
+	req := &proto.RetrieveProductReworkRecordRequest{}
+	resp := map[string]interface{}{"code": types.ServiceResponseCodeSuccess}
+
+	if err := c.BindJSON(req); err != nil {
+		resp["code"] = types.ServiceResponseCodeFailure
+		resp["message"] = err.Error()
+		c.JSON(http.StatusOK, resp)
+		log.Warnf(context.Background(), "TransID:%s,创建产品作业接口参数无效:%v", transID, err)
+		return
+	}
+
+	if err := middleware.Validate.Struct(req); err != nil {
+		resp["code"] = types.ServiceResponseCodeFailure
+		resp["message"] = err.Error()
+		c.JSON(http.StatusOK, resp)
+		return
+	}
+
+	data, err := logic.RetrieveProductReworkRecord(req)
+	if err != nil {
+		resp["code"] = types.ServiceResponseCodeFailure
+		resp["message"] = err.Error()
+	} else {
+		resp["data"] = data
+	}
+
+	c.JSON(http.StatusOK, resp)
+}
+
+// UpdateProductReworkRecord godoc
+// @Summary 更新产品返工记录
+// @Description 更新产品返工记录
+// @Tags WebAPI
+// @Accept  json
+// @Produce  json
+// @Param authorization header string true "jwt token"
+// @Param account body proto.UpdateProductReworkRecordRequest true "UpdateProductReworkRecordRequest"
+// @Success 200 {object} proto.CommonResponse
+// @Router /api/mom/webapi/production/updateproductreworkrecord [post]
+func UpdateProductReworkRecord(c *gin.Context) {
+	transID := middleware.GetTransID(c)
+	req := &proto.UpdateProductReworkRecordRequest{}
+	resp := map[string]interface{}{"code": types.ServiceResponseCodeSuccess}
+
+	if err := c.BindJSON(req); err != nil {
+		resp["code"] = types.ServiceResponseCodeFailure
+		resp["message"] = err.Error()
+		c.JSON(http.StatusOK, resp)
+		log.Warnf(context.Background(), "TransID:%s,创建产品作业接口参数无效:%v", transID, err)
+		return
+	}
+
+	if err := middleware.Validate.Struct(req); err != nil {
+		resp["code"] = types.ServiceResponseCodeFailure
+		resp["message"] = err.Error()
+		c.JSON(http.StatusOK, resp)
+		return
+	}
+
+	resp, err := logic.UpdateProductReworkRecord(req)
+	if err != nil {
+		resp["code"] = types.ServiceResponseCodeFailure
+		resp["message"] = err.Error()
+		c.JSON(http.StatusOK, resp)
+		return
+	}
+
+	c.JSON(http.StatusOK, resp)
+}
+
 func RegisterProductionRouter(r *gin.Engine) {
 	g := r.Group("/api/mom/webapi/production")
 
@@ -362,4 +444,6 @@ func RegisterProductionRouter(r *gin.Engine) {
 	g.POST("getproductionprocessstepwithparameter", GetProductionProcessStepWithParameter)
 	g.POST("createproductprocessrecord", CreateProductProcessRecord)
 	g.POST("createproductworkrecord", CreateProductWorkRecord)
+	g.POST("retrieveproductreworkrecord", RetrieveProductReworkRecord)
+	g.POST("updateproductreworkrecord", UpdateProductReworkRecord)
 }

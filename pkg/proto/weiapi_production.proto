@@ -154,6 +154,47 @@ message CreateProductWorkRecordRequest{
     bool IsQualified=7;
 }
 
+message RetrieveProductReworkRecordRequest{
+    //生产产线
+    string ProductionLine=1;
+    //产品序列号
+    string ProductSerialNo=2;
+    //起始日期
+    string StartDate=3;
+    //结束日期
+    string FinishDate=4;
+    //已返工完成
+    bool IsCompleted=5;
+}
+
+message UpdateProductReworkRecordRequest{
+    //返工记录ID
+    string ProductReworkRecordID=1;
+    //返工原因ID
+    string ProductReworkCauseID=2;
+    //返工解决方案ID
+    string ProductReworkSolutionID=3;
+    //返工类型ID
+    string ProductReworkTypeID=4;
+    //操作人员ID
+    string ProductReworkUserID=5;
+    //返工简述
+    string ReworkBrief=6;
+    //备注
+    string Remark=7;
+    repeated MaterialRecordInfo materialRecords=8;
+}
+
+message MaterialRecordInfo{
+    string ProductIssueRecordID=1;
+    string MaterialNo=2;
+    string MaterialDescription=3;
+    string ControlType=4;
+    string OperationMode=5;
+    string NewMaterialTraceNo=6;
+    string OldMaterialTraceNo=7;
+}
+
 // message GetProductionStationExhibitionResponse{
 //     int32 code=1;
 //     string message=2;

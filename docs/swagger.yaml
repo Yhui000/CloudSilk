@@ -230,9 +230,6 @@ definitions:
       productSerialNo:
         description: 产品序列号
         type: string
-      productionProcess:
-        description: 工艺代号
-        type: string
       productionStation:
         description: 工位代号
         type: string
@@ -2245,6 +2242,23 @@ definitions:
         type: string
       warehouse:
         description: 物料仓库
+        type: string
+    type: object
+  proto.MaterialRecordInfo:
+    properties:
+      ControlType:
+        type: string
+      MaterialDescription:
+        type: string
+      MaterialNo:
+        type: string
+      NewMaterialTraceNo:
+        type: string
+      OldMaterialTraceNo:
+        type: string
+      OperationMode:
+        type: string
+      ProductIssueRecordID:
         type: string
     type: object
   proto.MaterialSupplierInfo:
@@ -6358,6 +6372,24 @@ definitions:
       description:
         type: string
     type: object
+  proto.RetrieveProductReworkRecordRequest:
+    properties:
+      FinishDate:
+        description: 结束日期
+        type: string
+      IsCompleted:
+        description: 已返工完成
+        type: boolean
+      ProductSerialNo:
+        description: 产品序列号
+        type: string
+      ProductionLine:
+        description: 生产产线
+        type: string
+      StartDate:
+        description: 起始日期
+        type: string
+    type: object
   proto.RetrieveProductionCrosswayRequest:
     properties:
       productionLine:
@@ -6606,6 +6638,34 @@ definitions:
       value:
         description: 值
         type: string
+    type: object
+  proto.UpdateProductReworkRecordRequest:
+    properties:
+      ProductReworkCauseID:
+        description: 返工原因ID
+        type: string
+      ProductReworkRecordID:
+        description: 返工记录ID
+        type: string
+      ProductReworkSolutionID:
+        description: 返工解决方案ID
+        type: string
+      ProductReworkTypeID:
+        description: 返工类型ID
+        type: string
+      ProductReworkUserID:
+        description: 操作人员ID
+        type: string
+      Remark:
+        description: 备注
+        type: string
+      ReworkBrief:
+        description: 返工简述
+        type: string
+      materialRecords:
+        items:
+          $ref: '#/definitions/proto.MaterialRecordInfo'
+        type: array
     type: object
 info:
   contact: {}
@@ -20899,6 +20959,60 @@ paths:
           schema:
             $ref: '#/definitions/proto.CommonResponse'
       summary: 设定产品信息状态为上线装配
+      tags:
+      - WebAPI
+  /api/mom/webapi/production/retrieveproductreworkrecord:
+    post:
+      consumes:
+      - application/json
+      description: 获取产品返工记录
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      - description: RetrieveProductReworkRecordRequest
+        in: body
+        name: account
+        required: true
+        schema:
+          $ref: '#/definitions/proto.RetrieveProductReworkRecordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.CommonResponse'
+      summary: 获取产品返工记录
+      tags:
+      - WebAPI
+  /api/mom/webapi/production/updateproductreworkrecord:
+    post:
+      consumes:
+      - application/json
+      description: 更新产品返工记录
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      - description: UpdateProductReworkRecordRequest
+        in: body
+        name: account
+        required: true
+        schema:
+          $ref: '#/definitions/proto.UpdateProductReworkRecordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.CommonResponse'
+      summary: 更新产品返工记录
       tags:
       - WebAPI
 swagger: "2.0"

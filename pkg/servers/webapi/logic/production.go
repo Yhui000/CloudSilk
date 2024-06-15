@@ -1044,6 +1044,108 @@ func CreateProductProcessRecord(req *proto.CreateProductProcessRecordRequest) er
 	return nil
 }
 
+// 创建产品作业记录
+func CreateProductWorkRecord(req *proto.CreateProductWorkRecordRequest) error {
+	if req.WorkStartTime == "" {
+		return fmt.Errorf("WorkStartTime不能为空")
+	}
+	if req.WorkEndTime == "" {
+		return fmt.Errorf("WorkEndTime不能为空")
+	}
+	// if req.IsQualified == "" {
+	// 	return fmt.Errorf("IsQualified不能为空")
+	// }
+	if req.WorkData == "" {
+		return fmt.Errorf("WorkData不能为空")
+	}
+	if req.ProductionStation == "" {
+		return fmt.Errorf("ProductionStation不能为空")
+	}
+	if req.ProductSerialNo == "" {
+		return fmt.Errorf("ProductSerialNo不能为空")
+	}
+	if req.ProductionProcessStep == "" {
+		return fmt.Errorf("ProductionProcessStep不能为空")
+	}
+
+	productInfo := &model.ProductInfo{}
+	if err := model.DB.DB().Where(&model.ProductInfo{ProductSerialNo: req.ProductSerialNo}).First(productInfo).Error; err == gorm.ErrRecordNotFound {
+		return fmt.Errorf("无效的产品信息")
+	} else if err != nil {
+		return err
+	}
+
+	if productInfo.ProductionProcessID == "" {
+		return fmt.Errorf("无法获取产品的当前工序")
+	}
+
+	productionProcess := &model.ProductionProcess{}
+	if err := model.DB.DB().
+		Preload("ProductionProcessAvailableStations").
+		Preload("ProductionProcessAvailableStations.ProductionStation").
+		First(productionProcess, "`id` = ?", productInfo.ProductionProcessID).Error; err == gorm.ErrRecordNotFound {
+		return fmt.Errorf("读取产品的当前工序失败")
+	} else if err != nil {
+		return err
+	}
+
+	var processable bool
+	for _, v := range productionProcess.ProductionProcessAvailableStations {
+		if v.ProductionStation.Code == req.ProductionStation {
+			processable = true
+			break
+		}
+	}
+	if !processable {
+		return fmt.Errorf("非法操作，产品的当前工序不支持在此工位进行")
+	}
+
+	productionProcessStep := &model.ProductionProcessStep{}
+	if err := model.DB.DB().
+		Preload("AvailableProcesses").
+		Where(&model.ProductionProcessStep{Code: req.ProductionProcessStep}).First(productionProcessStep).Error; err == gorm.ErrRecordNotFound {
+		return fmt.Errorf("无效的作业步骤")
+	} else if err != nil {
+		return err
+	}
+
+	var workable bool
+	for _, v := range productionProcessStep.AvailableProcesses {
+		if v.ProductionProcessID == productionProcess.ID {
+			workable = true
+			break
+		}
+	}
+	if !workable {
+		return fmt.Errorf("非法操作，此测试项不支持在此工位进行")
+	}
+
+	productionStation := &model.ProductionStation{}
+	if err := model.DB.DB().Where(&model.ProductionStation{Code: req.ProductionStation}).First(productionStation).Error; err == gorm.ErrRecordNotFound {
+		return fmt.Errorf("无效的产线工位")
+	} else if err != nil {
+		return err
+	}
+
+	workEndTime := utils.ParseTime(req.WorkEndTime)
+	workStartTime := utils.ParseTime(req.WorkStartTime)
+	if err := model.DB.DB().Create(&model.ProductWorkRecord{
+		ProductionProcessStepID: productionProcessStep.ID,
+		ProductInfoID:           productInfo.ID,
+		ProductionStationID:     productionStation.ID,
+		WorkUserID:              *productionStation.CurrentUserID,
+		WorkData:                req.WorkData,
+		WorkEndTime:             sql.NullTime{Time: workEndTime, Valid: true},
+		WorkStartTime:           sql.NullTime{Time: workStartTime, Valid: true},
+		Duration:                int32(workEndTime.Sub(workStartTime).Seconds()),
+		IsQualified:             req.IsQualified,
+	}).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // 请求出站
 func ExitProductionStation(req *proto.ExitProductionStationRequest) (*proto.CommonResponse, error) {
 	if req.ProductionStation == "" {
@@ -1591,106 +1693,317 @@ func CheckProductProcessRouteFailure(req *proto.CheckProductProcessRouteFailureR
 	return nil
 }
 
-// 创建产品作业记录
-func CreateProductWorkRecord(req *proto.CreateProductWorkRecordRequest) error {
-	if req.WorkStartTime == "" {
-		return fmt.Errorf("WorkStartTime不能为空")
-	}
-	if req.WorkEndTime == "" {
-		return fmt.Errorf("WorkEndTime不能为空")
-	}
-	// if req.IsQualified == "" {
-	// 	return fmt.Errorf("IsQualified不能为空")
-	// }
-	if req.WorkData == "" {
-		return fmt.Errorf("WorkData不能为空")
-	}
-	if req.ProductionStation == "" {
-		return fmt.Errorf("ProductionStation不能为空")
-	}
-	if req.ProductSerialNo == "" {
-		return fmt.Errorf("ProductSerialNo不能为空")
-	}
-	if req.ProductionProcessStep == "" {
-		return fmt.Errorf("ProductionProcessStep不能为空")
+// 获取产品返工记录
+func RetrieveProductReworkRecord(req *proto.RetrieveProductReworkRecordRequest) ([]map[string]interface{}, error) {
+	if req.ProductionLine == "" {
+		return nil, fmt.Errorf("ProductionLine不能为空")
 	}
 
-	productInfo := &model.ProductInfo{}
-	if err := model.DB.DB().Where(&model.ProductInfo{ProductSerialNo: req.ProductSerialNo}).First(productInfo).Error; err == gorm.ErrRecordNotFound {
-		return fmt.Errorf("无效的产品信息")
-	} else if err != nil {
-		return err
-	}
+	var productReworkRecords []*model.ProductReworkRecord
+	db := model.DB.DB().Preload("ProductInfo").Preload("ProductInfo.ProductOrder").Preload("ProductionStation").
+		Joins("JOIN product_infos ON product_rework_records.product_info_id=product_infos.id").
+		Joins("JOIN production_stations ON product_rework_records.production_station_id=production_stations.id").
+		Joins("JOIN production_line ON production_stations.production_line_id=production_line.id").
+		Where("production_line.code = ?", req.ProductionLine)
 
-	if productInfo.ProductionProcessID == "" {
-		return fmt.Errorf("无法获取产品的当前工序")
+	if req.ProductSerialNo != "" {
+		db = db.Where("product_infos.product_serial_no LIKE ?", "%"+req.ProductSerialNo+"%")
 	}
-
-	productionProcess := &model.ProductionProcess{}
-	if err := model.DB.DB().
-		Preload("ProductionProcessAvailableStations").
-		Preload("ProductionProcessAvailableStations.ProductionStation").
-		First(productionProcess, "`id` = ?", productInfo.ProductionProcessID).Error; err == gorm.ErrRecordNotFound {
-		return fmt.Errorf("读取产品的当前工序失败")
-	} else if err != nil {
-		return err
+	if req.StartDate != "" {
+		db = db.Where("product_rework_records.rework_time >= ?", req.StartDate)
 	}
-
-	var processable bool
-	for _, v := range productionProcess.ProductionProcessAvailableStations {
-		if v.ProductionStation.Code == req.ProductionStation {
-			processable = true
-			break
+	if req.FinishDate != "" {
+		db = db.Where("product_rework_records.rework_time <= ?", req.FinishDate)
+	}
+	if req.IsCompleted {
+		db = db.Where("product_rework_records.complete_time IS NULL")
+	}
+	if err := db.Find(&productReworkRecords).Error; err != nil {
+		return nil, err
+	}
+	data := make([]map[string]interface{}, len(productReworkRecords))
+	for i, v := range productReworkRecords {
+		data[i] = map[string]interface{}{
+			"id":                v.ID,
+			"reworkReason":      v.ReworkReason,
+			"reworkTime":        v.ReworkTime,
+			"completeTime":      v.CompleteTime,
+			"productOrderNo":    v.ProductInfo.ProductOrder.ProductOrderNo,
+			"productSerialNo":   v.ProductInfo.ProductSerialNo,
+			"productionStation": v.ProductionStation.Description,
 		}
 	}
-	if !processable {
-		return fmt.Errorf("非法操作，产品的当前工序不支持在此工位进行")
+
+	return data, nil
+}
+
+// 更新产品返工记录
+func UpdateProductReworkRecord(req *proto.UpdateProductReworkRecordRequest) (map[string]interface{}, error) {
+	if req.ProductReworkRecordID != "" {
+		return nil, fmt.Errorf("ProductReworkRecordID不能为空")
+	}
+	if req.ProductReworkCauseID != "" {
+		return nil, fmt.Errorf("ProductReworkCauseID不能为空")
+	}
+	if req.ProductReworkSolutionID != "" {
+		return nil, fmt.Errorf("ProductReworkSolutionID不能为空")
+	}
+	if req.ProductReworkTypeID != "" {
+		return nil, fmt.Errorf("ProductReworkTypeID不能为空")
+	}
+	if req.ProductReworkUserID != "" {
+		return nil, fmt.Errorf("ProductReworkUserID不能为空")
 	}
 
-	productionProcessStep := &model.ProductionProcessStep{}
-	if err := model.DB.DB().
-		Preload("AvailableProcesses").
-		Where(&model.ProductionProcessStep{Code: req.ProductionProcessStep}).First(productionProcessStep).Error; err == gorm.ErrRecordNotFound {
-		return fmt.Errorf("无效的作业步骤")
-	} else if err != nil {
-		return err
-	}
-
-	var workable bool
-	for _, v := range productionProcessStep.AvailableProcesses {
-		if v.ProductionProcessID == productionProcess.ID {
-			workable = true
-			break
+	productReworkRecord := &model.ProductReworkRecord{}
+	nextProcess := &model.ProductionProcess{}
+	if err := model.DB.DB().Transaction(func(tx *gorm.DB) error {
+		if err := tx.First(productReworkRecord, "`id` = ?", req.ProductReworkRecordID).Error; err == gorm.ErrRecordNotFound {
+			return fmt.Errorf("无效的返工记录ID")
+		} else if err != nil {
+			return err
 		}
-	}
-	if !workable {
-		return fmt.Errorf("非法操作，此测试项不支持在此工位进行")
+
+		productReworkRecord.ProductReworkCauseID = req.ProductReworkCauseID
+		productReworkRecord.ProductReworkSolutionID = req.ProductReworkSolutionID
+		productReworkRecord.ProductReworkTypeID = req.ProductReworkTypeID
+		productReworkRecord.ReworkUserID = req.ProductReworkUserID
+		productReworkRecord.ReworkBrief = req.ReworkBrief
+		productReworkRecord.Remark = req.Remark
+		productReworkRecord.CompleteTime = sql.NullTime{Time: time.Now(), Valid: true}
+
+		// user, _ := clients.UserClient.GetDetail(context.Background(), &usercenter.GetDetailRequest{Id: req.ProductReworkUserID})
+
+		productInfo := &model.ProductInfo{}
+		if err := tx.Preload("ProductOrder").First(productInfo, "`id` = ?", productReworkRecord.ProductInfoID).Error; err == gorm.ErrRecordNotFound {
+			return fmt.Errorf("读取产品信息失败")
+		} else if err != nil {
+			return err
+		}
+
+		systemEvent := &model.SystemEvent{}
+		if err := tx.Preload("SystemEventParameters").First(systemEvent, map[string]interface{}{
+			"code":   types.SystemEventProductInfoReworked,
+			"enable": true,
+		}).Error; err != nil && err != gorm.ErrRecordNotFound {
+			return err
+		}
+
+		if systemEvent.ID != "" {
+			var reworkCause string
+			if err := tx.Model(model.ProductReworkCause{}).Select("`id` = ?", req.ProductReworkCauseID).Where("code").Scan(&reworkCause).Error; err != nil {
+				return err
+			}
+
+			productionStation := &model.ProductionStation{}
+			if err := tx.First(productionStation, "`id` = ?", productReworkRecord.ProductionStationID).Error; err == gorm.ErrRecordNotFound {
+				return fmt.Errorf("读取生产工站失败")
+			} else if err != nil {
+				return err
+			}
+
+			productionProcess := &model.ProductionProcess{}
+			if err := tx.First(productionProcess, "`id` = ?", productReworkRecord.ProductionProcessID).Error; err != nil && err != gorm.ErrRecordNotFound {
+				return fmt.Errorf("读取生产工序失败")
+			} else if err != nil {
+				return err
+			}
+
+			systemEventTrigger := &model.SystemEventTrigger{
+				SystemEventID: systemEvent.ID,
+				EventNo:       uuid.NewString(),
+				CurrentState:  types.SystemEventTriggerStateWaitExecute,
+			}
+			for _, systemEventParameter := range systemEvent.SystemEventParameters {
+				value := systemEventParameter.Value
+
+				value = strings.ReplaceAll(value, "{ProductSerialNo}", productInfo.ProductSerialNo)
+				value = strings.ReplaceAll(value, "{ProductionStation}", productionStation.Code)
+				value = strings.ReplaceAll(value, "{ProductionProcess.Identifier}", productionProcess.Identifier)
+				value = strings.ReplaceAll(value, "{ProductionProcess}", productionProcess.Code)
+				value = strings.ReplaceAll(value, "{ProductReworkCause}", reworkCause)
+
+				systemEventTrigger.SystemEventTriggerParameters = append(systemEventTrigger.SystemEventTriggerParameters, &model.SystemEventTriggerParameter{
+					DataType:    systemEventParameter.DataType,
+					Name:        systemEventParameter.Name,
+					Description: systemEventParameter.Description,
+					Value:       value,
+				})
+			}
+			if err := tx.Save(systemEventTrigger).Error; err != nil {
+				return err
+			}
+		}
+		bomIdMap := map[string]struct{}{}
+		if len(req.MaterialRecords) > 0 {
+			for _, record := range req.MaterialRecords {
+				productOrderBom := &model.ProductOrderBom{}
+				if err := tx.Where("`material_no` = ? AND `product_order_id` = ?", record.MaterialNo, productInfo.ProductOrderID).First(productOrderBom).Error; err == gorm.ErrRecordNotFound {
+					return fmt.Errorf("未能通过ID找到对应的工单BOM信息")
+				} else if err != nil {
+					return err
+				}
+
+				if _, ok := bomIdMap[productOrderBom.ID]; !ok {
+					bomIdMap[productOrderBom.ID] = struct{}{}
+				}
+				targetOperationModes := []string{types.ProductReworkOperationModeRework, types.ProductReworkOperationModeScrap}
+				if record.ProductIssueRecordID != "" {
+					if tool.Contains(record.OperationMode, targetOperationModes) && record.NewMaterialTraceNo == "" {
+						return fmt.Errorf("新的物料追溯号不允许为空！")
+					}
+
+					if tool.Contains(record.OperationMode, targetOperationModes) {
+						productIssueRecord := model.ProductIssueRecord{}
+						if err := tx.First(productIssueRecord, "`id` = ?", record.ProductIssueRecordID).Error; err == gorm.ErrRecordNotFound {
+							return fmt.Errorf("读取发料记录(%s)失败", record.ProductIssueRecordID)
+						} else if err != nil {
+							return err
+						}
+
+						//报废旧发料记录
+						productIssueRecord.CurrentState = types.ProductIssueRecordStateScrapped
+
+						//创建新发料记录
+						if err := tx.Save(&model.ProductIssueRecord{
+							IssuanceProcessID: productIssueRecord.IssuanceProcessID,
+							CurrentState:      types.ProductIssueRecordStateBatched,
+							MaterialTraceNo:   record.NewMaterialTraceNo,
+							ProductInfoID:     productReworkRecord.ProductInfoID,
+							ProductOrderBomID: productOrderBom.ID,
+							CreateUserID:      req.ProductReworkUserID,
+						}).Error; err != nil {
+							return err
+						}
+					}
+
+					//创建物料操作记录
+					if err := tx.Save(&model.ProductReworkOperation{
+						OperationMode:         record.OperationMode,
+						ProductOrderBomID:     productOrderBom.ID,
+						ProductReworkRecordID: productReworkRecord.ID,
+					}).Error; err != nil {
+						return err
+					}
+
+					if tool.Contains(record.OperationMode, targetOperationModes) {
+						materialInfo := &model.MaterialInfo{}
+						if err := tx.First(materialInfo, "`material_no` = ?", record.MaterialNo).Error; err == gorm.ErrRecordNotFound {
+							return fmt.Errorf("物料号%s对应的物料信息不存在，请在后台维护！", record.MaterialNo)
+						} else if err != nil {
+							return err
+						}
+
+						if err := tx.Save(&model.MaterialReturnRequestForm{
+							FormNo:          uuid.NewString(),
+							CreateUserID:    req.ProductReworkUserID,
+							HandleMethod:    record.OperationMode,
+							MaterialTraceNo: record.OldMaterialTraceNo,
+							ReturnSource:    "返工",
+							ReturnID:        req.ProductReworkRecordID,
+							MaterialInfoID:  materialInfo.ID,
+						}).Error; err != nil {
+							return err
+						}
+					}
+				}
+			}
+		}
+
+		lastProductProcessRoute := &model.ProductProcessRoute{}
+		if err := tx.Preload("CurrentProcess").Where(&model.ProductProcessRoute{
+			ProductInfoID:    productInfo.ID,
+			CurrentProcessID: productInfo.ProductionProcessID,
+			CurrentState:     types.ProductProcessRouteStateReworking,
+		}).First(lastProductProcessRoute).Error; err == gorm.ErrRecordNotFound {
+			return fmt.Errorf("读取产品当前工艺路线失败")
+		}
+
+		//上一步工艺完成
+		lastProductProcessRoute.CurrentState = types.ProductProcessRouteStateReworked
+
+		if lastProductProcessRoute.CurrentProcess == nil {
+			return fmt.Errorf("读取上一步工艺失败")
+		}
+
+		nextRouteID := lastProductProcessRoute.CurrentProcess.ID
+
+		if len(bomIdMap) > 0 {
+			bomIds := make([]string, 0, len(bomIdMap))
+			for k := range bomIdMap {
+				bomIds = append(bomIds, k)
+			}
+			materialNos := []string{}
+			if err := tx.Model(model.ProductOrderBom{}).Where("`id` in ?", bomIds).Select("material_no").Scan(&materialNos).Error; err != nil {
+				return err
+			}
+
+			materialCategories := []string{}
+			if err := tx.Model(model.MaterialInfo{}).Where("`material_no` in ?", materialNos).Select("material_category_id").Scan(&materialCategories).Error; err != nil {
+				return err
+			}
+
+			var followProcessID string
+			if err := tx.Model(model.ProductReworkRoute{}).Where("`material_category_id` in ?", materialCategories).Select("follow_process_id").Order("sort_index").Limit(1).Scan(&followProcessID).Error; err != nil {
+				return err
+			}
+			if followProcessID != "" {
+				nextRouteID = followProcessID
+			}
+		}
+
+		if err := tx.First(nextProcess, "`id` = ?", nextRouteID).Error; err != gorm.ErrRecordNotFound {
+			return fmt.Errorf("读取下一步工艺失败")
+		} else if err != nil {
+			return err
+		}
+
+		if err := tx.Create(&model.ProductProcessRoute{
+			CurrentState:     types.ProductProcessRouteStateWaitProcess,
+			LastProcessID:    &productInfo.ProductionProcessID,
+			CurrentProcessID: nextProcess.ID,
+			RouteIndex:       nextProcess.SortIndex,
+			ProductInfoID:    productInfo.ID,
+			WorkIndex:        lastProductProcessRoute.WorkIndex + 1,
+		}).Error; err != nil {
+			return err
+		}
+		productReworkRecord.ProductionProcessID = nextProcess.ID
+		productInfo.ProductionProcessID = nextProcess.ID
+
+		//从ProductionProcess表中获取当前工艺的产品状态
+		currentProductionProcess := &model.ProductionProcess{}
+		if err := tx.First(currentProductionProcess, "`id` = ?", productInfo.ProductionProcessID).Error; err != nil && err != gorm.ErrRecordNotFound {
+			return err
+		}
+		if currentProductionProcess.ProductState == "" {
+			return fmt.Errorf("工序%s的产品状态字段为空，请在后台工艺管理-生产工序管理中维护！", currentProductionProcess.Code)
+		}
+		productInfo.CurrentState = currentProductionProcess.ProductState
+
+		if err := tx.Save(productReworkRecord).Error; err != nil {
+			return err
+		}
+		if err := tx.Save(productInfo).Error; err != nil {
+			return err
+		}
+
+		return nil
+	}); err != nil {
+		return nil, err
 	}
 
-	productionStation := &model.ProductionStation{}
-	if err := model.DB.DB().Where(&model.ProductionStation{Code: req.ProductionStation}).First(productionStation).Error; err == gorm.ErrRecordNotFound {
-		return fmt.Errorf("无效的产线工位")
-	} else if err != nil {
-		return err
-	}
-
-	workEndTime := utils.ParseTime(req.WorkEndTime)
-	workStartTime := utils.ParseTime(req.WorkStartTime)
-	if err := model.DB.DB().Create(&model.ProductWorkRecord{
-		ProductionProcessStepID: productionProcessStep.ID,
-		ProductInfoID:           productInfo.ID,
-		ProductionStationID:     productionStation.ID,
-		WorkUserID:              *productionStation.CurrentUserID,
-		WorkData:                req.WorkData,
-		WorkEndTime:             sql.NullTime{Time: workEndTime, Valid: true},
-		WorkStartTime:           sql.NullTime{Time: workStartTime, Valid: true},
-		Duration:                int32(workEndTime.Sub(workStartTime).Seconds()),
-		IsQualified:             req.IsQualified,
-	}).Error; err != nil {
-		return err
-	}
-
-	return nil
+	return map[string]interface{}{
+		"code":    types.ServiceResponseCodeSuccess,
+		"message": fmt.Sprintf("返工处理完成，请将产品放行到下个工序: %s", nextProcess.Description),
+		"data": map[string]interface{}{
+			"id":                      productReworkRecord.ID,
+			"productReworkCauseID":    productReworkRecord.ProductReworkCauseID,
+			"productReworkSolutionID": productReworkRecord.ProductReworkSolutionID,
+			"completeTime":            productReworkRecord.CompleteTime,
+			"createTime":              productReworkRecord.CreateTime,
+		},
+	}, nil
 }
 
 // 创建产品测试记录

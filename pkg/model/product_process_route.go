@@ -22,7 +22,7 @@ type ProductProcessRoute struct {
 	CurrentProcess      *ProductionProcess `json:"currentProcess" gorm:"foreignkey:current_process_id;constraint:OnDelete:CASCADE"` //生产工序
 	ProductionStationID *string            `json:"productionStationID" gorm:"size:36;comment:执行工站ID"`
 	ProductionStation   *ProductionStation `json:"productionStation" gorm:"constraint:OnDelete:SET NULL"` //工站
-	ProcessUserID       string             `json:"processUserID" gorm:"size:36;comment:执行人员ID"`
+	ProcessUserID       *string            `json:"processUserID" gorm:"size:36;comment:执行人员ID"`
 	ProductInfoID       string             `json:"productInfoID" gorm:"size:36;comment:产品信息ID"`
 	ProductInfo         *ProductInfo       `json:"productInfo" gorm:"constraint:OnDelete:CASCADE"` //产品
 }
@@ -40,12 +40,15 @@ func PBToProductProcessRoute(in *proto.ProductProcessRouteInfo) *ProductProcessR
 		return nil
 	}
 
-	var lastProcessID, productionStationID *string
+	var lastProcessID, productionStationID, processUserID *string
 	if in.LastProcessID != "" {
 		lastProcessID = &in.LastProcessID
 	}
 	if in.ProductionStationID != "" {
 		productionStationID = &in.ProductionStationID
+	}
+	if in.ProcessUserID != "" {
+		processUserID = &in.ProcessUserID
 	}
 
 	return &ProductProcessRoute{
@@ -57,7 +60,7 @@ func PBToProductProcessRoute(in *proto.ProductProcessRouteInfo) *ProductProcessR
 		LastProcessID:       lastProcessID,
 		CurrentProcessID:    in.CurrentProcessID,
 		ProductionStationID: productionStationID,
-		ProcessUserID:       in.ProcessUserID,
+		ProcessUserID:       processUserID,
 		ProductInfoID:       in.ProductInfoID,
 	}
 }
@@ -75,12 +78,15 @@ func ProductProcessRouteToPB(in *ProductProcessRoute) *proto.ProductProcessRoute
 		return nil
 	}
 
-	var lastProcessID, productionStationID string
+	var lastProcessID, productionStationID, processUserID string
 	if in.LastProcessID != nil {
 		lastProcessID = *in.LastProcessID
 	}
 	if in.ProductionStationID != nil {
 		productionStationID = *in.ProductionStationID
+	}
+	if in.ProcessUserID != nil {
+		processUserID = *in.ProcessUserID
 	}
 
 	m := &proto.ProductProcessRouteInfo{
@@ -97,7 +103,7 @@ func ProductProcessRouteToPB(in *ProductProcessRoute) *proto.ProductProcessRoute
 		CurrentProcess:      ProductionProcessToPB(in.CurrentProcess),
 		ProductionStationID: productionStationID,
 		ProductionStation:   ProductionStationToPB(in.ProductionStation),
-		ProcessUserID:       in.ProcessUserID,
+		ProcessUserID:       processUserID,
 		ProductInfoID:       in.ProductInfoID,
 		ProductInfo:         ProductInfoToPB(in.ProductInfo),
 	}
