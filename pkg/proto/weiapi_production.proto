@@ -139,60 +139,60 @@ message CreateProductProcessRecordRequest{
 
 message CreateProductWorkRecordRequest{
     //产品序列号
-    string ProductSerialNo=1;
+    string productSerialNo=1;
     //产线工位
-    string ProductionStation=2;
+    string productionStation=2;
     //作业步骤
-    string ProductionProcessStep=3;
+    string productionProcessStep=3;
     //起始时间
-    string WorkStartTime=4;
+    string workStartTime=4;
     //结束时间
-    string WorkEndTime=5;
+    string workEndTime=5;
     //作业数据
-    string WorkData=6;
+    string workData=6;
     //是否合格
-    bool IsQualified=7;
+    bool isQualified=7;
 }
 
 message RetrieveProductReworkRecordRequest{
     //生产产线
-    string ProductionLine=1;
+    string productionLine=1;
     //产品序列号
-    string ProductSerialNo=2;
+    string productSerialNo=2;
     //起始日期
-    string StartDate=3;
+    string startDate=3;
     //结束日期
-    string FinishDate=4;
+    string finishDate=4;
     //已返工完成
-    bool IsCompleted=5;
+    bool isCompleted=5;
 }
 
 message UpdateProductReworkRecordRequest{
     //返工记录ID
-    string ProductReworkRecordID=1;
+    string productReworkRecordID=1;
     //返工原因ID
-    string ProductReworkCauseID=2;
+    string productReworkCauseID=2;
     //返工解决方案ID
-    string ProductReworkSolutionID=3;
+    string productReworkSolutionID=3;
     //返工类型ID
-    string ProductReworkTypeID=4;
+    string productReworkTypeID=4;
     //操作人员ID
-    string ProductReworkUserID=5;
+    string productReworkUserID=5;
     //返工简述
-    string ReworkBrief=6;
+    string reworkBrief=6;
     //备注
-    string Remark=7;
+    string remark=7;
     repeated MaterialRecordInfo materialRecords=8;
 }
 
 message MaterialRecordInfo{
-    string ProductIssueRecordID=1;
-    string MaterialNo=2;
-    string MaterialDescription=3;
-    string ControlType=4;
-    string OperationMode=5;
-    string NewMaterialTraceNo=6;
-    string OldMaterialTraceNo=7;
+    string productIssueRecordID=1;
+    string materialNo=2;
+    string materialDescription=3;
+    string controlType=4;
+    string operationMode=5;
+    string newMaterialTraceNo=6;
+    string oldMaterialTraceNo=7;
 }
 
 // message GetProductionStationExhibitionResponse{

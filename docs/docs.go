@@ -22088,31 +22088,31 @@ const docTemplate = `{
         "proto.CreateProductWorkRecordRequest": {
             "type": "object",
             "properties": {
-                "IsQualified": {
+                "isQualified": {
                     "description": "是否合格",
                     "type": "boolean"
                 },
-                "ProductSerialNo": {
+                "productSerialNo": {
                     "description": "产品序列号",
                     "type": "string"
                 },
-                "ProductionProcessStep": {
+                "productionProcessStep": {
                     "description": "作业步骤",
                     "type": "string"
                 },
-                "ProductionStation": {
+                "productionStation": {
                     "description": "产线工位",
                     "type": "string"
                 },
-                "WorkData": {
+                "workData": {
                     "description": "作业数据",
                     "type": "string"
                 },
-                "WorkEndTime": {
+                "workEndTime": {
                     "description": "结束时间",
                     "type": "string"
                 },
-                "WorkStartTime": {
+                "workStartTime": {
                     "description": "起始时间",
                     "type": "string"
                 }
@@ -25140,25 +25140,25 @@ const docTemplate = `{
         "proto.MaterialRecordInfo": {
             "type": "object",
             "properties": {
-                "ControlType": {
+                "controlType": {
                     "type": "string"
                 },
-                "MaterialDescription": {
+                "materialDescription": {
                     "type": "string"
                 },
-                "MaterialNo": {
+                "materialNo": {
                     "type": "string"
                 },
-                "NewMaterialTraceNo": {
+                "newMaterialTraceNo": {
                     "type": "string"
                 },
-                "OldMaterialTraceNo": {
+                "oldMaterialTraceNo": {
                     "type": "string"
                 },
-                "OperationMode": {
+                "operationMode": {
                     "type": "string"
                 },
-                "ProductIssueRecordID": {
+                "productIssueRecordID": {
                     "type": "string"
                 }
             }
@@ -31083,23 +31083,23 @@ const docTemplate = `{
         "proto.RetrieveProductReworkRecordRequest": {
             "type": "object",
             "properties": {
-                "FinishDate": {
+                "finishDate": {
                     "description": "结束日期",
                     "type": "string"
                 },
-                "IsCompleted": {
+                "isCompleted": {
                     "description": "已返工完成",
                     "type": "boolean"
                 },
-                "ProductSerialNo": {
+                "productSerialNo": {
                     "description": "产品序列号",
                     "type": "string"
                 },
-                "ProductionLine": {
+                "productionLine": {
                     "description": "生产产线",
                     "type": "string"
                 },
-                "StartDate": {
+                "startDate": {
                     "description": "起始日期",
                     "type": "string"
                 }
@@ -31457,39 +31457,39 @@ const docTemplate = `{
         "proto.UpdateProductReworkRecordRequest": {
             "type": "object",
             "properties": {
-                "ProductReworkCauseID": {
-                    "description": "返工原因ID",
-                    "type": "string"
-                },
-                "ProductReworkRecordID": {
-                    "description": "返工记录ID",
-                    "type": "string"
-                },
-                "ProductReworkSolutionID": {
-                    "description": "返工解决方案ID",
-                    "type": "string"
-                },
-                "ProductReworkTypeID": {
-                    "description": "返工类型ID",
-                    "type": "string"
-                },
-                "ProductReworkUserID": {
-                    "description": "操作人员ID",
-                    "type": "string"
-                },
-                "Remark": {
-                    "description": "备注",
-                    "type": "string"
-                },
-                "ReworkBrief": {
-                    "description": "返工简述",
-                    "type": "string"
-                },
                 "materialRecords": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/proto.MaterialRecordInfo"
                     }
+                },
+                "productReworkCauseID": {
+                    "description": "返工原因ID",
+                    "type": "string"
+                },
+                "productReworkRecordID": {
+                    "description": "返工记录ID",
+                    "type": "string"
+                },
+                "productReworkSolutionID": {
+                    "description": "返工解决方案ID",
+                    "type": "string"
+                },
+                "productReworkTypeID": {
+                    "description": "返工类型ID",
+                    "type": "string"
+                },
+                "productReworkUserID": {
+                    "description": "操作人员ID",
+                    "type": "string"
+                },
+                "remark": {
+                    "description": "备注",
+                    "type": "string"
+                },
+                "reworkBrief": {
+                    "description": "返工简述",
+                    "type": "string"
                 }
             }
         }
