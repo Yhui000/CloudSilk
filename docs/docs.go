@@ -22246,30 +22246,39 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "isFail": {
+                    "description": "是否失败",
                     "type": "boolean"
                 },
                 "isRework": {
+                    "description": "是否返工",
                     "type": "boolean"
                 },
                 "packageNo": {
+                    "description": "包装箱号",
                     "type": "string"
                 },
                 "productSerialNo": {
+                    "description": "产品序列号",
                     "type": "string"
                 },
                 "productionStation": {
+                    "description": "工位代号",
                     "type": "string"
                 },
                 "reworkReason": {
+                    "description": "返工原因",
                     "type": "string"
                 },
                 "trayNo": {
+                    "description": "托盘号",
                     "type": "string"
                 },
                 "unbindTray": {
+                    "description": "是否解除托盘",
                     "type": "boolean"
                 },
                 "waitTime": {
+                    "description": "等待时长",
                     "type": "integer"
                 }
             }

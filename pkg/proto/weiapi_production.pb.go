@@ -460,15 +460,24 @@ type ExitProductionStationRequest struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// 工位代号
 	ProductionStation string `protobuf:"bytes,1,opt,name=productionStation,proto3" json:"productionStation"`
-	TrayNo            string `protobuf:"bytes,2,opt,name=trayNo,proto3" json:"trayNo"`
-	ProductSerialNo   string `protobuf:"bytes,3,opt,name=productSerialNo,proto3" json:"productSerialNo"`
-	PackageNo         string `protobuf:"bytes,4,opt,name=packageNo,proto3" json:"packageNo"`
-	IsFail            bool   `protobuf:"varint,5,opt,name=isFail,proto3" json:"isFail"`
-	IsRework          bool   `protobuf:"varint,6,opt,name=isRework,proto3" json:"isRework"`
-	ReworkReason      string `protobuf:"bytes,7,opt,name=reworkReason,proto3" json:"reworkReason"`
-	WaitTime          int32  `protobuf:"varint,8,opt,name=waitTime,proto3" json:"waitTime"`
-	UnbindTray        bool   `protobuf:"varint,9,opt,name=unbindTray,proto3" json:"unbindTray"`
+	// 托盘号
+	TrayNo string `protobuf:"bytes,2,opt,name=trayNo,proto3" json:"trayNo"`
+	// 产品序列号
+	ProductSerialNo string `protobuf:"bytes,3,opt,name=productSerialNo,proto3" json:"productSerialNo"`
+	// 包装箱号
+	PackageNo string `protobuf:"bytes,4,opt,name=packageNo,proto3" json:"packageNo"`
+	// 是否失败
+	IsFail bool `protobuf:"varint,5,opt,name=isFail,proto3" json:"isFail"`
+	// 是否返工
+	IsRework bool `protobuf:"varint,6,opt,name=isRework,proto3" json:"isRework"`
+	// 返工原因
+	ReworkReason string `protobuf:"bytes,7,opt,name=reworkReason,proto3" json:"reworkReason"`
+	// 等待时长
+	WaitTime int32 `protobuf:"varint,8,opt,name=waitTime,proto3" json:"waitTime"`
+	// 是否解除托盘
+	UnbindTray bool `protobuf:"varint,9,opt,name=unbindTray,proto3" json:"unbindTray"`
 }
 
 func (x *ExitProductionStationRequest) Reset() {

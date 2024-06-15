@@ -61,14 +61,23 @@ message EnterProductionStationInfo{
 }
 
 message ExitProductionStationRequest{
+    //工位代号
     string productionStation=1;
+    //托盘号
     string trayNo=2;
+    //产品序列号
     string productSerialNo=3;
+    //包装箱号
     string packageNo=4;
+    //是否失败
     bool isFail=5;
+    //是否返工
     bool isRework=6;
+    //返工原因
     string reworkReason=7;
+    //等待时长
     int32 waitTime=8;
+    //是否解除托盘
     bool unbindTray=9;
 }
 

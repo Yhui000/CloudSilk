@@ -14,4 +14,5 @@ func (s *Server) Start(r *gin.Engine) {
 
 	config.SetProviderService(&provider.MaterialTrayProvider{})
 	config.SetProviderService(&provider.MaterialTrayBindingRecordProvider{})
+	config.SetProviderService(&provider.MaterialChannelLayerProvider{})
 }
