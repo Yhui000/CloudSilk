@@ -8,7 +8,7 @@ import (
 )
 
 type ProductOrderProcessStepProvider struct {
-	proto.ProductOrderProcessStepServer
+	proto.UnimplementedProductOrderProcessStepServer
 }
 
 func (u *ProductOrderProcessStepProvider) Query(ctx context.Context, in *proto.QueryProductOrderProcessStepRequest) (*proto.QueryProductOrderProcessStepResponse, error) {

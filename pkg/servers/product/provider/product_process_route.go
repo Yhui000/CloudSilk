@@ -9,7 +9,7 @@ import (
 )
 
 type ProductProcessRouteProvider struct {
-	proto.ProductProcessRouteServer
+	proto.UnimplementedProductProcessRouteServer
 }
 
 func (u *ProductProcessRouteProvider) Add(ctx context.Context, in *proto.ProductProcessRouteInfo) (*proto.CommonResponse, error) {

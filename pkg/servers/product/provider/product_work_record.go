@@ -8,7 +8,7 @@ import (
 )
 
 type ProductWorkRecordProvider struct {
-	proto.ProductWorkRecordServer
+	proto.UnimplementedProductWorkRecordServer
 }
 
 func (u *ProductWorkRecordProvider) Query(ctx context.Context, in *proto.QueryProductWorkRecordRequest) (*proto.QueryProductWorkRecordResponse, error) {

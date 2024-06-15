@@ -8,7 +8,7 @@ import (
 )
 
 type ProductOrderBomProvider struct {
-	proto.ProductOrderBomServer
+	proto.UnimplementedProductOrderBomServer
 }
 
 func (u *ProductOrderBomProvider) Query(ctx context.Context, in *proto.QueryProductOrderBomRequest) (*proto.QueryProductOrderBomResponse, error) {

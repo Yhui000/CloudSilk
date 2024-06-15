@@ -22,7 +22,7 @@ import (
 // @Success 200 {object} proto.GetAllProductionLineResponse
 // @Router /api/mom/webapi/infrastructure/getallproductionline [get]
 func GetAllProductionLine(c *gin.Context) {
-	resp := map[string]interface{}{"code": 0}
+	resp := map[string]interface{}{"code": types.ServiceResponseCodeSuccess}
 	// resp := &proto.GetAllProductionLineResponse{
 	// 	Code: proto.Code_Success,
 	// }
@@ -51,32 +51,33 @@ func GetAllProductionLine(c *gin.Context) {
 func RetrieveProductionStation(c *gin.Context) {
 	transID := middleware.GetTransID(c)
 	req := &proto.RetrieveProductionStationRequest{}
-	resp := &proto.GetAllProductionStationResponse{Code: 200}
+	// resp := &proto.GetAllProductionStationResponse{Code: 200}
+	resp := map[string]interface{}{"code": types.ServiceResponseCodeSuccess}
 
 	if err := c.BindJSON(req); err != nil {
-		resp.Code = 400
-		resp.Message = err.Error()
+		resp["code"] = types.ServiceResponseCodeFailure
+		resp["message"] = err.Error()
 		c.JSON(http.StatusOK, resp)
 		log.Warnf(context.Background(), "TransID:%s,查询产线工位信息请求参数无效:%v", transID, err)
 		return
 	}
 
 	if err := middleware.Validate.Struct(req); err != nil {
-		resp.Code = 400
-		resp.Message = err.Error()
+		resp["code"] = types.ServiceResponseCodeFailure
+		resp["message"] = err.Error()
 		c.JSON(http.StatusOK, resp)
 		return
 	}
 
 	data, err := logic.RetrieveProductionStation(req)
 	if err != nil {
-		resp.Code = 400
-		resp.Message = err.Error()
+		resp["code"] = types.ServiceResponseCodeFailure
+		resp["message"] = err.Error()
 		c.JSON(http.StatusOK, resp)
 		return
 	}
 
-	resp.Data = data
+	resp["data"] = data
 	c.JSON(http.StatusOK, resp)
 }
 
@@ -93,32 +94,33 @@ func RetrieveProductionStation(c *gin.Context) {
 func RetrieveProductAttribute(c *gin.Context) {
 	transID := middleware.GetTransID(c)
 	req := &proto.RetrieveProductAttributeRequest{}
-	resp := &proto.GetAllProductAttributeResponse{Code: 200}
+	// resp := &proto.GetAllProductAttributeResponse{Code: 200}
+	resp := map[string]interface{}{"code": types.ServiceResponseCodeSuccess}
 
 	if err := c.BindJSON(req); err != nil {
-		resp.Code = 400
-		resp.Message = err.Error()
+		resp["code"] = types.ServiceResponseCodeFailure
+		resp["message"] = err.Error()
 		c.JSON(http.StatusOK, resp)
 		log.Warnf(context.Background(), "TransID:%s,查询产品特性信息请求参数无效:%v", transID, err)
 		return
 	}
 
 	if err := middleware.Validate.Struct(req); err != nil {
-		resp.Code = 400
-		resp.Message = err.Error()
+		resp["code"] = types.ServiceResponseCodeFailure
+		resp["message"] = err.Error()
 		c.JSON(http.StatusOK, resp)
 		return
 	}
 
 	data, err := logic.RetrieveProductAttribute(req)
 	if err != nil {
-		resp.Code = 400
-		resp.Message = err.Error()
+		resp["code"] = types.ServiceResponseCodeFailure
+		resp["message"] = err.Error()
 		c.JSON(http.StatusOK, resp)
 		return
 	}
 
-	resp.Data = data
+	resp["data"] = data
 	c.JSON(http.StatusOK, resp)
 }
 
@@ -135,32 +137,33 @@ func RetrieveProductAttribute(c *gin.Context) {
 func RetrieveProductionCrossway(c *gin.Context) {
 	transID := middleware.GetTransID(c)
 	req := &proto.RetrieveProductionCrosswayRequest{}
-	resp := &proto.GetAllProductionCrosswayResponse{Code: 200}
+	resp := map[string]interface{}{"code": types.ServiceResponseCodeSuccess}
+	// resp := &proto.GetAllProductionCrosswayResponse{Code: 200}
 
 	if err := c.BindJSON(req); err != nil {
-		resp.Code = 400
-		resp.Message = err.Error()
+		resp["code"] = types.ServiceResponseCodeFailure
+		resp["message"] = err.Error()
 		c.JSON(http.StatusOK, resp)
 		log.Warnf(context.Background(), "TransID:%s,查询产品特性信息请求参数无效:%v", transID, err)
 		return
 	}
 
 	if err := middleware.Validate.Struct(req); err != nil {
-		resp.Code = 400
-		resp.Message = err.Error()
+		resp["code"] = types.ServiceResponseCodeFailure
+		resp["message"] = err.Error()
 		c.JSON(http.StatusOK, resp)
 		return
 	}
 
 	data, err := logic.RetrieveProductionCrossway(req)
 	if err != nil {
-		resp.Code = 400
-		resp.Message = err.Error()
+		resp["code"] = types.ServiceResponseCodeFailure
+		resp["message"] = err.Error()
 		c.JSON(http.StatusOK, resp)
 		return
 	}
 
-	resp.Data = data
+	resp["data"] = data
 	c.JSON(http.StatusOK, resp)
 }
 
