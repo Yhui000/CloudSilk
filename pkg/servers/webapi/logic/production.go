@@ -1174,7 +1174,7 @@ func ExitProductionStation(req *proto.ExitProductionStationRequest) (*proto.Comm
 		//切换到下个工艺
 		_productProcessRoutes, _ := clients.ProductProcessRouteClient.Query(context.Background(), &proto.QueryProductProcessRouteRequest{
 			PageSize:      1,
-			SortConfig:    `{"sort_index": "asc"}`,
+			SortConfig:    `{"work_index": "asc"}`,
 			ProductInfoID: productInfo.Id,
 			RouteIndex:    lastProductProcessRoute.RouteIndex,
 			CurrentState:  types.ProductProcessRouteStateWaitProcess,
