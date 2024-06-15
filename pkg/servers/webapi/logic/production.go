@@ -1726,8 +1726,8 @@ func RetrieveProductReworkRecord(req *proto.RetrieveProductReworkRecordRequest) 
 		data[i] = map[string]interface{}{
 			"id":                v.ID,
 			"reworkReason":      v.ReworkReason,
-			"reworkTime":        v.ReworkTime,
-			"completeTime":      v.CompleteTime,
+			"reworkTime":        utils.FormatSqlNullTime(v.ReworkTime),
+			"completeTime":      utils.FormatSqlNullTime(v.CompleteTime),
 			"productOrderNo":    v.ProductInfo.ProductOrder.ProductOrderNo,
 			"productSerialNo":   v.ProductInfo.ProductSerialNo,
 			"productionStation": v.ProductionStation.Description,

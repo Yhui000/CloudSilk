@@ -421,7 +421,7 @@ func UpdateProductReworkRecord(c *gin.Context) {
 		return
 	}
 
-	resp, err := logic.UpdateProductReworkRecord(req)
+	_resp, err := logic.UpdateProductReworkRecord(req)
 	if err != nil {
 		resp["code"] = types.ServiceResponseCodeFailure
 		resp["message"] = err.Error()
@@ -429,7 +429,7 @@ func UpdateProductReworkRecord(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, resp)
+	c.JSON(http.StatusOK, _resp)
 }
 
 func RegisterProductionRouter(r *gin.Engine) {
