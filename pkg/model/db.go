@@ -61,7 +61,10 @@ func AutoMigrate() {
 		&MaterialReturnRequestForm{},
 		&MaterialReturnType{},
 		&MaterialReturnCause{},
+		&MaterialReturnCauseAvailableCategory{},
+		&MaterialReturnCauseAvailableType{},
 		&MaterialReturnSolution{},
+		&MaterialReturnSolutionAvailableCause{},
 
 		&ProductInfo{},
 		&ProductOrderAttribute{},
