@@ -71,8 +71,8 @@ func RetrieveProductionStation(req *proto.RetrieveProductionStationRequest) ([]m
 	data := []map[string]interface{}{}
 	for _, s := range productionLine.ProductionStations {
 		data = append(data, map[string]interface{}{
-			"dd":              s.ID,
-			"dode":            s.Code,
+			"id":              s.ID,
+			"code":            s.Code,
 			"description":     s.Description,
 			"stationType":     s.StationType,
 			"accountControl":  s.AccountControl,

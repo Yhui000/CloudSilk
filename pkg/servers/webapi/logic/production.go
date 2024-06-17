@@ -2002,8 +2002,8 @@ func UpdateProductReworkRecord(req *proto.UpdateProductReworkRecordRequest) (map
 			"id":                      productReworkRecord.ID,
 			"productReworkCauseID":    productReworkRecord.ProductReworkCauseID,
 			"productReworkSolutionID": productReworkRecord.ProductReworkSolutionID,
-			"completeTime":            productReworkRecord.CompleteTime,
-			"createTime":              productReworkRecord.CreateTime,
+			"completeTime":            utils.FormatSqlNullTime(productReworkRecord.CompleteTime),
+			"createTime":              utils.FormatTime(productReworkRecord.CreateTime),
 		},
 	}, nil
 }
