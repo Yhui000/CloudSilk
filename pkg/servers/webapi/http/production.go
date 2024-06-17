@@ -25,7 +25,7 @@ import (
 func OnlineProductInfo(c *gin.Context) {
 	transID := middleware.GetTransID(c)
 	req := &proto.OnlineProductInfoRequest{}
-	resp := &proto.CommonResponse{Code: types.ServiceResponseCodeSuccess}
+	resp := &proto.CommonResponse{Code: types.ServiceResponseCodeSuccess, Message: "上线成功"}
 
 	var err error
 	if err = c.BindJSON(req); err != nil {
@@ -43,7 +43,13 @@ func OnlineProductInfo(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, logic.OnlineProductInfo(req))
+	code, err := logic.OnlineProductInfo(req)
+	if err != nil {
+		resp.Code = proto.Code(code)
+		resp.Message = err.Error()
+	}
+
+	c.JSON(http.StatusOK, resp)
 }
 
 // EnterProductionStation godoc

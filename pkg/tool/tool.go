@@ -1,9 +1,11 @@
 package tool
 
 import (
+	"database/sql"
 	"fmt"
 	"strconv"
 	"strings"
+	"time"
 )
 
 func MathOperator(value, method, attributeExpressionValue string) (bool, error) {
@@ -76,4 +78,8 @@ func Contains(v string, list []string) bool {
 		}
 	}
 	return false
+}
+
+func Time2NullTime(time time.Time) sql.NullTime {
+	return sql.NullTime{Time: time, Valid: true}
 }

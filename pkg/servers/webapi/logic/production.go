@@ -20,229 +20,244 @@ import (
 )
 
 // 设定产品信息状态为上线装配
-func OnlineProductInfo(req *proto.OnlineProductInfoRequest) *proto.CommonResponse {
+func OnlineProductInfo(req *proto.OnlineProductInfoRequest) (code int32, err error) {
 	if req.ProductionLine == "" {
-		return &proto.CommonResponse{Code: 40000, Message: "ProductionLine不能为空"}
+		return 40000, fmt.Errorf("ProductionLine不能为空")
 	}
 	if req.ProductSerialNo == "" {
-		return &proto.CommonResponse{Code: 40000, Message: "ProductSerialNo不能为空"}
+		return 40000, fmt.Errorf("ProductSerialNo不能为空")
 	}
 
-	_productionLine, _ := clients.ProductionLineClient.Get(context.Background(), &proto.GetProductionLineRequest{Code: req.ProductionLine})
-	if _productionLine.Message == gorm.ErrRecordNotFound.Error() {
-		return &proto.CommonResponse{Code: 10001, Message: "无效的产线代号"}
-	}
-	if _productionLine.Code != modelcode.Success {
-		return &proto.CommonResponse{Code: 50000, Message: _productionLine.Message}
-	}
-	productionLine := _productionLine.Data
-
-	_productInfo, _ := clients.ProductInfoClient.Get(context.Background(), &proto.GetProductInfoRequest{ProductSerialNo: req.ProductSerialNo})
-	if _productInfo.Message == gorm.ErrRecordNotFound.Error() {
-		return &proto.CommonResponse{Code: 10002, Message: "读取产品信息失败，请联系管理员处理"}
-	}
-	if _productInfo.Code != modelcode.Success {
-		return &proto.CommonResponse{Code: 50000, Message: _productInfo.Message}
-	}
-	productInfo := _productInfo.Data
-
-	_productOrder, _ := clients.ProductOrderClient.GetDetail(context.Background(), &proto.GetDetailRequest{Id: productInfo.ProductOrderID})
-	if _productOrder.Message == gorm.ErrRecordNotFound.Error() {
-		return &proto.CommonResponse{Code: 10003, Message: "此生产工单发放产线与上线产线不匹配"}
-	}
-	if _productOrder.Code != modelcode.Success {
-		return &proto.CommonResponse{Code: 50000, Message: _productOrder.Message}
-	}
-	productOrder := _productOrder.Data
-
-	if req.ProductOrderNo != "" && productOrder.ProductOrderNo != req.ProductOrderNo {
-		return &proto.CommonResponse{Code: 10003, Message: "此产品的隶属工单与当前工单不匹配"}
-	}
-
-	//TODO: 兼容，部分产线是直接创建产品工艺路线，部分是根据工单工艺动态创建
-	_productProcessRoutes, _ := clients.ProductProcessRouteClient.Query(context.Background(), &proto.QueryProductProcessRouteRequest{
-		PageSize:      1,
-		SortConfig:    `{"route_index": "asc"}`,
-		ProductInfoID: productInfo.Id,
-		CurrentState:  types.ProductProcessRouteStateWaitProcess,
-	})
-	if _productProcessRoutes.Code != modelcode.Success {
-		return &proto.CommonResponse{Code: 50000, Message: _productProcessRoutes.Message}
-	}
-	productProcessRoutes := _productProcessRoutes.Data
-
-	var productProcessRoute *proto.ProductProcessRouteInfo
-	if len(productProcessRoutes) == 0 {
-		_productOrderProcesses, _ := clients.ProductOrderProcessClient.Query(context.Background(), &proto.QueryProductOrderProcessRequest{
-			PageSize:       1,
-			SortConfig:     `{"sort_index": "asc"}`,
-			ProductOrderID: productInfo.ProductOrderID,
-			Enable:         true,
-		})
-		if _productOrderProcesses.Code != modelcode.Success {
-			return &proto.CommonResponse{Code: 50000, Message: _productOrderProcesses.Message}
-		}
-		if len(_productOrderProcesses.Data) == 0 {
-			return &proto.CommonResponse{Code: 10004, Message: "上线失败，此工单缺少工艺路线"}
-		}
-		productOrderProcess := _productOrderProcesses.Data[0]
-
-		productProcessRoute = &proto.ProductProcessRouteInfo{
-			CurrentProcessID: productOrderProcess.ProductionProcessID,
-			CurrentState:     types.ProductProcessRouteStateWaitProcess,
-			RouteIndex:       productOrderProcess.SortIndex,
-			ProductInfoID:    productInfo.Id,
+	if err := model.DB.DB().Transaction(func(tx *gorm.DB) error {
+		productionLine := &model.ProductionLine{}
+		if err := tx.First(productionLine, "`code` = ?", req.ProductionLine).Error; err == gorm.ErrRecordNotFound {
+			code = 10001
+			return fmt.Errorf("无效的产线代号")
+		} else if err != nil {
+			code = 50000
+			return err
 		}
 
-		if _productProcessRoute, _ := clients.ProductProcessRouteClient.Add(context.Background(), productProcessRoute); _productProcessRoute.Code != modelcode.Success {
-			return &proto.CommonResponse{Code: 50000, Message: _productProcessRoute.Message}
+		productInfo := &model.ProductInfo{}
+		if err := tx.Preload("ProductOrder").First(productInfo, "`product_serial_no` = ?", req.ProductSerialNo).Error; err == gorm.ErrRecordNotFound {
+			code = 10002
+			return fmt.Errorf("读取产品信息失败，请联系管理员处理")
+		} else if err != nil {
+			code = 50000
+			return err
 		}
-	} else {
-		productProcessRoute = productProcessRoutes[0]
-	}
 
-	productProcessRoute.WorkIndex = 1
+		if productInfo.CurrentState != types.ProductStateReceipted {
+			code = 10002
+			return fmt.Errorf("产品当前状态为%s，无法上线", productInfo.CurrentState)
+		}
 
-	//TODO: 更新产品信息
-	_productOrderProcesses, _ := clients.ProductOrderProcessClient.Query(context.Background(), &proto.QueryProductOrderProcessRequest{
-		ProductOrderID: productInfo.ProductOrderID,
-		Enable:         true,
-		SortIndex:      productProcessRoute.WorkIndex,
-	})
-	now := time.Now()
-	nowStr := time.Now().Format("2006-01-02 15:04:05")
-	remainingRoutes := int32(len(_productOrderProcesses.Data))
-	estimateTime := now.Add(time.Duration(remainingRoutes*productInfo.ProductOrder.StandardWorkTime) * time.Second).Format("2006-01-02 15:04:05")
-	productInfo.ProductionProcessID = productProcessRoute.CurrentProcessID
-	productInfo.RemainingRoutes = remainingRoutes
-	productInfo.EstimateTime = estimateTime
-	if productProcessRoute.CurrentProcess != nil && productProcessRoute.CurrentProcess.ProductState != "" {
-		productInfo.CurrentState = productProcessRoute.CurrentProcess.ProductState
-	} else {
-		productInfo.CurrentState = types.ProductStateAssembling
-	}
+		productOrder := productInfo.ProductOrder
+		if productOrder == nil {
+			code = 10003
+			return fmt.Errorf("读取生产工单失败，请联系管理员处理")
+		}
 
-	productInfo.StartedTime = nowStr
-	if _productInfo, _ := clients.ProductInfoClient.Update(context.Background(), productInfo); _productInfo.Code != modelcode.Success {
-		return &proto.CommonResponse{Code: 50000, Message: _productInfo.Message}
-	}
+		if productOrder.ProductionLineID != &productInfo.ID {
+			code = 10003
+			return fmt.Errorf("此生产工单发放产线与上线产线不匹配")
+		}
+		if req.ProductOrderNo != "" && productOrder.ProductOrderNo != req.ProductOrderNo {
+			code = 10003
+			return fmt.Errorf("此产品的隶属工单与当前工单不匹配")
+		}
 
-	//TODO: 更新工单信息
-	if productOrder.ActualStartTime == "" {
-		productOrder.ActualStartTime = nowStr
-		productOrder.StartedQTY = 0
-		productOrder.CurrentState = types.ProductOrderStateProducting
-		_systemEvent, _ := clients.SystemEventClient.Get(context.Background(), &proto.GetSystemEventRequest{Code: types.SystemEventProductOrderStarted})
-		if _systemEvent.Data != nil {
-			systemEvent := _systemEvent.Data
-			_systemEventTrigger, _ := clients.SystemEventTriggerClient.Add(context.Background(), &proto.SystemEventTriggerInfo{
-				SystemEventID: systemEvent.Id,
-				EventNo:       uuid.NewString(),
-				CurrentState:  types.SystemEventTriggerStateWaitExecute,
-			})
-			if _systemEventTrigger.Code != modelcode.Success {
-				return &proto.CommonResponse{Code: 50000, Message: _systemEventTrigger.Message}
+		//TODO: 兼容，部分产线是直接创建产品工艺路线，部分是根据工单工艺动态创建
+		productProcessRoute := &model.ProductProcessRoute{}
+		if err := tx.Where(model.ProductProcessRoute{
+			ProductInfoID: productInfo.ID,
+			CurrentState:  types.ProductProcessRouteStateWaitProcess,
+		}).Order("route_index").First(productProcessRoute).Error; err != nil && err != gorm.ErrRecordNotFound {
+			code = 50000
+			return err
+		}
+
+		if productProcessRoute.ID == "" {
+			productOrderProcess := &model.ProductOrderProcess{}
+			if err := tx.Where(model.ProductOrderProcess{ProductOrderID: productInfo.ProductOrderID, Enable: true}).Order("sort_index").First(productOrderProcess).Error; err == gorm.ErrRecordNotFound {
+				code = 10004
+				return fmt.Errorf("上线失败，此工单缺少工艺路线")
+			} else if err != nil {
+				code = 50000
+				return err
 			}
-			systemEventTriggerID := _systemEventTrigger.Message
 
-			for _, systemEventParameter := range systemEvent.SystemEventParameters {
-				value := strings.ReplaceAll(systemEventParameter.Value, "{ProductOrderNo}", productOrder.ProductOrderNo)
-				if _systemEventTriggerParameter, _ := clients.SystemEventTriggerParameterClient.Add(context.Background(), &proto.SystemEventTriggerParameterInfo{
-					SystemEventTriggerID: systemEventTriggerID,
-					DataType:             systemEventParameter.DataType,
-					Name:                 systemEventParameter.Name,
-					Description:          systemEventParameter.Description,
-					Value:                value,
-				}); _systemEventTriggerParameter.Code != modelcode.Success {
-					return &proto.CommonResponse{Code: 50000, Message: _systemEventTriggerParameter.Message}
+			productProcessRoute = &model.ProductProcessRoute{
+				LastProcessID:    nil,
+				CurrentProcessID: productOrderProcess.ProductionProcessID,
+				CurrentProcess:   productOrderProcess.ProductionProcess,
+				CurrentState:     types.ProductProcessRouteStateWaitProcess,
+				RouteIndex:       productOrderProcess.SortIndex,
+				ProductInfoID:    productInfo.ID,
+			}
+
+			if err := tx.Create(productProcessRoute).Error; err != nil {
+				code = 50000
+				return err
+			}
+		}
+
+		productProcessRoute.WorkIndex = 1
+
+		//TODO: 更新产品信息
+		productOrderProcesses := []*model.ProductOrderProcess{}
+		if err := tx.Where(model.ProductOrderProcess{ProductOrderID: productInfo.ProductOrderID, Enable: true}).Where("`sort_index` > ?", productProcessRoute.WorkIndex).Find(&productOrderProcesses).Error; err != nil {
+			code = 50000
+			return err
+		}
+
+		now := time.Now()
+		remainingRoutes := int32(len(productOrderProcesses))
+		estimateTime := now.Add(time.Duration(remainingRoutes*productInfo.ProductOrder.StandardWorkTime) * time.Second)
+		productInfo.ProductionProcessID = productProcessRoute.CurrentProcessID
+		productInfo.RemainingRoutes = remainingRoutes
+		productInfo.EstimateTime = tool.Time2NullTime(estimateTime)
+		productInfo.StartedTime = tool.Time2NullTime(now)
+		if productProcessRoute.CurrentProcess != nil && productProcessRoute.CurrentProcess.ProductState != "" {
+			productInfo.CurrentState = productProcessRoute.CurrentProcess.ProductState
+		} else {
+			productInfo.CurrentState = types.ProductStateAssembling
+		}
+
+		//TODO: 更新工单信息
+		if !productOrder.ActualStartTime.Valid {
+			productOrder.ActualStartTime = tool.Time2NullTime(now)
+			productOrder.StartedQTY = 0
+			productOrder.CurrentState = types.ProductOrderStateProducting
+
+			systemEvent := &model.SystemEvent{}
+			if err := tx.First(systemEvent, "`code` = ?", types.SystemEventProductOrderStarted).Error; err != nil && err != gorm.ErrRecordNotFound {
+				code = 50000
+				return err
+			}
+
+			if systemEvent.ID != "" {
+				systemEventTriggerParameter := []*model.SystemEventTriggerParameter{}
+				for _, systemEventParameter := range systemEvent.SystemEventParameters {
+					value := strings.ReplaceAll(systemEventParameter.Value, "{ProductOrderNo}", productOrder.ProductOrderNo)
+					systemEventTriggerParameter = append(systemEventTriggerParameter, &model.SystemEventTriggerParameter{
+						DataType:    systemEventParameter.DataType,
+						Name:        systemEventParameter.Name,
+						Description: systemEventParameter.Description,
+						Value:       value,
+					})
+				}
+
+				if err := tx.Create(&model.SystemEventTrigger{
+					SystemEventID:                systemEvent.ID,
+					EventNo:                      uuid.NewString(),
+					CurrentState:                 types.SystemEventTriggerStateWaitExecute,
+					SystemEventTriggerParameters: systemEventTriggerParameter,
+				}).Error; err != nil {
+					code = 50000
+					return err
+				}
+			}
+			productOrder.StartedQTY += 1
+
+			//TODO: 绑定托盘
+			if req.TrayNo != "" {
+				materialTray := &model.MaterialTray{}
+				if err := tx.First(materialTray, "`identifier` = ?", req.TrayNo).Error; err == gorm.ErrRecordNotFound {
+					code = 10005
+					return fmt.Errorf("无效的物料托盘识别码")
+				} else if err != nil {
+					code = 50000
+					return err
+				}
+
+				if !materialTray.Enable {
+					code = 10005
+					return fmt.Errorf("托盘已禁用")
+				}
+				if materialTray.TrayType != types.MaterialTrayTypeMaterialTray {
+					code = 10005
+					return fmt.Errorf("非法操作，只允许使用物料托盘上线")
+				}
+				if materialTray.ProductionLineID != productionLine.ID {
+					code = 10005
+					return fmt.Errorf("非法操作，此托盘不属于当前产线")
+				}
+				if materialTray.ProductInfoID != nil && *materialTray.ProductInfoID != productInfo.ID {
+					code = 10005
+					return fmt.Errorf("非法操作，此托盘已绑定其他产品")
+				}
+
+				if err := tx.Create(&model.MaterialTrayBindingRecord{
+					MaterialTrayID: materialTray.ID,
+					ProductInfoID:  productInfo.ID,
+					CurrentState:   types.MaterialTrayBindingRecordStateEffected,
+				}).Error; err != nil {
+					code = 50000
+					return err
+				}
+			}
+
+			//TODO: 触发事件
+			systemEvent2 := &model.SystemEvent{}
+			if err := tx.First(systemEvent2, "`code` = ?", types.SystemEventProductInfoOnlined).Error; err != nil && err != gorm.ErrRecordNotFound {
+				code = 50000
+				return err
+			}
+
+			if systemEvent2.ID != "" {
+				productOrderAttributes := []*model.ProductOrderAttribute{}
+				if err := tx.Find(&productOrderAttributes, "`product_order_id` = ?", productInfo.ProductOrderID).Error; err != nil {
+					code = 50000
+					return err
+				}
+
+				systemEventTriggerParameter := []*model.SystemEventTriggerParameter{}
+				for _, systemEventParameter := range systemEvent2.SystemEventParameters {
+					value := systemEventParameter.Value
+					value = strings.ReplaceAll(value, "{ProductSerialNo}", productInfo.ProductSerialNo)
+					value = strings.ReplaceAll(value, "{ProductOrderNo}", productOrder.ProductOrderNo)
+					value = strings.ReplaceAll(value, "{SalesOrderNo}", productOrder.SalesOrderNo)
+					value = strings.ReplaceAll(value, "{ItemNo}", productOrder.ItemNo)
+					for _, productOrderAttribute := range productOrderAttributes {
+						value = strings.ReplaceAll(value, "{"+productOrderAttribute.ProductAttribute.Code+"}", productOrderAttribute.Value)
+					}
+
+					systemEventTriggerParameter = append(systemEventTriggerParameter, &model.SystemEventTriggerParameter{
+						DataType:    systemEventParameter.DataType,
+						Name:        systemEventParameter.Name,
+						Description: systemEventParameter.Description,
+						Value:       value,
+					})
+				}
+
+				if err := tx.Create(&model.SystemEventTrigger{
+					SystemEventID:                systemEvent2.ID,
+					EventNo:                      uuid.NewString(),
+					CurrentState:                 types.SystemEventTriggerStateWaitExecute,
+					SystemEventTriggerParameters: systemEventTriggerParameter,
+				}).Error; err != nil {
+					code = 50000
+					return err
 				}
 			}
 		}
-		productOrder.StartedQTY += 1
 
-		if _productOrder, _ := clients.ProductOrderClient.Update(context.Background(), productOrder); _productOrder.Code != modelcode.Success {
-			return &proto.CommonResponse{Code: 50000, Message: _productOrder.Message}
+		if err := tx.Save(productInfo).Error; err != nil {
+			code = 50000
+			return err
+		}
+		if err := tx.Save(productOrder).Error; err != nil {
+			code = 50000
+			return err
 		}
 
-		//TODO: 绑定托盘
-		if req.TrayNo != "" {
-			_materialTray, _ := clients.MaterialTrayClient.Get(context.Background(), &proto.GetMaterialTrayRequest{Identifier: req.TrayNo})
-			if _materialTray.Message == gorm.ErrRecordNotFound.Error() {
-				return &proto.CommonResponse{Code: 10005, Message: "无效的物料托盘识别码"}
-			}
-			if _materialTray.Code != modelcode.Success {
-				return &proto.CommonResponse{Code: 50000, Message: _materialTray.Message}
-			}
-			materialTray := _materialTray.Data
-
-			if !materialTray.Enable {
-				return &proto.CommonResponse{Code: 10005, Message: "托盘已禁用"}
-			}
-			if materialTray.TrayType != types.MaterialTrayTypeMaterialTray {
-				return &proto.CommonResponse{Code: 10005, Message: "非法操作，只允许使用物料托盘上线"}
-			}
-			if materialTray.ProductionLineID != productionLine.Id {
-				return &proto.CommonResponse{Code: 10005, Message: "非法操作，此托盘不属于当前产线"}
-			}
-			if materialTray.ProductInfoID != "" && materialTray.ProductInfoID != productInfo.Id {
-				return &proto.CommonResponse{Code: 10005, Message: "非法操作，此托盘已绑定其他产品"}
-			}
-
-			if _materialTrayBindingRecord, _ := clients.MaterialTrayBindingRecordClient.Add(context.Background(), &proto.MaterialTrayBindingRecordInfo{
-				MaterialTrayID: materialTray.Id,
-				ProductInfoID:  productInfo.Id,
-				CreateTime:     nowStr,
-				CurrentState:   types.MaterialTrayBindingRecordStateEffected,
-			}); _materialTrayBindingRecord.Code != modelcode.Success {
-				return &proto.CommonResponse{Code: 50000, Message: _materialTrayBindingRecord.Message}
-			}
-		}
-
-		//TODO: 触发事件
-		_systemEvent, _ = clients.SystemEventClient.Get(context.Background(), &proto.GetSystemEventRequest{Code: types.SystemEventProductInfoOnlined})
-		if _systemEvent.Code != modelcode.Success && _systemEvent.Message != gorm.ErrRecordNotFound.Error() {
-			return &proto.CommonResponse{Code: 50000, Message: _systemEvent.Message}
-		}
-		if _systemEvent.Data != nil {
-			systemEvent := _systemEvent.Data
-			_systemEventTrigger, _ := clients.SystemEventTriggerClient.Add(context.Background(), &proto.SystemEventTriggerInfo{
-				SystemEventID: systemEvent.Id,
-				EventNo:       uuid.NewString(),
-				CurrentState:  types.SystemEventTriggerStateWaitExecute,
-			})
-			if _systemEventTrigger.Code != modelcode.Success {
-				return &proto.CommonResponse{Code: 50000, Message: _systemEventTrigger.Message}
-			}
-			systemEventTriggerID := _systemEventTrigger.Message
-
-			_productOrderAttributes, _ := clients.ProductOrderAttributeClient.Query(context.Background(), &proto.QueryProductOrderAttributeRequest{ProductOrderID: productInfo.ProductOrderID})
-			if _productOrderAttributes.Code != modelcode.Success {
-				return &proto.CommonResponse{Code: 50000, Message: _systemEventTrigger.Message}
-			}
-			for _, systemEventParameter := range systemEvent.SystemEventParameters {
-				value := systemEventParameter.Value
-				value = strings.ReplaceAll(value, "{ProductSerialNo}", productInfo.ProductSerialNo)
-				value = strings.ReplaceAll(value, "{ProductOrderNo}", productOrder.ProductOrderNo)
-				value = strings.ReplaceAll(value, "{SalesOrderNo}", productOrder.SalesOrderNo)
-				value = strings.ReplaceAll(value, "{ItemNo}", productOrder.ItemNo)
-				for _, productOrderAttribute := range _productOrderAttributes.Data {
-					value = strings.ReplaceAll(value, "{"+productOrderAttribute.ProductAttribute.Code+"}", productOrderAttribute.Value)
-				}
-
-				if _systemEventTriggerParameter, _ := clients.SystemEventTriggerParameterClient.Add(context.Background(), &proto.SystemEventTriggerParameterInfo{
-					SystemEventTriggerID: systemEventTriggerID,
-					DataType:             systemEventParameter.DataType,
-					Name:                 systemEventParameter.Name,
-					Description:          systemEventParameter.Description,
-					Value:                value,
-				}); _systemEventTriggerParameter.Code != modelcode.Success {
-					return &proto.CommonResponse{Code: 50000, Message: _systemEventTriggerParameter.Message}
-				}
-			}
-		}
+		return nil
+	}); err != nil {
+		return code, err
 	}
 
-	return &proto.CommonResponse{Code: 20000, Message: "上线成功"}
+	return 20000, nil
 }
 
 // Code = 0, 工艺路线正确
@@ -2007,132 +2022,3 @@ func UpdateProductReworkRecord(req *proto.UpdateProductReworkRecordRequest) (map
 		},
 	}, nil
 }
-
-// 创建产品测试记录
-// func CreateProductTestRecord(req *proto.CreateProductTestRecordRequest) error {
-// 	if req.TestStartTime == "" {
-// 		return fmt.Errorf("TestStartTime不能为空")
-// 	}
-// 	if req.TestEndTime == "" {
-// 		return fmt.Errorf("TestEndTime不能为空")
-// 	}
-// 	if req.TestData == "" {
-// 		return fmt.Errorf("TestData不能为空")
-// 	}
-// 	if req.ProductionStation == "" {
-// 		return fmt.Errorf("ProductionStation不能为空")
-// 	}
-// 	if req.ProductSerialNo == "" {
-// 		return fmt.Errorf("ProductSerialNo不能为空")
-// 	}
-// 	if req.TestProject == "" {
-// 		return fmt.Errorf("TestProject不能为空")
-// 	}
-// 	timeNow := time.Now()
-// 	timeNowStr := timeNow.Format("2006-01-02 15:04:05")
-// 	req.ProductSerialNo = strings.Trim(strings.Trim(req.ProductSerialNo, "\000"), "\r")
-// 	_productInfo, err := clients.ProductInfoClient.Get(context.Background(), &proto.GetProductInfoRequest{ProductSerialNo: req.ProductSerialNo})
-// 	if err == gorm.ErrRecordNotFound {
-// 		return fmt.Errorf("无效的产品信息")
-// 	} else if err != nil {
-// 		return nil, err
-// 	}
-// 	productInfo := _productInfo.Data
-// 	_productionProcessStep, err := clients.ProductionProcessStepClient.Get(context.Background(), &proto.GetProductionProcessStepRequest{Code: req.TestProject})
-// 	if err == gorm.ErrRecordNotFound {
-// 		return fmt.Errorf("无效的测试项目")
-// 	} else if err != nil {
-// 		return nil, err
-// 	}
-// 	productionProcessStep := _productionProcessStep.Data
-// 	if productInfo.ProductionProcessID == "" && productionProcessStep.ProcessControl {
-// 		return fmt.Errorf("无法获取产品的当前工序")
-// 	}
-// 	_ProductionProcess, err := clients.ProductionProcessClient.GetDetail(context.Background(), &proto.GetDetailRequest{Id: productInfo.ProductionProcessID})
-// 	if err != nil && err != gorm.ErrRecordNotFound {
-// 		return nil, err
-// 	}
-// 	productionProcess := _ProductionProcess.Data
-// 	if productionProcessStep.ProcessControl {
-// 		if productionProcess == nil {
-// 			return fmt.Errorf("读取产品的当前工序失败")
-// 		}
-// 		var hasProductionStation bool
-// 		for _, v := range productionProcess.ProductionProcessAvailableStations {
-// 			if v.ProductionStation.Code == req.ProductionStation {
-// 				hasProductionStation = true
-// 				break
-// 			}
-// 		}
-// 		if productionProcess.EnableControl && !hasProductionStation {
-// 			return fmt.Errorf("非法操作，产品的当前工序不支持在此工位进行")
-// 		}
-// 	}
-// 	_productionStation, err := clients.ProductionStationClient.Get(context.Background(), &proto.GetProductionStationRequest{Code: req.ProductionStation})
-// 	if err == gorm.ErrRecordNotFound {
-// 		return fmt.Errorf("无效的产线工位")
-// 	} else if err != nil {
-// 		return nil, err
-// 	}
-// 	productionStation := _productionStation.Data
-// 	testEndTime, err := time.Parse("2006-01-02 15:04:05", req.TestEndTime)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	testStartTime, err := time.Parse("2006-01-02 15:04:05", req.TestStartTime)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	productTestRecord := &proto.ProductTestRecordInfo{
-// 		ProductionProcessStepID: productionProcessStep.Id,
-// 		ProductInfoID:           productInfo.Id,
-// 		ProductionProcessID:     productionProcess.Id,
-// 		ProductionStationID:     productionStation.Id,
-// 		TestUserID:              productionStation.CurrentUserID,
-// 		TestData:                req.TestData,
-// 		TestEndTime:             req.TestEndTime,
-// 		TestStartTime:           req.TestStartTime,
-// 		Duration:                int32(testEndTime.Sub(testStartTime).Seconds()),
-// 		IsQualified:             req.IsQualified,
-// 	}
-// 	if _, err := clients.ProductTestRecordClient.Add(context.Background(), productTestRecord); err != nil {
-// 		return nil, err
-// 	}
-// 	if productionProcess != nil && productionProcess.Identifier != "" {
-// 		//创建系统事件上报测试数据
-// 		_systemEvent, err := clients.SystemEventClient.Get(context.Background(), &proto.GetSystemEventRequest{Code: types.SystemEventProductInfoTested, Enable: true})
-// 		switch err {
-// 		case nil:
-// 			systemEvent := _systemEvent.Data
-// 			systemEventTrigger := &proto.SystemEventTriggerInfo{
-// 				SystemEventID: systemEvent.Id,
-// 				CreateTime:    timeNowStr,
-// 				EventNo:       uuid.NewString(),
-// 				CurrentState:  types.SystemEventTriggerStateWaitExecute,
-// 			}
-// 			for _, _systemEventParameter := range systemEvent.SystemEventParameters {
-// 				value := _systemEventParameter.Value
-// 				if _systemEventParameter.Name == "TestData" {
-// 					value = productTestRecord.TestData
-// 				}
-// 				value = strings.ReplaceAll(value, "{ProductSerialNo}", productInfo.ProductSerialNo)
-// 				value = strings.ReplaceAll(value, "{ProductionStation}", productionStation.Code)
-// 				value = strings.ReplaceAll(value, "{ProductionProcessIdentifier}", productionProcess.Identifier)
-// 				value = strings.ReplaceAll(value, "{ProductionProcess}", productionProcess.Code)
-// 				systemEventTrigger.SystemEventTriggerParameters = append(systemEventTrigger.SystemEventTriggerParameters, &proto.SystemEventTriggerParameterInfo{
-// 					DataType:    _systemEventParameter.DataType,
-// 					Name:        _systemEventParameter.Name,
-// 					Description: _systemEventParameter.Description,
-// 					Value:       value,
-// 				})
-// 			}
-// 			if _, err := clients.SystemEventTriggerClient.Add(context.Background(), systemEventTrigger); err != nil {
-// 				return nil, err
-// 			}
-// 		case gorm.ErrRecordNotFound:
-// 		default:
-// 			return nil, err
-// 		}
-// 	}
-// 	return &proto.CommonResponse{Code: types.ServiceResponseCodeSuccess, Message: "创建成功"}, nil
-// }
