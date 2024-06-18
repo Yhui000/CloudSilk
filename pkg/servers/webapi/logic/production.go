@@ -58,7 +58,7 @@ func OnlineProductInfo(req *proto.OnlineProductInfoRequest) (code int32, err err
 			return fmt.Errorf("读取生产工单失败，请联系管理员处理")
 		}
 
-		if *productOrder.ProductionLineID != productInfo.ID {
+		if *productOrder.ProductionLineID != productionLine.ID {
 			code = 10003
 			return fmt.Errorf("此生产工单发放产线与上线产线不匹配")
 		}
@@ -337,7 +337,10 @@ func EnterProductionStation(req *proto.EnterProductionStationRequest) (data *pro
 		}
 
 		//根据产品序列号获取产品
-		if err := tx.Preload("ProductOrder").First(productInfo, "`product_serial_no` = ?", req.ProductSerialNo).Error; err == gorm.ErrRecordNotFound {
+		if err := tx.Preload("ProductOrder").
+			Preload("ProductOrder.ProductModel").
+			Preload("ProductOrder.ProductModel.ProductCategory").
+			First(productInfo, "`product_serial_no` = ?", req.ProductSerialNo).Error; err == gorm.ErrRecordNotFound {
 			code = 1
 			return fmt.Errorf("读取产品信息失败")
 		} else if err != nil {
@@ -396,7 +399,7 @@ func EnterProductionStation(req *proto.EnterProductionStationRequest) (data *pro
 		//获取产品工艺路线
 		targetStates := []string{types.ProductProcessRouteStateWaitProcess, types.ProductProcessRouteStateProcessing}
 		productProcessRoute := &model.ProductProcessRoute{}
-		if err := tx.Where("`product_info_id` = ? AND `current_process_id` = ? AND `current_states` in ?", productInfo.ID, productInfo.ProductionProcessID, targetStates).First(productProcessRoute).Error; err == gorm.ErrRecordNotFound {
+		if err := tx.Where("`product_info_id` = ? AND `current_process_id` = ? AND `current_state` in ?", productInfo.ID, productInfo.ProductionProcessID, targetStates).First(productProcessRoute).Error; err == gorm.ErrRecordNotFound {
 			code = 1
 			return fmt.Errorf("读取产品当前工艺路线错误")
 		} else if err != nil {
@@ -649,7 +652,9 @@ func GetProductionProcessStepWithParameter(req *proto.GetProductionProcessStepWi
 
 	//获取生产工艺
 	productionProcess := &model.ProductionProcess{}
-	if err := model.DB.DB().Preload("ProductionProcessAvailableStations").First(productionProcess, "`id` = ?", productInfo.ProductionProcessID).Error; err == gorm.ErrRecordNotFound {
+	if err := model.DB.DB().Preload("ProductionProcessAvailableStations").
+		Preload("ProductionProcessAvailableStations.ProductionStation").
+		First(productionProcess, "`id` = ?", productInfo.ProductionProcessID).Error; err == gorm.ErrRecordNotFound {
 		return nil, fmt.Errorf("读取产品的当前工序失败")
 	} else if err != nil {
 		return nil, err
@@ -674,7 +679,10 @@ func GetProductionProcessStepWithParameter(req *proto.GetProductionProcessStepWi
 	}
 
 	productOrder := &model.ProductOrder{}
-	if err := model.DB.DB().Preload("ProductOrderAttributes").First(productOrder, "`id` = ?", productInfo.ProductOrderID).Error; err == gorm.ErrRecordNotFound {
+	if err := model.DB.DB().Preload("ProductOrderAttributes").
+		Preload("ProductOrderAttributes.ProductAttribute").
+		Preload("ProductModel").
+		First(productOrder, "`id` = ?", productInfo.ProductOrderID).Error; err == gorm.ErrRecordNotFound {
 		return nil, fmt.Errorf("读取产品工单失败")
 	} else if err != nil {
 		return nil, err
@@ -696,7 +704,7 @@ func GetProductionProcessStepWithParameter(req *proto.GetProductionProcessStepWi
 	if err := model.DB.DB().Preload("MaterialChannelLayer").
 		Joins("JOIN material_channel_layers ON material_channels.material_channel_layer_id=material_channel_layers.id").
 		Where("material_channel_layers.production_station_id = ?", productionStation.ID).
-		Find(materialChannels).Error; err != nil {
+		Find(&materialChannels).Error; err != nil {
 		return nil, err
 	}
 
@@ -724,10 +732,10 @@ func GetProductionProcessStepWithParameter(req *proto.GetProductionProcessStepWi
 
 	_productionProcessSteps := []*model.ProductionProcessStep{}
 	if err := model.DB.DB().Preload("AttributeExpressions").Preload("ProcessStepType").Preload("ProcessStepType.ProcessStepTypeParameters").
-		Joins("available_processes ON production_process_steps.id=available_processes.production_process_step_id").
+		Joins("JOIN available_processes ON production_process_steps.id=available_processes.production_process_step_id").
 		Where("available_processes.production_process_id = ? AND production_process_steps.enable = ?", productionProcess.ID, true).
 		Order("sort_index").
-		Find(_productionProcessSteps).Error; err != nil {
+		Find(&_productionProcessSteps).Error; err != nil {
 		return nil, err
 	}
 
@@ -738,6 +746,7 @@ func GetProductionProcessStepWithParameter(req *proto.GetProductionProcessStepWi
 			match = false
 			for _, productOrderAttribute := range productOrder.ProductOrderAttributes {
 				if productOrderAttribute.ProductAttributeID == attributeExpression.ProductAttributeID {
+					fmt.Println(productOrderAttribute.Value, attributeExpression.MathOperator, attributeExpression.AttributeValue)
 					if b, err := tool.MathOperator(productOrderAttribute.Value, attributeExpression.MathOperator, attributeExpression.AttributeValue); b {
 						match = true
 						break
@@ -778,7 +787,7 @@ func GetProductionProcessStepWithParameter(req *proto.GetProductionProcessStepWi
 	if err := model.DB.DB().Preload("ProductOrderProcessStepTypeParameters").Preload("ProductOrderProcessStepTypeParameters.ProcessStepTypeParameter").
 		Joins("JOIN product_order_processes ON product_order_process_steps.product_order_process_id=product_order_processes.id").
 		Where("product_order_processes.production_process_id=? AND product_order_processes.product_order_id=?", productionProcess.ID, productOrder.ID).
-		Find(productOrderProcessStep).Error; err != nil {
+		Find(&productOrderProcessStep).Error; err != nil {
 		return nil, err
 	}
 
