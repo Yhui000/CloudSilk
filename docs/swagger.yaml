@@ -2434,6 +2434,16 @@ definitions:
         description: 备注
         type: string
     type: object
+  proto.PersonnelQualificationTypeAvailableModelInfo:
+    properties:
+      id:
+        description: ID
+        type: string
+      personnelQualificationTypeID:
+        type: string
+      productModelID:
+        type: string
+    type: object
   proto.PersonnelQualificationTypeInfo:
     properties:
       code:
@@ -2454,7 +2464,7 @@ definitions:
       productModels:
         description: 产品型号
         items:
-          $ref: '#/definitions/proto.ProductModelInfo'
+          $ref: '#/definitions/proto.PersonnelQualificationTypeAvailableModelInfo'
         type: array
       productionProcess:
         allOf:

@@ -67,8 +67,7 @@ func EnterProductionStation(c *gin.Context) {
 	req := &proto.EnterProductionStationRequest{}
 	resp := &proto.EnterProductionStationResponse{Code: types.ServiceResponseCodeSuccess}
 
-	var err error
-	if err = c.BindJSON(req); err != nil {
+	if err := c.BindJSON(req); err != nil {
 		resp.Code = types.ServiceResponseCodeFailure
 		resp.Message = err.Error()
 		c.JSON(http.StatusOK, resp)
@@ -76,14 +75,21 @@ func EnterProductionStation(c *gin.Context) {
 		return
 	}
 
-	if err = middleware.Validate.Struct(req); err != nil {
+	if err := middleware.Validate.Struct(req); err != nil {
 		resp.Code = types.ServiceResponseCodeFailure
 		resp.Message = err.Error()
 		c.JSON(http.StatusOK, resp)
 		return
 	}
 
-	c.JSON(http.StatusOK, logic.EnterProductionStation(req))
+	data, code, err := logic.EnterProductionStation(req)
+	if err != nil {
+		resp.Message = err.Error()
+	}
+	resp.Data = data
+	resp.Code = code
+
+	c.JSON(http.StatusOK, resp)
 }
 
 // GetProductionStationExhibition godoc

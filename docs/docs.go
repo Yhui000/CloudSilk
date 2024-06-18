@@ -25412,6 +25412,21 @@ const docTemplate = `{
                 }
             }
         },
+        "proto.PersonnelQualificationTypeAvailableModelInfo": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "description": "ID",
+                    "type": "string"
+                },
+                "personnelQualificationTypeID": {
+                    "type": "string"
+                },
+                "productModelID": {
+                    "type": "string"
+                }
+            }
+        },
         "proto.PersonnelQualificationTypeInfo": {
             "type": "object",
             "properties": {
@@ -25439,7 +25454,7 @@ const docTemplate = `{
                     "description": "产品型号",
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/proto.ProductModelInfo"
+                        "$ref": "#/definitions/proto.PersonnelQualificationTypeAvailableModelInfo"
                     }
                 },
                 "productionProcess": {

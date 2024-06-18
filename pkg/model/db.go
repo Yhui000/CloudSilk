@@ -155,6 +155,8 @@ func AutoMigrate() {
 		&ExceptionTrace{},
 
 		&PersonnelQualification{},
+		&PersonnelQualificationType{},
+		&PersonnelQualificationTypeAvailableModel{},
 
 		&AttributeExpression{},
 		&PropertyExpression{},
