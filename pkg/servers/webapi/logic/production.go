@@ -611,140 +611,6 @@ func EnterProductionStation(req *proto.EnterProductionStationRequest) (data *pro
 	}, 0, nil
 }
 
-// 获取工站的当前生产工单，工序展示信息
-// func GetProductionStationExhibition(productionStationCode string) (*proto.GetProductionStationExhibitionData, error) {
-// 	if productionStationCode == "" {
-// 		return nil, fmt.Errorf("ProductionStation不能为空")
-// 	}
-// 	_productionStation, _ := clients.ProductionStationClient.Get(context.Background(), &proto.GetProductionStationRequest{Code: productionStationCode})
-// 	if _productionStation.Message == gorm.ErrRecordNotFound.Error() {
-// 		return nil, fmt.Errorf("无效的工站代号")
-// 	}
-// 	if _productionStation.Code != modelcode.Success {
-// 		return nil, fmt.Errorf(_productionStation.Message)
-// 	}
-// 	productionStation := _productionStation.Data
-// 	if productionStation.ProductionLineID == "" {
-// 		return nil, fmt.Errorf("读取工站所属产线失败")
-// 	}
-// 	if productionStation.ProductionLine.ProductModelID == "" {
-// 		return nil, fmt.Errorf("读取失败，工站所属的产线未设置当前产品型号")
-// 	}
-// 	_productionProcesses, _ := clients.ProductionProcessClient.Query(context.Background(), &proto.QueryProductionProcessRequest{
-// 		PageSize:            1,
-// 		ProductionLineID:    productionStation.ProductionLineID,
-// 		ProductionStationID: productionStation.Id,
-// 	})
-// 	if _productionProcesses.Code != modelcode.Success {
-// 		return nil, fmt.Errorf(_productionProcesses.Message)
-// 	}
-// 	if len(_productionProcesses.Data) == 0 {
-// 		return nil, fmt.Errorf("读取工位的归属工序失败")
-// 	}
-// 	productionProcess := _productionProcesses.Data[0]
-// 	_productProcessRoutes, _ := clients.ProductProcessRouteClient.Query(context.Background(), &proto.QueryProductProcessRouteRequest{
-// 		PageSize:         1000,
-// 		SortConfig:       `{"create_time": "descend"}`,
-// 		CurrentProcessID: productionProcess.Id,
-// 	})
-// 	if _productProcessRoutes.Code != modelcode.Success {
-// 		return nil, fmt.Errorf(_productProcessRoutes.Message)
-// 	}
-// 	var productProcessRoute *proto.ProductProcessRouteInfo
-// 	for _, v := range _productProcessRoutes.Data {
-// 		if v.ProductInfo.ProductOrder.ProductModelID == productionStation.ProductionLine.ProductModelID && (v.CurrentState == types.ProductProcessRouteStateWaitProcess || v.CurrentState == types.ProductProcessRouteStateProcessing || v.CurrentState == types.ProductProcessRouteStateReworking || v.CurrentState == types.ProductProcessRouteStateChecking) {
-// 			productProcessRoute = v
-// 		}
-// 	}
-// 	if productProcessRoute == nil {
-// 		return nil, fmt.Errorf("读取工序最后的工艺路线失败")
-// 	}
-// 	_productOrder, _ := clients.ProductOrderClient.GetDetail(context.Background(), &proto.GetDetailRequest{Id: productProcessRoute.ProductInfo.ProductOrderID})
-// 	if _productOrder.Message == gorm.ErrRecordNotFound.Error() {
-// 		return nil, fmt.Errorf("读取当前工单数据失败")
-// 	}
-// 	if _productOrder.Code != modelcode.Success {
-// 		return nil, fmt.Errorf(_productOrder.Message)
-// 	}
-// 	productOrder := _productOrder.Data
-// 	_productionProcessSop, _ := clients.ProductionProcessSopClient.Get(context.Background(), &proto.GetProductionProcessSopRequest{
-// 		ProductionProcessID: productionProcess.Id,
-// 		ProductModelID:      productOrder.ProductModelID,
-// 	})
-// 	if _productionProcessSop.Code != modelcode.Success && _productionProcessSop.Message != gorm.ErrRecordNotFound.Error() {
-// 		return nil, fmt.Errorf(_productionProcessSop.Message)
-// 	}
-// 	var productionProcessSop *proto.ProductionProcessSopInfo
-// 	if _productionProcessSop.Data != nil && _productionProcessSop.Data.ProductionProcess != nil && _productionProcessSop.Data.ProductionProcess.ProductionLineID == productionStation.ProductionLineID {
-// 		productionProcessSop = _productionProcessSop.Data
-// 	}
-// 	productProcessRoutesTemp := []*proto.ProductProcessRouteInfo{}
-// 	for _, v := range _productProcessRoutes.Data {
-// 		if v.ProductInfo != nil && v.ProductInfo.ProductOrderID == productOrder.Id {
-// 			productProcessRoutesTemp = append(productProcessRoutesTemp, v)
-// 		}
-// 	}
-// 	productProcessRoutesMap := make(map[string]*proto.ProductProcessRouteInfo)
-// 	for _, route := range productProcessRoutesTemp {
-// 		if _, ok := productProcessRoutesMap[route.ProductInfoID]; !ok {
-// 			productProcessRoutesMap[route.ProductInfoID] = route
-// 		} else if route.CreateTime > productProcessRoutesMap[route.ProductInfoID].CreateTime {
-// 			productProcessRoutesMap[route.ProductInfoID] = route
-// 		}
-// 	}
-// 	var countOfProcessing, countOfProcessed int32
-// 	for _, v := range productProcessRoutesMap {
-// 		if v.CurrentState == types.ProductProcessRouteStateWaitProcess || v.CurrentState == types.ProductProcessRouteStateProcessing || v.CurrentState == types.ProductProcessRouteStateReworking || v.CurrentState == types.ProductProcessRouteStateChecking {
-// 			countOfProcessing++
-// 		}
-// 		if v.CurrentState == types.ProductProcessRouteStateProcessed {
-// 			countOfProcessed++
-// 		}
-// 	}
-// 	_productOrderBoms, _ := clients.ProductOrderBomClient.Query(context.Background(), &proto.QueryProductOrderBomRequest{PageSize: 1000, ProductOrderID: productOrder.Id})
-// 	if _productOrderBoms.Code != modelcode.Success {
-// 		return nil, fmt.Errorf(_productOrderBoms.Message)
-// 	}
-// 	productOrderBoms := []*proto.ProductOrderBomInfo{}
-// 	for _, v := range _productOrderBoms.Data {
-// 		if v.ProductionProcess == "" || v.ProductionProcess == productionProcess.Code || v.ProductionProcess == productionProcess.Identifier {
-// 			productOrderBoms = append(productOrderBoms, &proto.ProductOrderBomInfo{
-// 				ItemNo:              v.ItemNo,
-// 				MaterialNo:          v.MaterialNo,
-// 				MaterialDescription: v.MaterialDescription,
-// 				PieceQTY:            v.PieceQTY,
-// 				RequireQTY:          v.RequireQTY,
-// 				Unit:                v.Unit,
-// 				Remark:              v.Remark,
-// 			})
-// 		}
-// 	}
-// 	return &proto.GetProductionStationExhibitionData{
-// 		ProductOrderNo:      productOrder.ProductOrderNo,
-// 		SalesOrderNo:        productOrder.SalesOrderNo,
-// 		ItemNo:              productOrder.ItemNo,
-// 		OrderTime:           productOrder.OrderTime,
-// 		OrderQTY:            productOrder.OrderQTY,
-// 		ProductCategory:     productOrder.ProductModel.ProductCategory.Code,
-// 		ProductModel:        productOrder.ProductModel.Code,
-// 		MaterialNo:          productOrder.ProductModel.MaterialNo,
-// 		MaterialDescription: productOrder.ProductModel.MaterialDescription,
-// 		CurrentState:        productOrder.CurrentState,
-// 		PropertyBrief:       productOrder.PropertyBrief,
-// 		StartedQTY:          productOrder.StartedQTY,
-// 		FinishedQTY:         productOrder.FinishedQTY,
-// 		Remark:              productOrder.Remark,
-// 		ProductOrderBoms:    productOrderBoms,
-// 		ProductionProcess: &proto.ProductionProcessInfo{
-// 			Code:              productionProcess.Code,
-// 			Description:       productionProcess.Description,
-// 			SopLink:           productionProcessSop.FileLink,
-// 			CountOfProcessing: countOfProcessing,
-// 			CountOfProcessed:  countOfProcessed,
-// 		},
-// 	}, nil
-// }
-
 // 获取作业步骤和作业参数
 func GetProductionProcessStepWithParameter(req *proto.GetProductionProcessStepWithParameterRequest) (map[string]interface{}, error) {
 	if req.ProductionStation == "" {
@@ -752,91 +618,94 @@ func GetProductionProcessStepWithParameter(req *proto.GetProductionProcessStepWi
 	}
 
 	if req.TrayNo != "" {
-		_materialTray, _ := clients.MaterialTrayClient.Get(context.Background(), &proto.GetMaterialTrayRequest{Identifier: req.TrayNo})
-		if _materialTray.Message == gorm.ErrRecordNotFound.Error() {
-			return nil, fmt.Errorf("无效的托盘号")
-		} else if _materialTray.Code != modelcode.Success {
-			return nil, fmt.Errorf(_materialTray.Message)
+		materialTray := &model.MaterialTray{}
+		if err := model.DB.DB().Preload("ProductInfo").First(materialTray, "`identifier` = ?", req.TrayNo).Error; err == gorm.ErrRecordNotFound {
+			return nil, fmt.Errorf("无效的物料托盘识别码")
+		} else if err != nil {
+			return nil, err
 		}
 
-		if _materialTray.Data.ProductInfoID == "" {
+		if materialTray.ProductInfo == nil {
 			return nil, fmt.Errorf("托盘未绑定任何产品")
 		}
-		req.ProductSerialNo = _materialTray.Data.ProductInfo.ProductSerialNo
+
+		req.ProductSerialNo = materialTray.ProductInfo.ProductSerialNo
 	}
 
 	if strings.TrimSpace(req.ProductSerialNo) == "" {
 		return nil, fmt.Errorf("ProductSerialNo不能为空")
 	}
 
-	_productInfo, _ := clients.ProductInfoClient.Get(context.Background(), &proto.GetProductInfoRequest{ProductSerialNo: req.ProductSerialNo})
-	if _productInfo.Message == gorm.ErrRecordNotFound.Error() {
-		return nil, fmt.Errorf("读取产品信息失败")
-	} else if _productInfo.Code != modelcode.Success {
-		return nil, fmt.Errorf(_productInfo.Message)
+	productInfo := &model.ProductInfo{}
+	if err := model.DB.DB().First(productInfo, "`product_serial_no` = ?", req.ProductSerialNo).Error; err == gorm.ErrRecordNotFound {
+		return nil, fmt.Errorf("无效的产品序列号")
+	} else if err != nil {
+		return nil, err
 	}
-	productInfo := _productInfo.Data
+
 	if productInfo.ProductionProcessID == "" {
 		return nil, fmt.Errorf("无法读取产品的当前工序")
 	}
 
 	//获取生产工艺
-	_productionProcess, _ := clients.ProductionProcessClient.GetDetail(context.Background(), &proto.GetDetailRequest{Id: productInfo.ProductionProcessID})
-	if _productionProcess.Message == gorm.ErrRecordNotFound.Error() {
+	productionProcess := &model.ProductionProcess{}
+	if err := model.DB.DB().Preload("ProductionProcessAvailableStations").First(productionProcess, "`id` = ?", productInfo.ProductionProcessID).Error; err == gorm.ErrRecordNotFound {
 		return nil, fmt.Errorf("读取产品的当前工序失败")
-	} else if _productionProcess.Code != modelcode.Success {
-		return nil, fmt.Errorf(_productionProcess.Message)
+	} else if err != nil {
+		return nil, err
 	}
-	productionProcess := _productionProcess.Data
 
-	var productionStation *proto.ProductionStationInfo
+	var processable bool
 	for _, v := range productionProcess.ProductionProcessAvailableStations {
 		if v.ProductionStation.Code == req.ProductionStation {
-			productionStation = v.ProductionStation
+			processable = true
 			break
 		}
 	}
-	if productionStation == nil {
+	if !processable {
 		return nil, fmt.Errorf("非法操作，产品的当前工序不支持在此工位进行")
 	}
 
-	_productOrder, _ := clients.ProductOrderClient.GetDetail(context.Background(), &proto.GetDetailRequest{Id: productInfo.ProductOrderID})
-	if _productOrder.Message == gorm.ErrRecordNotFound.Error() {
+	productionStation := &model.ProductionStation{}
+	if err := model.DB.DB().First(productionStation, "`code` = ?", req.ProductionStation).Error; err == gorm.ErrRecordNotFound {
+		return nil, fmt.Errorf("无效的生产工站")
+	} else if err != nil {
+		return nil, err
+	}
+
+	productOrder := &model.ProductOrder{}
+	if err := model.DB.DB().Preload("ProductOrderAttributes").First(productOrder, "`id` = ?", productInfo.ProductOrderID).Error; err == gorm.ErrRecordNotFound {
 		return nil, fmt.Errorf("读取产品工单失败")
-	} else if _productOrder.Code != modelcode.Success {
-		return nil, fmt.Errorf(_productOrder.Message)
+	} else if err != nil {
+		return nil, err
 	}
-	productOrder := _productOrder.Data
 
-	productOrderBoms := []*proto.ProductOrderBomInfo{}
+	productOrderBoms := []map[string]interface{}{}
 	materialNoArray := []string{}
-	for _, v := range productOrder.ProductOrderBoms {
-		if v.ProductionProcess == productionProcess.Identifier || v.ProductionProcess == productionProcess.Code {
-			materialNoArray = append(materialNoArray, v.MaterialNo)
-			productOrderBoms = append(productOrderBoms, &proto.ProductOrderBomInfo{
-				MaterialNo:          v.MaterialNo,
-				MaterialDescription: v.MaterialDescription,
-				PieceQTY:            v.PieceQTY,
-				RequireQTY:          v.RequireQTY,
-				Unit:                v.Unit,
-				EnableControl:       v.EnableControl,
-				ControlType:         v.ControlType,
-				Warehouse:           v.Warehouse,
-				ProductionProcess:   v.ProductionProcess,
-			})
-		}
+	if err := model.DB.DB().Model(model.ProductOrderBom{}).
+		Where("`product_order_id` = ? AND `production_process` in ?", productOrder.ID, []string{productionProcess.Identifier, productionProcess.Code}).
+		Select("material_no", "material_description", "piece_qty", "require_qty", "unit", "enable_control", "control_type", "warehouse", "production_process").
+		Find(&productOrderBoms).Error; err != nil {
+		return nil, err
+	}
+	for _, v := range productOrderBoms {
+		materialNoArray = append(materialNoArray, v["material_no"].(string))
 	}
 
-	_materialChannels, _ := clients.MaterialChannelLayerClient.GetMaterialChannels(context.Background(), &proto.GetMaterialChannelRequest{ProductionStationID: productionStation.Id})
-	if _materialChannels.Code != modelcode.Success {
-		return nil, fmt.Errorf(_materialChannels.Message)
+	materialChannels := []*model.MaterialChannel{}
+	if err := model.DB.DB().Preload("MaterialChannelLayer").
+		Joins("JOIN material_channel_layers ON material_channels.material_channel_layer_id=material_channel_layers.id").
+		Where("material_channel_layers.production_station_id = ?", productionStation.ID).
+		Find(materialChannels).Error; err != nil {
+		return nil, err
+	}
+
+	materialChannelGroup := map[int32][]*model.MaterialChannel{}
+	for _, v := range materialChannels {
+		materialChannelGroup[v.MaterialChannelLayer.LightRegisterAddress] = append(materialChannelGroup[v.MaterialChannelLayer.LightRegisterAddress], v)
 	}
 
 	materialChannelLayers := []map[string]interface{}{}
-	materialChannelGroup := map[int32][]*proto.MaterialChannelInfo{}
-	for _, v := range _materialChannels.Data {
-		materialChannelGroup[v.MaterialChannelLayer.LightRegisterAddress] = append(materialChannelGroup[v.MaterialChannelLayer.LightRegisterAddress], v)
-	}
 	for k, _materialChannels := range materialChannelGroup {
 		var lightRegisterValue int32
 		for _, v := range _materialChannels {
@@ -853,18 +722,17 @@ func GetProductionProcessStepWithParameter(req *proto.GetProductionProcessStepWi
 		})
 	}
 
-	_productionProcessStep, _ := clients.ProductionProcessStepClient.Query(context.Background(), &proto.QueryProductionProcessStepRequest{
-		SortConfig:          `{"sort_index": ""}`,
-		Enable:              true,
-		ProductionProcessID: productionProcess.Id,
-	})
-	if _productionProcessStep.Code != modelcode.Success {
-		return nil, fmt.Errorf(_productionProcessStep.Message)
+	_productionProcessSteps := []*model.ProductionProcessStep{}
+	if err := model.DB.DB().Preload("AttributeExpressions").Preload("ProcessStepType").Preload("ProcessStepType.ProcessStepTypeParameters").
+		Joins("available_processes ON production_process_steps.id=available_processes.production_process_step_id").
+		Where("available_processes.production_process_id = ? AND production_process_steps.enable = ?", productionProcess.ID, true).
+		Order("sort_index").
+		Find(_productionProcessSteps).Error; err != nil {
+		return nil, err
 	}
 
-	//TODO
 	productionProcessSteps := []map[string]interface{}{}
-	for _, v := range _productionProcessStep.Data {
+	for _, v := range _productionProcessSteps {
 		match := v.InitialValue
 		for _, attributeExpression := range v.AttributeExpressions {
 			match = false
@@ -883,16 +751,16 @@ func GetProductionProcessStepWithParameter(req *proto.GetProductionProcessStepWi
 			}
 		}
 		if match {
-			processStepTypeParameters := []map[string]interface{}{}
-			for _, v := range v.ProcessStepType.ProcessStepTypeParameters {
-				processStepTypeParameters = append(processStepTypeParameters, map[string]interface{}{
-					"code":        v.Code,
-					"description": v.Description,
-					"value":       v.DefaultValue,
-				})
+			processStepTypeParameters := make([]map[string]interface{}, len(v.ProcessStepType.ProcessStepTypeParameters))
+			for i, vv := range v.ProcessStepType.ProcessStepTypeParameters {
+				processStepTypeParameters[i] = map[string]interface{}{
+					"code":        vv.Code,
+					"description": vv.Description,
+					"value":       vv.DefaultValue,
+				}
 			}
 			productionProcessSteps = append(productionProcessSteps, map[string]interface{}{
-				"id":                  v.Id,
+				"id":                  v.ID,
 				"sortIndex":           v.SortIndex,
 				"code":                v.Code,
 				"description":         v.Description,
@@ -906,55 +774,51 @@ func GetProductionProcessStepWithParameter(req *proto.GetProductionProcessStepWi
 		}
 	}
 
-	_productOrderProcess, _ := clients.ProductOrderProcessStepClient.Query(context.Background(), &proto.QueryProductOrderProcessStepRequest{
-		PageSize:            1000,
-		ProductionProcessID: productionProcess.Id,
-		ProductOrderID:      productOrder.Id,
-	})
-	if _productOrderProcess.Code != modelcode.Success {
-		return nil, fmt.Errorf(_productOrderProcess.Message)
+	productOrderProcessStep := []*model.ProductOrderProcessStep{}
+	if err := model.DB.DB().Preload("ProductOrderProcessStepTypeParameters").Preload("ProductOrderProcessStepTypeParameters.ProcessStepTypeParameter").
+		Joins("JOIN product_order_processes ON product_order_process_steps.product_order_process_id=product_order_processes.id").
+		Where("product_order_processes.production_process_id=? AND product_order_processes.product_order_id=?", productionProcess.ID, productOrder.ID).
+		Find(productOrderProcessStep).Error; err != nil {
+		return nil, err
 	}
+
 	productOrderProcess := []map[string]interface{}{}
-	for _, v := range _productOrderProcess.Data {
-		productOrderProcessStepTypeParameters := []map[string]interface{}{}
-		for _, vv := range v.ProductOrderProcessStepTypeParameters {
-			productOrderProcessStepTypeParameters = append(productOrderProcessStepTypeParameters, map[string]interface{}{
-				// "Code": vv.Code,
-				// "Code": vv.Code,
-				"value": vv.Value,
-			})
+	for _, v := range productOrderProcessStep {
+		parameters := make([]map[string]interface{}, len(v.ProductOrderProcessStepTypeParameters))
+		for i, vv := range v.ProductOrderProcessStepTypeParameters {
+			parameters[i] = map[string]interface{}{
+				"Code":        vv.ProcessStepTypeParameter.Code,
+				"description": vv.ProcessStepTypeParameter.Description,
+				"value":       vv.Value,
+			}
 		}
 		productOrderProcess = append(productOrderProcess, map[string]interface{}{
-			"id":                                    v.Id,
-			"sortIndex":                             v.SortIndex,
-			"code":                                  "",
-			"workDescription":                       v.WorkDescription,
-			"processStepType":                       v.ProcessStepType.Code,
-			"processStepTypeDesc":                   v.ProcessStepType.Description,
-			"workGraphic":                           v.WorkGraphic,
-			"remark":                                v.Remark,
-			"workResult":                            "",
-			"productOrderProcessStepTypeParameters": productOrderProcessStepTypeParameters,
+			"id":                  v.ID,
+			"sortIndex":           v.SortIndex,
+			"code":                "",
+			"workDescription":     v.WorkDescription,
+			"processStepType":     v.ProcessStepType.Code,
+			"processStepTypeDesc": v.ProcessStepType.Description,
+			"workGraphic":         v.WorkGraphic,
+			"remark":              v.Remark,
+			"workResult":          "",
+			"parameters":          parameters,
 		})
 	}
 
-	_productWorkRecord, _ := clients.ProductWorkRecordClient.Query(context.Background(), &proto.QueryProductWorkRecordRequest{ProductInfoID: productInfo.Id})
-	if _productWorkRecord.Code != modelcode.Success {
-		return nil, fmt.Errorf(_productWorkRecord.Message)
-	}
 	productWorkRecords := []map[string]interface{}{}
-	for _, v := range _productWorkRecord.Data {
-		productWorkRecords = append(productWorkRecords, map[string]interface{}{
-			"productionProcessStepID": v.ProductionProcessStepID,
-			"isQualified":             v.IsQualified,
-		})
+	if err := model.DB.DB().Model(model.ProductWorkRecord{}).
+		Select("production_process_step_id AS productionProcessStepID", "is_qualified AS isQualified").
+		Where("`product_info_id` = ?", productInfo.ID).
+		Find(&productWorkRecords).Error; err != nil {
+		return nil, err
 	}
 
 	for i, v := range productionProcessSteps {
 		for _, vv := range productWorkRecords {
 			if vv["productionProcessStepID"] == v["id"] {
 				workResult := ""
-				if vv["isQualified"] == "true" {
+				if vv["isQualified"].(bool) {
 					workResult = "PASS"
 				}
 				productionProcessSteps[i]["workResult"] = workResult
@@ -963,36 +827,29 @@ func GetProductionProcessStepWithParameter(req *proto.GetProductionProcessStepWi
 		}
 	}
 
-	var materialTray, assembleTray string
-	_materialTray, _ := clients.MaterialTrayClient.Get(context.Background(), &proto.GetMaterialTrayRequest{ProductInfoID: productInfo.Id, TrayType: types.MaterialTrayTypeMaterialTray})
-	if _materialTray.Code != modelcode.Success && _materialTray.Message != gorm.ErrRecordNotFound.Error() {
-		return nil, fmt.Errorf(_materialTray.Message)
+	var materialTray string
+	if err := model.DB.DB().Model(model.MaterialTray{}).Where("`product_info_id` = ? AND `tray_type` = ?", productInfo.ID, types.MaterialTrayTypeMaterialTray).Select("identifier").Scan(&materialTray).Error; err != nil {
+		return nil, err
 	}
-	if _materialTray.Data != nil {
-		materialTray = _materialTray.Data.Identifier
-	}
-	_assembleTray, _ := clients.MaterialTrayClient.Get(context.Background(), &proto.GetMaterialTrayRequest{ProductInfoID: productInfo.Id, TrayType: types.MaterialTrayTypeAssembleTray})
-	if _assembleTray.Code != modelcode.Success && _assembleTray.Message != gorm.ErrRecordNotFound.Error() {
-		return nil, fmt.Errorf(_assembleTray.Message)
-	}
-	if _assembleTray.Data != nil {
-		assembleTray = _assembleTray.Data.Identifier
+	var assembleTray string
+	if err := model.DB.DB().Model(model.MaterialTray{}).Where("`product_info_id` = ? AND `tray_type` = ?", productInfo.ID, types.MaterialTrayTypeAssembleTray).Select("identifier").Scan(&assembleTray).Error; err != nil {
+		return nil, err
 	}
 
-	var productOrderAttributes []map[string]interface{}
-	for _, v := range productOrder.ProductOrderAttributes {
-		productOrderAttributes = append(productOrderAttributes, map[string]interface{}{
-			"ID":               v.Id,
-			"Code":             v.ProductAttribute.Code,
-			"CodeDescription":  v.ProductAttribute.Description,
-			"Value":            v.Value,
-			"ValueDescription": v.Description,
-		})
+	productOrderAttributes := make([]map[string]interface{}, len(productOrder.ProductOrderAttributes))
+	for i, v := range productOrder.ProductOrderAttributes {
+		productOrderAttributes[i] = map[string]interface{}{
+			"id":               v.ID,
+			"code":             v.ProductAttribute.Code,
+			"codeDescription":  v.ProductAttribute.Description,
+			"value":            v.Value,
+			"valueDescription": v.Description,
+		}
 	}
 
 	return map[string]interface{}{
 		"productOrder": map[string]interface{}{
-			"id":                  productOrder.Id,
+			"id":                  productOrder.ID,
 			"productOrderNo":      productOrder.ProductOrderNo,
 			"productModel":        productOrder.ProductModel.Code,
 			"materialNo":          productOrder.ProductModel.MaterialNo,
@@ -1004,7 +861,7 @@ func GetProductionProcessStepWithParameter(req *proto.GetProductionProcessStepWi
 			"orderQTY":            productOrder.OrderQTY,
 		},
 		"productInfo": map[string]interface{}{
-			"id":              productInfo.Id,
+			"id":              productInfo.ID,
 			"productSerialNo": productInfo.ProductSerialNo,
 			"materialTray":    materialTray,
 			"assembleTray":    assembleTray,
@@ -2030,3 +1887,137 @@ func UpdateProductReworkRecord(req *proto.UpdateProductReworkRecordRequest) (map
 		},
 	}, nil
 }
+
+// 获取工站的当前生产工单，工序展示信息
+// func GetProductionStationExhibition(productionStationCode string) (*proto.GetProductionStationExhibitionData, error) {
+// 	if productionStationCode == "" {
+// 		return nil, fmt.Errorf("ProductionStation不能为空")
+// 	}
+// 	_productionStation, _ := clients.ProductionStationClient.Get(context.Background(), &proto.GetProductionStationRequest{Code: productionStationCode})
+// 	if _productionStation.Message == gorm.ErrRecordNotFound.Error() {
+// 		return nil, fmt.Errorf("无效的工站代号")
+// 	}
+// 	if _productionStation.Code != modelcode.Success {
+// 		return nil, fmt.Errorf(_productionStation.Message)
+// 	}
+// 	productionStation := _productionStation.Data
+// 	if productionStation.ProductionLineID == "" {
+// 		return nil, fmt.Errorf("读取工站所属产线失败")
+// 	}
+// 	if productionStation.ProductionLine.ProductModelID == "" {
+// 		return nil, fmt.Errorf("读取失败，工站所属的产线未设置当前产品型号")
+// 	}
+// 	_productionProcesses, _ := clients.ProductionProcessClient.Query(context.Background(), &proto.QueryProductionProcessRequest{
+// 		PageSize:            1,
+// 		ProductionLineID:    productionStation.ProductionLineID,
+// 		ProductionStationID: productionStation.Id,
+// 	})
+// 	if _productionProcesses.Code != modelcode.Success {
+// 		return nil, fmt.Errorf(_productionProcesses.Message)
+// 	}
+// 	if len(_productionProcesses.Data) == 0 {
+// 		return nil, fmt.Errorf("读取工位的归属工序失败")
+// 	}
+// 	productionProcess := _productionProcesses.Data[0]
+// 	_productProcessRoutes, _ := clients.ProductProcessRouteClient.Query(context.Background(), &proto.QueryProductProcessRouteRequest{
+// 		PageSize:         1000,
+// 		SortConfig:       `{"create_time": "descend"}`,
+// 		CurrentProcessID: productionProcess.Id,
+// 	})
+// 	if _productProcessRoutes.Code != modelcode.Success {
+// 		return nil, fmt.Errorf(_productProcessRoutes.Message)
+// 	}
+// 	var productProcessRoute *proto.ProductProcessRouteInfo
+// 	for _, v := range _productProcessRoutes.Data {
+// 		if v.ProductInfo.ProductOrder.ProductModelID == productionStation.ProductionLine.ProductModelID && (v.CurrentState == types.ProductProcessRouteStateWaitProcess || v.CurrentState == types.ProductProcessRouteStateProcessing || v.CurrentState == types.ProductProcessRouteStateReworking || v.CurrentState == types.ProductProcessRouteStateChecking) {
+// 			productProcessRoute = v
+// 		}
+// 	}
+// 	if productProcessRoute == nil {
+// 		return nil, fmt.Errorf("读取工序最后的工艺路线失败")
+// 	}
+// 	_productOrder, _ := clients.ProductOrderClient.GetDetail(context.Background(), &proto.GetDetailRequest{Id: productProcessRoute.ProductInfo.ProductOrderID})
+// 	if _productOrder.Message == gorm.ErrRecordNotFound.Error() {
+// 		return nil, fmt.Errorf("读取当前工单数据失败")
+// 	}
+// 	if _productOrder.Code != modelcode.Success {
+// 		return nil, fmt.Errorf(_productOrder.Message)
+// 	}
+// 	productOrder := _productOrder.Data
+// 	_productionProcessSop, _ := clients.ProductionProcessSopClient.Get(context.Background(), &proto.GetProductionProcessSopRequest{
+// 		ProductionProcessID: productionProcess.Id,
+// 		ProductModelID:      productOrder.ProductModelID,
+// 	})
+// 	if _productionProcessSop.Code != modelcode.Success && _productionProcessSop.Message != gorm.ErrRecordNotFound.Error() {
+// 		return nil, fmt.Errorf(_productionProcessSop.Message)
+// 	}
+// 	var productionProcessSop *proto.ProductionProcessSopInfo
+// 	if _productionProcessSop.Data != nil && _productionProcessSop.Data.ProductionProcess != nil && _productionProcessSop.Data.ProductionProcess.ProductionLineID == productionStation.ProductionLineID {
+// 		productionProcessSop = _productionProcessSop.Data
+// 	}
+// 	productProcessRoutesTemp := []*proto.ProductProcessRouteInfo{}
+// 	for _, v := range _productProcessRoutes.Data {
+// 		if v.ProductInfo != nil && v.ProductInfo.ProductOrderID == productOrder.Id {
+// 			productProcessRoutesTemp = append(productProcessRoutesTemp, v)
+// 		}
+// 	}
+// 	productProcessRoutesMap := make(map[string]*proto.ProductProcessRouteInfo)
+// 	for _, route := range productProcessRoutesTemp {
+// 		if _, ok := productProcessRoutesMap[route.ProductInfoID]; !ok {
+// 			productProcessRoutesMap[route.ProductInfoID] = route
+// 		} else if route.CreateTime > productProcessRoutesMap[route.ProductInfoID].CreateTime {
+// 			productProcessRoutesMap[route.ProductInfoID] = route
+// 		}
+// 	}
+// 	var countOfProcessing, countOfProcessed int32
+// 	for _, v := range productProcessRoutesMap {
+// 		if v.CurrentState == types.ProductProcessRouteStateWaitProcess || v.CurrentState == types.ProductProcessRouteStateProcessing || v.CurrentState == types.ProductProcessRouteStateReworking || v.CurrentState == types.ProductProcessRouteStateChecking {
+// 			countOfProcessing++
+// 		}
+// 		if v.CurrentState == types.ProductProcessRouteStateProcessed {
+// 			countOfProcessed++
+// 		}
+// 	}
+// 	_productOrderBoms, _ := clients.ProductOrderBomClient.Query(context.Background(), &proto.QueryProductOrderBomRequest{PageSize: 1000, ProductOrderID: productOrder.Id})
+// 	if _productOrderBoms.Code != modelcode.Success {
+// 		return nil, fmt.Errorf(_productOrderBoms.Message)
+// 	}
+// 	productOrderBoms := []*proto.ProductOrderBomInfo{}
+// 	for _, v := range _productOrderBoms.Data {
+// 		if v.ProductionProcess == "" || v.ProductionProcess == productionProcess.Code || v.ProductionProcess == productionProcess.Identifier {
+// 			productOrderBoms = append(productOrderBoms, &proto.ProductOrderBomInfo{
+// 				ItemNo:              v.ItemNo,
+// 				MaterialNo:          v.MaterialNo,
+// 				MaterialDescription: v.MaterialDescription,
+// 				PieceQTY:            v.PieceQTY,
+// 				RequireQTY:          v.RequireQTY,
+// 				Unit:                v.Unit,
+// 				Remark:              v.Remark,
+// 			})
+// 		}
+// 	}
+// 	return &proto.GetProductionStationExhibitionData{
+// 		ProductOrderNo:      productOrder.ProductOrderNo,
+// 		SalesOrderNo:        productOrder.SalesOrderNo,
+// 		ItemNo:              productOrder.ItemNo,
+// 		OrderTime:           productOrder.OrderTime,
+// 		OrderQTY:            productOrder.OrderQTY,
+// 		ProductCategory:     productOrder.ProductModel.ProductCategory.Code,
+// 		ProductModel:        productOrder.ProductModel.Code,
+// 		MaterialNo:          productOrder.ProductModel.MaterialNo,
+// 		MaterialDescription: productOrder.ProductModel.MaterialDescription,
+// 		CurrentState:        productOrder.CurrentState,
+// 		PropertyBrief:       productOrder.PropertyBrief,
+// 		StartedQTY:          productOrder.StartedQTY,
+// 		FinishedQTY:         productOrder.FinishedQTY,
+// 		Remark:              productOrder.Remark,
+// 		ProductOrderBoms:    productOrderBoms,
+// 		ProductionProcess: &proto.ProductionProcessInfo{
+// 			Code:              productionProcess.Code,
+// 			Description:       productionProcess.Description,
+// 			SopLink:           productionProcessSop.FileLink,
+// 			CountOfProcessing: countOfProcessing,
+// 			CountOfProcessed:  countOfProcessed,
+// 		},
+// 	}, nil
+// }
