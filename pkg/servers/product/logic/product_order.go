@@ -349,13 +349,6 @@ func VerifyProductOrder(tx *gorm.DB, id string) (err error) {
 	}
 
 	if err = tx.Model(productOrder).Where("`id` = ?", id).Update("current_state", types.ProductOrderStateVerified).Error; err != nil {
-		// if err = model.DB.DB().Create(model.TaskQueueExecution{
-		// 	Success:       false,
-		// 	FailureReason: fmt.Sprintf("%v", err),
-		// 	DataTrace:     fmt.Sprintf("数据表: ProductOrder, 索引: %s", productOrder.ProductOrderNo),
-		// }).Error; err != nil {
-		// 	return
-		// }
 		return
 	}
 

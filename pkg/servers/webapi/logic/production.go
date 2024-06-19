@@ -44,7 +44,7 @@ func OnlineProductInfo(req *proto.OnlineProductInfoRequest) (code int32, err err
 			return err
 		}
 
-		if productInfo.CurrentState != types.ProductStateReceipted {
+		if productInfo.CurrentState != types.ProductStateReleased {
 			code = 10002
 			return fmt.Errorf("产品当前状态为%s，无法上线", productInfo.CurrentState)
 		}
@@ -1588,7 +1588,7 @@ func UpdateProductReworkRecord(req *proto.UpdateProductReworkRecordRequest) (map
 		productReworkRecord.ReworkUserID = req.ProductReworkUserID
 		productReworkRecord.ReworkBrief = req.ReworkBrief
 		productReworkRecord.Remark = req.Remark
-		productReworkRecord.CompleteTime = sql.NullTime{Time: time.Now(), Valid: true}
+		productReworkRecord.CompleteTime = tool.Time2NullTime(time.Now())
 
 		// user, _ := clients.UserClient.GetDetail(context.Background(), &usercenter.GetDetailRequest{Id: req.ProductReworkUserID})
 
