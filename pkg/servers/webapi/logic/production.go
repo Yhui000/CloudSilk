@@ -1,19 +1,16 @@
 package logic
 
 import (
-	"context"
 	"database/sql"
 	"fmt"
 	"math"
 	"strings"
 	"time"
 
-	"github.com/CloudSilk/CloudSilk/pkg/clients"
 	"github.com/CloudSilk/CloudSilk/pkg/model"
 	"github.com/CloudSilk/CloudSilk/pkg/proto"
 	"github.com/CloudSilk/CloudSilk/pkg/tool"
 	"github.com/CloudSilk/CloudSilk/pkg/types"
-	modelcode "github.com/CloudSilk/pkg/model"
 	"github.com/CloudSilk/pkg/utils"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -109,7 +106,7 @@ func OnlineProductInfo(req *proto.OnlineProductInfoRequest) (code int32, err err
 		}
 
 		nowTime := time.Now()
-		productInfo.ProductionProcessID = productProcessRoute.CurrentProcessID
+		productInfo.ProductionProcessID = &productProcessRoute.CurrentProcessID
 		productInfo.RemainingRoutes = int32(remainingRoutes)
 		productInfo.EstimateTime = tool.Time2NullTime(nowTime.Add(time.Duration(int32(remainingRoutes)*productInfo.ProductOrder.StandardWorkTime) * time.Second))
 		productInfo.StartedTime = tool.Time2NullTime(nowTime)
@@ -359,7 +356,7 @@ func EnterProductionStation(req *proto.EnterProductionStationRequest) (data *pro
 			code = 4
 			return fmt.Errorf("产品状态错误，此产品状态为已完工")
 		}
-		if productInfo.ProductionProcessID == "" {
+		if productInfo.ProductionProcessID == nil {
 			code = 1
 			return fmt.Errorf("此产品未开工")
 		}
@@ -387,7 +384,7 @@ func EnterProductionStation(req *proto.EnterProductionStationRequest) (data *pro
 				WorkUserID:          *productionStation.CurrentUserID,
 				ProductionStationID: productionStation.ID,
 				ProductInfoID:       productInfo.ID,
-				ProductionProcessID: productInfo.ProductionProcessID,
+				ProductionProcessID: *productInfo.ProductionProcessID,
 				StandardWorkTime:    productInfo.ProductOrder.StandardWorkTime,
 				WorkStartTime:       tool.Time2NullTime(nowTime),
 			}).Error; err != nil {
@@ -646,7 +643,7 @@ func GetProductionProcessStepWithParameter(req *proto.GetProductionProcessStepWi
 		return nil, err
 	}
 
-	if productInfo.ProductionProcessID == "" {
+	if productInfo.ProductionProcessID == nil {
 		return nil, fmt.Errorf("无法读取产品的当前工序")
 	}
 
@@ -919,7 +916,7 @@ func CreateProductProcessRecord(req *proto.CreateProductProcessRecordRequest) er
 
 	if err := model.DB.DB().Create(&model.ProductProcessRecord{
 		ProductInfoID:       productInfo.ID,
-		ProductionProcessID: productInfo.ProductionProcessID,
+		ProductionProcessID: *productInfo.ProductionProcessID,
 		ProductionStationID: productionStation.ID,
 		ProcessStepType:     req.ProcessStepType,
 		WorkDescription:     req.WorkDescription,
@@ -964,7 +961,7 @@ func CreateProductWorkRecord(req *proto.CreateProductWorkRecordRequest) error {
 		return err
 	}
 
-	if productInfo.ProductionProcessID == "" {
+	if productInfo.ProductionProcessID == nil {
 		return fmt.Errorf("无法获取产品的当前工序")
 	}
 
@@ -1092,13 +1089,13 @@ func ExitProductionStation(req *proto.ExitProductionStationRequest) error {
 			return err
 		}
 
-		if productInfo.ProductionProcessID == "" {
+		if productInfo.ProductionProcessID == nil {
 			return fmt.Errorf("无法读取产品的当前工序")
 		}
 
 		//上传节拍
 		productRhythmRecord := &model.ProductRhythmRecord{}
-		if err := tx.Where("`production_station_id` = ? AND `product_info_id` = ? AND `work_end_time` IS NULL").First(productRhythmRecord).Error; err == gorm.ErrRecordNotFound {
+		if err := tx.Where("`production_station_id` = ? AND `product_info_id` = ? AND `work_end_time` IS NULL", productionStation.ID, productInfo.ID).First(productRhythmRecord).Error; err == gorm.ErrRecordNotFound {
 			return fmt.Errorf("读取工位当前节拍数据失败")
 		} else if err != nil {
 			return err
@@ -1127,7 +1124,7 @@ func ExitProductionStation(req *proto.ExitProductionStationRequest) error {
 			if err := tx.Create(&model.ProductReworkRecord{
 				ProductionStationID: productionStation.ID,
 				ProductInfoID:       productInfo.ID,
-				ProductionProcessID: productInfo.ProductionProcessID,
+				ProductionProcessID: *productInfo.ProductionProcessID,
 				ReworkTime:          tool.Time2NullTime(nowTime),
 				ReworkReason:        req.ReworkReason,
 			}).Error; err != nil {
@@ -1177,7 +1174,7 @@ func ExitProductionStation(req *proto.ExitProductionStationRequest) error {
 					//设定当前工序的产品信息状态
 					productInfo.CurrentState = nextProductProcessRoute.CurrentProcess.ProductState
 				}
-				productInfo.ProductionProcessID = nextProductProcessRoute.CurrentProcessID
+				productInfo.ProductionProcessID = &nextProductProcessRoute.CurrentProcessID
 
 				//计算预计下线时间
 				var remainingRoutes int64
@@ -1193,7 +1190,7 @@ func ExitProductionStation(req *proto.ExitProductionStationRequest) error {
 				//没有下一个工序判定为完工
 				productInfo.CurrentState = types.ProductStateCompleted
 				productInfo.FinishedTime = tool.Time2NullTime(nowTime)
-				productInfo.ProductionProcessID = ""
+				productInfo.ProductionProcessID = nil
 
 				productOrder := &model.ProductOrder{}
 				if err := tx.Preload("ProductInfos").First(productOrder, "`id` = ?", productInfo.ProductOrderID).Error; err != nil && err != gorm.ErrRecordNotFound {
@@ -1381,114 +1378,92 @@ func CheckProductProcessRouteFailure(req *proto.CheckProductProcessRouteFailureR
 		return fmt.Errorf("ProductSerialNo不能为空")
 	}
 
-	timeNow := time.Now()
-	timeNowStr := timeNow.Format("2006-01-02 15:04:05")
-	_productionStation, _ := clients.ProductionStationClient.Get(context.Background(), &proto.GetProductionStationRequest{Code: req.ProductionStation})
-	if _productionStation.Message == gorm.ErrRecordNotFound.Error() {
-		return fmt.Errorf("无效的工站代号")
-	} else if _productionStation.Code != modelcode.Success {
-		return fmt.Errorf(_productionStation.Message)
-	}
-	productionStation := _productionStation.Data
+	if err := model.DB.DB().Transaction(func(tx *gorm.DB) error {
+		nowTime := time.Now()
 
-	_productInfo, _ := clients.ProductInfoClient.Get(context.Background(), &proto.GetProductInfoRequest{ProductSerialNo: req.ProductSerialNo})
-	if _productInfo.Message == gorm.ErrRecordNotFound.Error() {
-		return fmt.Errorf("无效的产品序列号")
-	} else if _productInfo.Code != modelcode.Success {
-		return fmt.Errorf(_productInfo.Message)
-	}
-	productInfo := _productInfo.Data
-
-	if productInfo.ProductionProcessID == "" {
-		return fmt.Errorf("数据错误，此产品的当前工序为空")
-	}
-
-	_productProcessRoute, _ := clients.ProductProcessRouteClient.Get(context.Background(), &proto.GetProductProcessRouteRequest{
-		CurrentProcessID: productInfo.ProductionProcessID,
-		ProductInfoID:    productInfo.Id,
-		CurrentStates:    []string{types.ProductProcessRouteStateChecking},
-	})
-	if _productProcessRoute.Message == gorm.ErrRecordNotFound.Error() {
-		return fmt.Errorf("状态错误，此产品的当前工艺状态不是" + types.ProductProcessRouteStateChecking)
-	} else if _productProcessRoute.Code != modelcode.Success {
-		return fmt.Errorf(_productProcessRoute.Message)
-	}
-	lastProductProcessRoute := _productProcessRoute.Data
-
-	handleMethod := req.HandleMethod
-	if handleMethod == 0 {
-		handleMethod = types.ProductionProcessHandleMethodRetry
-	}
-	switch handleMethod {
-	case types.ProductionProcessHandleMethodRetry:
-		lastProductProcessRoute.Remark = ""
-		lastProductProcessRoute.CurrentState = types.ProductProcessRouteStateProcessing
-
-		productInfo.CurrentState = lastProductProcessRoute.CurrentProcess.ProductState
-		if productInfo.CurrentState == "" {
-			productInfo.CurrentState = types.ProductStateTesting
-		}
-	case types.ProductionProcessHandleMethodRework:
-		lastProductProcessRoute.CurrentState = types.ProductProcessRouteStateReworking
-
-		productReworkRecord := &proto.ProductReworkRecordInfo{
-			ProductionStationID: productionStation.Id,
-			ProductInfoID:       productInfo.Id,
-			ProductionProcessID: productInfo.ProductionProcessID,
-			ReworkTime:          timeNowStr,
-			ReworkReason:        lastProductProcessRoute.Remark,
-		}
-		if resp, _ := clients.ProductReworkRecordClient.Add(context.Background(), productReworkRecord); resp.Code != modelcode.Success {
-			return fmt.Errorf(resp.Message)
+		productionStation := &model.ProductionStation{}
+		if err := tx.First(productionStation, "`code` = ?", req.ProductionStation).Error; err == gorm.ErrRecordNotFound {
+			return fmt.Errorf("无效的工站代号")
+		} else if err != nil {
+			return err
 		}
 
-		productInfo.CurrentState = types.ProductStateReworking
-	case types.ProductionProcessHandleMethodIgnore:
-		lastProductProcessRoute.CurrentState = types.ProductProcessRouteStateProcessed
+		productInfo := &model.ProductInfo{}
+		if err := tx.First(productInfo, "`product_serial_no` = ?", req.ProductSerialNo).Error; err == gorm.ErrRecordNotFound {
+			return fmt.Errorf("无效的产品序列号")
+		} else if err != nil {
+			return err
+		}
 
-		//切换到下个工艺
-		_productProcessRoutes, _ := clients.ProductProcessRouteClient.Query(context.Background(), &proto.QueryProductProcessRouteRequest{
-			PageSize:      1,
-			SortConfig:    `{"route_index": "asc"}`,
-			ProductInfoID: productInfo.Id,
-			RouteIndex:    lastProductProcessRoute.RouteIndex,
-			CurrentState:  types.ProductProcessRouteStateWaitProcess,
-		})
-		if _productProcessRoutes.Code != modelcode.Success {
-			return fmt.Errorf(_productProcessRoutes.Message)
+		if productInfo.ProductionProcessID == nil {
+			return fmt.Errorf("数据错误，此产品的当前工序为空")
 		}
-		var nextProductProcessRoute *proto.ProductProcessRouteInfo
-		if len(_productProcessRoutes.Data) > 0 {
-			nextProductProcessRoute = _productProcessRoutes.Data[0]
+
+		lastProductProcessRoute := &model.ProductProcessRoute{}
+		if err := tx.Preload("CurrentProcess").Where("`current_process_id` = ? AND `product_info_id` = ? AND `current_state` = ?", productInfo.ProductionProcessID, productInfo.ID, types.ProductProcessRouteStateChecking).First(lastProductProcessRoute).Error; err == gorm.ErrRecordNotFound {
+			return fmt.Errorf("状态错误，此产品的当前工艺状态不是" + types.ProductProcessRouteStateChecking)
+		} else if err != nil {
+			return err
 		}
-		if nextProductProcessRoute == nil {
-			_productOrderProcesses, _ := clients.ProductOrderProcessClient.Query(context.Background(), &proto.QueryProductOrderProcessRequest{
-				PageSize:       1,
-				SortConfig:     `{"route_index": "asc"}`,
-				ProductOrderID: productInfo.ProductOrderID,
-				Enable:         true,
-				SortIndex:      lastProductProcessRoute.RouteIndex,
-			})
-			if _productOrderProcesses.Code != modelcode.Success {
-				return fmt.Errorf(_productOrderProcesses.Message)
+
+		handleMethod := req.HandleMethod
+		if handleMethod == 0 {
+			handleMethod = types.ProductionProcessHandleMethodRetry
+		}
+		switch handleMethod {
+		case types.ProductionProcessHandleMethodRetry:
+			lastProductProcessRoute.Remark = ""
+			lastProductProcessRoute.CurrentState = types.ProductProcessRouteStateProcessing
+
+			productInfo.CurrentState = lastProductProcessRoute.CurrentProcess.ProductState
+			if productInfo.CurrentState == "" {
+				productInfo.CurrentState = types.ProductStateTesting
 			}
-			if len(_productOrderProcesses.Data) == 0 {
-				productOrderProcess := _productOrderProcesses.Data[0]
-				nextProductProcessRoute = &proto.ProductProcessRouteInfo{
-					LastProcessID:    lastProductProcessRoute.CurrentProcessID,
-					CurrentProcessID: productOrderProcess.ProductionProcessID,
-					CurrentProcess:   productOrderProcess.ProductionProcess,
-					CreateTime:       timeNowStr,
-					CurrentState:     types.ProductProcessRouteStateWaitProcess,
-					RouteIndex:       productOrderProcess.SortIndex,
-					ProductInfoID:    productInfo.Id,
+		case types.ProductionProcessHandleMethodRework:
+			lastProductProcessRoute.CurrentState = types.ProductProcessRouteStateReworking
+
+			if err := tx.Create(&model.ProductReworkRecord{
+				ProductionStationID: productionStation.ID,
+				ProductInfoID:       productInfo.ID,
+				ProductionProcessID: *productInfo.ProductionProcessID,
+				ReworkTime:          tool.Time2NullTime(nowTime),
+				ReworkReason:        lastProductProcessRoute.Remark,
+			}).Error; err != nil {
+				return err
+			}
+
+			productInfo.CurrentState = types.ProductStateReworking
+		case types.ProductionProcessHandleMethodIgnore:
+			lastProductProcessRoute.CurrentState = types.ProductProcessRouteStateProcessed
+
+			//切换到下个工艺
+			nextProductProcessRoute := &model.ProductProcessRoute{}
+			if err := tx.Preload("CurrentProcess").Where("`product_info_id` = ? AND `route_index` > ? AND `current_state` = ?", productInfo.ID, lastProductProcessRoute.RouteIndex, types.ProductProcessRouteStateWaitProcess).Order("route_index").First(nextProductProcessRoute).Error; err != nil && err != gorm.ErrRecordNotFound {
+				return err
+			}
+
+			if nextProductProcessRoute.ID == "" {
+				productOrderProcess := &model.ProductOrderProcess{}
+				if err := tx.Where("`product_order_id` = ? AND `enable` = ? AND `sort_index` > ?", productInfo.ProductOrderID, true, lastProductProcessRoute.RouteIndex).Order("sort_index").First(productOrderProcess).Error; err != nil && err != gorm.ErrRecordNotFound {
+					return err
 				}
-				if resp, _ := clients.ProductProcessRouteClient.Add(context.Background(), nextProductProcessRoute); resp.Code != modelcode.Success {
-					return fmt.Errorf(resp.Message)
+
+				if productOrderProcess.ID == "" {
+					nextProductProcessRoute = &model.ProductProcessRoute{
+						LastProcessID:    &lastProductProcessRoute.CurrentProcessID,
+						CurrentProcessID: productOrderProcess.ProductionProcessID,
+						CurrentProcess:   productOrderProcess.ProductionProcess,
+						CurrentState:     types.ProductProcessRouteStateWaitProcess,
+						RouteIndex:       productOrderProcess.SortIndex,
+						ProductInfoID:    productInfo.ID,
+					}
+					if err := tx.Create(nextProductProcessRoute).Error; err != nil {
+						return err
+					}
 				}
 			}
 
-			if nextProductProcessRoute != nil {
+			if nextProductProcessRoute.ID != "" {
 				nextProductProcessRoute.WorkIndex = lastProductProcessRoute.WorkIndex + 1
 				nextProductProcessRoute.CurrentState = types.ProductProcessRouteStateProcessing
 
@@ -1496,38 +1471,40 @@ func CheckProductProcessRouteFailure(req *proto.CheckProductProcessRouteFailureR
 					//设定当前工序的产品信息状态
 					productInfo.CurrentState = nextProductProcessRoute.CurrentProcess.ProductState
 				}
-				productInfo.ProductionProcessID = nextProductProcessRoute.CurrentProcessID
+				productInfo.ProductionProcessID = &nextProductProcessRoute.CurrentProcessID
+
 				//TODO: 计算预计下线时间
-				_productProcessRoutes, _ := clients.ProductProcessRouteClient.Query(context.Background(), &proto.QueryProductProcessRouteRequest{
-					ProductInfoID: productInfo.Id,
-					CurrentState:  types.ProductProcessRouteStateWaitProcess,
-				})
-				if _productProcessRoutes.Code != modelcode.Success {
-					return fmt.Errorf(_productProcessRoutes.Message)
+				var remainingRoutes int64
+				if err := tx.Model(model.ProductProcessRoute{}).Where("`product_info_id` = ? AND `current_state` = ?", productInfo.ID, types.ProductProcessRouteStateWaitProcess).Count(&remainingRoutes).Error; err != nil {
+					return err
 				}
-				remainingRoutes := int32(_productProcessRoutes.Total)
-				productInfo.RemainingRoutes = remainingRoutes
+
+				productInfo.RemainingRoutes = int32(remainingRoutes)
 				if remainingRoutes > 0 {
-					productInfo.EstimateTime = timeNow.Add(time.Duration(remainingRoutes*productInfo.ProductOrder.StandardWorkTime) * time.Second).Format("2006-01-02 15:04:05")
+					productInfo.EstimateTime = tool.Time2NullTime(nowTime.Add(time.Duration(int32(remainingRoutes)*productInfo.ProductOrder.StandardWorkTime) * time.Second))
 				}
-				if resp, _ := clients.ProductProcessRouteClient.Update(context.Background(), nextProductProcessRoute); resp.Code != modelcode.Success {
-					return fmt.Errorf(resp.Message)
+
+				if err := tx.Save(nextProductProcessRoute).Error; err != nil {
+					return err
 				}
 			} else {
 				productInfo.CurrentState = types.ProductStateCompleted
-				productInfo.FinishedTime = timeNowStr
-				productInfo.ProductionProcessID = ""
+				productInfo.FinishedTime = tool.Time2NullTime(nowTime)
+				productInfo.ProductionProcessID = nil
 			}
+			if err := tx.Save(productInfo).Error; err != nil {
+				return err
+			}
+			if err := tx.Save(lastProductProcessRoute).Error; err != nil {
+				return err
+			}
+		default:
+			return fmt.Errorf("无效的处理方式")
 		}
-	default:
-		return fmt.Errorf("无效的处理方式")
-	}
 
-	if resp, _ := clients.ProductInfoClient.Update(context.Background(), productInfo); resp.Code != modelcode.Success {
-		return fmt.Errorf(resp.Message)
-	}
-	if resp, _ := clients.ProductProcessRouteClient.Update(context.Background(), lastProductProcessRoute); resp.Code != modelcode.Success {
-		return fmt.Errorf(resp.Message)
+		return nil
+	}); err != nil {
+		return err
 	}
 
 	return nil
@@ -1753,7 +1730,7 @@ func UpdateProductReworkRecord(req *proto.UpdateProductReworkRecordRequest) (map
 		lastProductProcessRoute := &model.ProductProcessRoute{}
 		if err := tx.Preload("CurrentProcess").Where(&model.ProductProcessRoute{
 			ProductInfoID:    productInfo.ID,
-			CurrentProcessID: productInfo.ProductionProcessID,
+			CurrentProcessID: *productInfo.ProductionProcessID,
 			CurrentState:     types.ProductProcessRouteStateReworking,
 		}).First(lastProductProcessRoute).Error; err == gorm.ErrRecordNotFound {
 			return fmt.Errorf("读取产品当前工艺路线失败")
@@ -1802,7 +1779,7 @@ func UpdateProductReworkRecord(req *proto.UpdateProductReworkRecordRequest) (map
 
 		if err := tx.Create(&model.ProductProcessRoute{
 			CurrentState:     types.ProductProcessRouteStateWaitProcess,
-			LastProcessID:    &productInfo.ProductionProcessID,
+			LastProcessID:    productInfo.ProductionProcessID,
 			CurrentProcessID: nextProcess.ID,
 			RouteIndex:       nextProcess.SortIndex,
 			ProductInfoID:    productInfo.ID,
@@ -1811,7 +1788,7 @@ func UpdateProductReworkRecord(req *proto.UpdateProductReworkRecordRequest) (map
 			return err
 		}
 		productReworkRecord.ProductionProcessID = nextProcess.ID
-		productInfo.ProductionProcessID = nextProcess.ID
+		productInfo.ProductionProcessID = &nextProcess.ID
 
 		//从ProductionProcess表中获取当前工艺的产品状态
 		currentProductionProcess := &model.ProductionProcess{}

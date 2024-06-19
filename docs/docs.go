@@ -21331,47 +21331,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/mom/webapi/material/bindmaterialtray": {
-            "post": {
-                "description": "绑定物料载具",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "WebAPI"
-                ],
-                "summary": "绑定物料载具",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "jwt token",
-                        "name": "authorization",
-                        "in": "header",
-                        "required": true
-                    },
-                    {
-                        "description": "BindMaterialTrayRequest",
-                        "name": "account",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/proto.BindMaterialTrayRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/proto.CommonResponse"
-                        }
-                    }
-                }
-            }
-        },
         "/api/mom/webapi/production/checkproductprocessroutefailure": {
             "post": {
                 "description": "设置失败后续处理接口",
@@ -21820,17 +21779,6 @@ const docTemplate = `{
                     "$ref": "#/definitions/proto.ProductionProcessStepInfo"
                 },
                 "productionProcessStepID": {
-                    "type": "string"
-                }
-            }
-        },
-        "proto.BindMaterialTrayRequest": {
-            "type": "object",
-            "properties": {
-                "materialTray": {
-                    "type": "string"
-                },
-                "productSerialNo": {
                     "type": "string"
                 }
             }
