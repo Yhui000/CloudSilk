@@ -73,7 +73,7 @@ func OnlineProductInfo(req *proto.OnlineProductInfoRequest) (code int32, err err
 
 		if productProcessRoute.ID == "" {
 			productOrderProcess := &model.ProductOrderProcess{}
-			if err := tx.Where(model.ProductOrderProcess{ProductOrderID: productInfo.ProductOrderID, Enable: true}).Order("sort_index").First(productOrderProcess).Error; err == gorm.ErrRecordNotFound {
+			if err := tx.Preload("ProductionProcess").Where(model.ProductOrderProcess{ProductOrderID: productInfo.ProductOrderID, Enable: true}).Order("sort_index").First(productOrderProcess).Error; err == gorm.ErrRecordNotFound {
 				code = 10004
 				return fmt.Errorf("上线失败，此工单缺少工艺路线")
 			} else if err != nil {
@@ -123,7 +123,7 @@ func OnlineProductInfo(req *proto.OnlineProductInfoRequest) (code int32, err err
 			productOrder.CurrentState = types.ProductOrderStateProducting
 
 			systemEvent := &model.SystemEvent{}
-			if err := tx.First(systemEvent, "`code` = ?", types.SystemEventProductOrderStarted).Error; err != nil && err != gorm.ErrRecordNotFound {
+			if err := tx.Preload("SystemEventParameters").First(systemEvent, "`code` = ?", types.SystemEventProductOrderStarted).Error; err != nil && err != gorm.ErrRecordNotFound {
 				code = 50000
 				return err
 			}
@@ -193,7 +193,7 @@ func OnlineProductInfo(req *proto.OnlineProductInfoRequest) (code int32, err err
 
 			//TODO: 触发事件
 			systemEvent2 := &model.SystemEvent{}
-			if err := tx.First(systemEvent2, "`code` = ?", types.SystemEventProductInfoOnlined).Error; err != nil && err != gorm.ErrRecordNotFound {
+			if err := tx.Preload("SystemEventParameters").First(systemEvent2, "`code` = ?", types.SystemEventProductInfoOnlined).Error; err != nil && err != gorm.ErrRecordNotFound {
 				code = 50000
 				return err
 			}
@@ -316,7 +316,7 @@ func EnterProductionStation(req *proto.EnterProductionStationRequest) (data *pro
 
 		//根据工位代号获取产线工站
 		productionStation := &model.ProductionStation{}
-		if err := tx.First(productionStation, "`code` = ?", req.ProductionStation).Error; err == gorm.ErrRecordNotFound {
+		if err := tx.Preload("ProductionLine").First(productionStation, "`code` = ?", req.ProductionStation).Error; err == gorm.ErrRecordNotFound {
 			code = 1
 			return fmt.Errorf("无效的工位代号")
 		} else if err != nil {
@@ -619,7 +619,7 @@ func GetProductionProcessStepWithParameter(req *proto.GetProductionProcessStepWi
 
 	if req.TrayNo != "" {
 		materialTray := &model.MaterialTray{}
-		if err := model.DB.DB().Preload("ProductInfo").Preload("ProductInfo").First(materialTray, "`identifier` = ?", req.TrayNo).Error; err == gorm.ErrRecordNotFound {
+		if err := model.DB.DB().Preload("ProductInfo").First(materialTray, "`identifier` = ?", req.TrayNo).Error; err == gorm.ErrRecordNotFound {
 			return nil, fmt.Errorf("无效的物料载具识别码")
 		} else if err != nil {
 			return nil, err
@@ -689,12 +689,12 @@ func GetProductionProcessStepWithParameter(req *proto.GetProductionProcessStepWi
 	materialNoArray := []string{}
 	if err := model.DB.DB().Model(model.ProductOrderBom{}).
 		Where("`product_order_id` = ? AND `production_process` in ?", productOrder.ID, []string{productionProcess.Identifier, productionProcess.Code}).
-		Select("material_no", "material_description", "piece_qty", "require_qty", "unit", "enable_control", "control_type", "warehouse", "production_process").
+		Select("material_no materialNo", "material_description materialDescription", "piece_qty pieceQTY", "require_qty requireQTY", "unit", "enable_control enableControl", "control_type controlType", "warehouse", "production_process productionProcess").
 		Find(&productOrderBoms).Error; err != nil {
 		return nil, err
 	}
 	for _, v := range productOrderBoms {
-		materialNoArray = append(materialNoArray, v["material_no"].(string))
+		materialNoArray = append(materialNoArray, v["materialNo"].(string))
 	}
 
 	materialChannels := []*model.MaterialChannel{}
@@ -1076,14 +1076,14 @@ func ExitProductionStation(req *proto.ExitProductionStationRequest) error {
 		}
 
 		productionStation := &model.ProductionStation{}
-		if err := tx.First(productionStation, "`code` = ?", req.ProductionStation).Error; err == gorm.ErrRecordNotFound {
+		if err := tx.Preload("ProductionLine").First(productionStation, "`code` = ?", req.ProductionStation).Error; err == gorm.ErrRecordNotFound {
 			return fmt.Errorf("非法的工站代号")
 		} else if err != nil {
 			return err
 		}
 
 		productInfo := &model.ProductInfo{}
-		if err := tx.First(productInfo, "`product_serial_no` = ?", req.ProductSerialNo).Error; err == gorm.ErrRecordNotFound {
+		if err := tx.Preload("ProductOrder").First(productInfo, "`product_serial_no` = ?", req.ProductSerialNo).Error; err == gorm.ErrRecordNotFound {
 			return fmt.Errorf("读取产品信息失败")
 		} else if err != nil {
 			return err
@@ -1266,7 +1266,7 @@ func ExitProductionStation(req *proto.ExitProductionStationRequest) error {
 			// 判断是否要解绑载具
 			if req.UnbindTray {
 				materialTray := &model.MaterialTray{}
-				if err := tx.Preload("ProductInfo").First(materialTray, "`product_info_id` = ?", productInfo.ID).Error; err != nil && err != gorm.ErrRecordNotFound {
+				if err := tx.First(materialTray, "`product_info_id` = ?", productInfo.ID).Error; err != nil && err != gorm.ErrRecordNotFound {
 					return err
 				}
 				if materialTray.ID != "" {
@@ -1389,7 +1389,7 @@ func CheckProductProcessRouteFailure(req *proto.CheckProductProcessRouteFailureR
 		}
 
 		productInfo := &model.ProductInfo{}
-		if err := tx.First(productInfo, "`product_serial_no` = ?", req.ProductSerialNo).Error; err == gorm.ErrRecordNotFound {
+		if err := tx.Preload("ProductOrder").First(productInfo, "`product_serial_no` = ?", req.ProductSerialNo).Error; err == gorm.ErrRecordNotFound {
 			return fmt.Errorf("无效的产品序列号")
 		} else if err != nil {
 			return err
@@ -1444,7 +1444,7 @@ func CheckProductProcessRouteFailure(req *proto.CheckProductProcessRouteFailureR
 
 			if nextProductProcessRoute.ID == "" {
 				productOrderProcess := &model.ProductOrderProcess{}
-				if err := tx.Where("`product_order_id` = ? AND `enable` = ? AND `sort_index` > ?", productInfo.ProductOrderID, true, lastProductProcessRoute.RouteIndex).Order("sort_index").First(productOrderProcess).Error; err != nil && err != gorm.ErrRecordNotFound {
+				if err := tx.Preload("ProductionProcess").Where("`product_order_id` = ? AND `enable` = ? AND `sort_index` > ?", productInfo.ProductOrderID, true, lastProductProcessRoute.RouteIndex).Order("sort_index").First(productOrderProcess).Error; err != nil && err != gorm.ErrRecordNotFound {
 					return err
 				}
 
