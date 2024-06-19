@@ -154,7 +154,7 @@ func ExitProductionStation(c *gin.Context) {
 		return
 	}
 
-	_, err := logic.ExitProductionStation(req)
+	err := logic.ExitProductionStation(req)
 	if err != nil {
 		resp.Code = types.ServiceResponseCodeFailure
 		resp.Message = err.Error()

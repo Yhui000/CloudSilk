@@ -2317,7 +2317,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "物料托盘管理"
+                    "物料载具管理"
                 ],
                 "summary": "新增",
                 "parameters": [
@@ -2358,7 +2358,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "物料托盘管理"
+                    "物料载具管理"
                 ],
                 "summary": "查询所有",
                 "parameters": [
@@ -2390,7 +2390,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "物料托盘管理"
+                    "物料载具管理"
                 ],
                 "summary": "删除",
                 "parameters": [
@@ -2431,7 +2431,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "物料托盘管理"
+                    "物料载具管理"
                 ],
                 "summary": "查询明细",
                 "parameters": [
@@ -2470,7 +2470,7 @@ const docTemplate = `{
                     "application/octet-stream"
                 ],
                 "tags": [
-                    "物料托盘管理"
+                    "物料载具管理"
                 ],
                 "summary": "分页查询",
                 "parameters": [
@@ -2532,7 +2532,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "物料托盘管理"
+                    "物料载具管理"
                 ],
                 "summary": "更新",
                 "parameters": [
@@ -2573,7 +2573,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "物料托盘绑定记录"
+                    "物料载具绑定记录"
                 ],
                 "summary": "新增",
                 "parameters": [
@@ -2614,7 +2614,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "物料托盘绑定记录"
+                    "物料载具绑定记录"
                 ],
                 "summary": "查询所有",
                 "parameters": [
@@ -2646,7 +2646,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "物料托盘绑定记录"
+                    "物料载具绑定记录"
                 ],
                 "summary": "删除",
                 "parameters": [
@@ -2687,7 +2687,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "物料托盘绑定记录"
+                    "物料载具绑定记录"
                 ],
                 "summary": "查询明细",
                 "parameters": [
@@ -2726,7 +2726,7 @@ const docTemplate = `{
                     "application/octet-stream"
                 ],
                 "tags": [
-                    "物料托盘绑定记录"
+                    "物料载具绑定记录"
                 ],
                 "summary": "分页查询",
                 "parameters": [
@@ -2800,7 +2800,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "物料托盘绑定记录"
+                    "物料载具绑定记录"
                 ],
                 "summary": "更新",
                 "parameters": [
@@ -21333,7 +21333,7 @@ const docTemplate = `{
         },
         "/api/mom/webapi/material/bindmaterialtray": {
             "post": {
-                "description": "绑定物料托盘",
+                "description": "绑定物料载具",
                 "consumes": [
                     "application/json"
                 ],
@@ -21343,7 +21343,7 @@ const docTemplate = `{
                 "tags": [
                     "WebAPI"
                 ],
-                "summary": "绑定物料托盘",
+                "summary": "绑定物料载具",
                 "parameters": [
                     {
                         "type": "string",
@@ -22256,7 +22256,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "trayNo": {
-                    "description": "托盘号",
+                    "description": "载具号",
                     "type": "string"
                 }
             }
@@ -22347,11 +22347,11 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "trayNo": {
-                    "description": "托盘号",
+                    "description": "载具号",
                     "type": "string"
                 },
                 "unbindTray": {
-                    "description": "是否解除托盘",
+                    "description": "是否解除载具",
                     "type": "boolean"
                 },
                 "waitTime": {
@@ -25220,7 +25220,7 @@ const docTemplate = `{
                     ]
                 },
                 "materialTrayID": {
-                    "description": "使用托盘ID",
+                    "description": "使用载具ID",
                     "type": "string"
                 },
                 "productInfo": {
@@ -25300,7 +25300,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "trayType": {
-                    "description": "托盘类型",
+                    "description": "载具类型",
                     "type": "string"
                 }
             }
@@ -25321,7 +25321,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "trayNo": {
-                    "description": "托盘号",
+                    "description": "载具号",
                     "type": "string"
                 }
             }

@@ -156,12 +156,12 @@ func OnlineProductInfo(req *proto.OnlineProductInfoRequest) (code int32, err err
 			}
 			productOrder.StartedQTY += 1
 
-			//绑定托盘
+			//绑定载具
 			if req.TrayNo != "" {
 				materialTray := &model.MaterialTray{}
 				if err := tx.First(materialTray, "`identifier` = ?", req.TrayNo).Error; err == gorm.ErrRecordNotFound {
 					code = 10005
-					return fmt.Errorf("无效的物料托盘识别码")
+					return fmt.Errorf("无效的物料载具识别码")
 				} else if err != nil {
 					code = 50000
 					return err
@@ -169,19 +169,19 @@ func OnlineProductInfo(req *proto.OnlineProductInfoRequest) (code int32, err err
 
 				if !materialTray.Enable {
 					code = 10005
-					return fmt.Errorf("托盘已禁用")
+					return fmt.Errorf("载具已禁用")
 				}
 				if materialTray.TrayType != types.MaterialTrayTypeMaterialTray {
 					code = 10005
-					return fmt.Errorf("非法操作，只允许使用物料托盘上线")
+					return fmt.Errorf("非法操作，只允许使用物料载具上线")
 				}
 				if materialTray.ProductionLineID != productionLine.ID {
 					code = 10005
-					return fmt.Errorf("非法操作，此托盘不属于当前产线")
+					return fmt.Errorf("非法操作，此载具不属于当前产线")
 				}
 				if materialTray.ProductInfoID != nil && *materialTray.ProductInfoID != productInfo.ID {
 					code = 10005
-					return fmt.Errorf("非法操作，此托盘已绑定其他产品")
+					return fmt.Errorf("非法操作，此载具已绑定其他产品")
 				}
 
 				if err := tx.Create(&model.MaterialTrayBindingRecord{
@@ -261,7 +261,7 @@ func OnlineProductInfo(req *proto.OnlineProductInfoRequest) (code int32, err err
 // Code = 2, 返工产品
 // Code = 3，工艺路线错误
 // Code = 4, 完工产品
-// Code = 5, 读取托盘信息失败
+// Code = 5, 读取载具信息失败
 // 请求入站
 func EnterProductionStation(req *proto.EnterProductionStationRequest) (data *proto.EnterProductionStationData, code int32, err error) {
 	if req.ProductionStation == "" {
@@ -276,11 +276,11 @@ func EnterProductionStation(req *proto.EnterProductionStationRequest) (data *pro
 	if err := model.DB.DB().Transaction(func(tx *gorm.DB) error {
 		nowTime := time.Now()
 		if req.TrayNo != "" {
-			//根据托盘号获取物料托盘
+			//根据载具号获取物料载具
 			materialTray := &model.MaterialTray{}
 			if err := tx.Preload("ProductInfo").First(materialTray, "`identifier` = ?", req.TrayNo).Error; err == gorm.ErrRecordNotFound {
 				code = 5
-				return fmt.Errorf("无效的物料托盘识别码")
+				return fmt.Errorf("无效的物料载具识别码")
 			} else if err != nil {
 				code = 1
 				return err
@@ -288,7 +288,7 @@ func EnterProductionStation(req *proto.EnterProductionStationRequest) (data *pro
 
 			if materialTray.ProductInfo == nil {
 				code = 5
-				return fmt.Errorf("托盘未绑定任何产品")
+				return fmt.Errorf("载具未绑定任何产品")
 			}
 
 			req.ProductSerialNo = materialTray.ProductInfo.ProductSerialNo
@@ -622,14 +622,14 @@ func GetProductionProcessStepWithParameter(req *proto.GetProductionProcessStepWi
 
 	if req.TrayNo != "" {
 		materialTray := &model.MaterialTray{}
-		if err := model.DB.DB().Preload("ProductInfo").First(materialTray, "`identifier` = ?", req.TrayNo).Error; err == gorm.ErrRecordNotFound {
-			return nil, fmt.Errorf("无效的物料托盘识别码")
+		if err := model.DB.DB().Preload("ProductInfo").Preload("ProductInfo").First(materialTray, "`identifier` = ?", req.TrayNo).Error; err == gorm.ErrRecordNotFound {
+			return nil, fmt.Errorf("无效的物料载具识别码")
 		} else if err != nil {
 			return nil, err
 		}
 
 		if materialTray.ProductInfo == nil {
-			return nil, fmt.Errorf("托盘未绑定任何产品")
+			return nil, fmt.Errorf("载具未绑定任何产品")
 		}
 
 		req.ProductSerialNo = materialTray.ProductInfo.ProductSerialNo
@@ -1036,330 +1036,310 @@ func CreateProductWorkRecord(req *proto.CreateProductWorkRecordRequest) error {
 }
 
 // 请求出站
-func ExitProductionStation(req *proto.ExitProductionStationRequest) (*proto.CommonResponse, error) {
+func ExitProductionStation(req *proto.ExitProductionStationRequest) error {
 	if req.ProductionStation == "" {
-		return nil, fmt.Errorf("ProductionStation不能为空")
+		return fmt.Errorf("ProductionStation不能为空")
 	}
-	timeNow := time.Now()
-	timeNowStr := timeNow.Format("2006-01-02 15:04:05")
-	if req.TrayNo != "" {
-		//根据托盘号获取物料托盘
-		_materialTray, _ := clients.MaterialTrayClient.Get(context.Background(), &proto.GetMaterialTrayRequest{Identifier: req.TrayNo})
-		if _materialTray.Message == gorm.ErrRecordNotFound.Error() {
-			return nil, fmt.Errorf("无效的托盘号")
-		}
-		if _materialTray.Code != modelcode.Success {
-			return nil, fmt.Errorf(_materialTray.Message)
-		}
-
-		materialTray := _materialTray.Data
-		if materialTray.ProductionLineID == "" {
-			return nil, fmt.Errorf("托盘未绑定任何产品")
-		}
-
-		req.ProductSerialNo = materialTray.ProductInfo.ProductSerialNo
-	}
-	if req.PackageNo != "" {
-		//根据包装箱号获取产品包装记录
-		_productPackageRecord, _ := clients.ProductPackageRecordClient.Get(context.Background(), &proto.GetProductPackageRecordRequest{PackageNo: req.PackageNo})
-		if _productPackageRecord.Message == gorm.ErrRecordNotFound.Error() {
-			return nil, fmt.Errorf("无效的包装箱号")
-		}
-		if _productPackageRecord.Code != modelcode.Success {
-			return nil, fmt.Errorf(_productPackageRecord.Message)
-		}
-
-		productPackageRecord := _productPackageRecord.Data
-		if productPackageRecord.ProductInfoID == "" {
-			return &proto.CommonResponse{Code: 5, Message: "包装箱未绑定任何产品"}, nil
-		}
-
-		req.ProductSerialNo = productPackageRecord.ProductInfo.ProductSerialNo
-	}
-	req.ProductSerialNo = strings.Trim(strings.Trim(req.ProductSerialNo, "\000"), "\r")
-	if req.ProductSerialNo == "" {
-		return nil, fmt.Errorf("ProductSerialNo不能为空")
-	}
-
-	_productionStation, _ := clients.ProductionStationClient.Get(context.Background(), &proto.GetProductionStationRequest{Code: req.ProductionStation})
-	if _productionStation.Message == gorm.ErrRecordNotFound.Error() {
-		return nil, fmt.Errorf("非法的工站代号")
-	}
-	if _productionStation.Code != modelcode.Success {
-		return nil, fmt.Errorf(_productionStation.Message)
-	}
-	productionStation := _productionStation.Data
-
-	_productInfo, _ := clients.ProductInfoClient.Get(context.Background(), &proto.GetProductInfoRequest{ProductSerialNo: req.ProductSerialNo})
-	if _productInfo.Message == gorm.ErrRecordNotFound.Error() {
-		return nil, fmt.Errorf("读取产品信息失败")
-	}
-	if _productInfo.Code != modelcode.Success {
-		return nil, fmt.Errorf(_productInfo.Message)
-	}
-	productInfo := _productInfo.Data
-	if productInfo.ProductionProcessID == "" {
-		return nil, fmt.Errorf("无法读取产品的当前工序")
-	}
-
-	//上传节拍
-	_productRhythmRecord, _ := clients.ProductRhythmRecordClient.Get(context.Background(), &proto.GetProductRhythmRecordRequest{ProductionStationID: productionStation.Id, ProductInfoID: productInfo.Id, HasWorkEndTime: false})
-	if _productRhythmRecord.Message == gorm.ErrRecordNotFound.Error() {
-		return nil, fmt.Errorf("读取工位当前节拍数据失败")
-	}
-	if _productRhythmRecord.Code != modelcode.Success {
-		return nil, fmt.Errorf(_productRhythmRecord.Message)
-	}
-	productRhythmRecord := _productRhythmRecord.Data
-
-	productRhythmRecord.WorkEndTime = timeNowStr
-	workStartTime, err := time.Parse("2006-01-02 15:04:05", productRhythmRecord.WorkStartTime)
-	if err != nil {
-		return nil, err
-	}
-	workEndTime, err := time.Parse("2006-01-02 15:04:05", productRhythmRecord.WorkEndTime)
-	if err != nil {
-		return nil, err
-	}
-	productRhythmRecord.WorkTime = int32(workEndTime.Sub(workStartTime).Seconds())
-	productRhythmRecord.OverTime = productRhythmRecord.WorkTime - productRhythmRecord.StandardWorkTime
-	if productRhythmRecord.OverTime < 0 {
-		productRhythmRecord.OverTime = 0
-	}
-	productRhythmRecord.WaitTime = req.WaitTime
-
-	//修改工艺记录
-	_productProcessRoute, _ := clients.ProductProcessRouteClient.Get(context.Background(), &proto.GetProductProcessRouteRequest{ProductInfoID: productInfo.Id, CurrentProcessID: productInfo.ProductionProcessID, CurrentStates: []string{types.ProductProcessRouteStateProcessing}})
-	if _productProcessRoute.Message == gorm.ErrRecordNotFound.Error() {
-		return nil, fmt.Errorf("读取产品当前工艺路线失败")
-	}
-	if _productProcessRoute.Code != modelcode.Success {
-		return nil, fmt.Errorf(_productProcessRoute.Message)
-	}
-	lastProductProcessRoute := _productProcessRoute.Data
-
-	if req.IsRework {
-		productRhythmRecord.IsRework = true
-
-		lastProductProcessRoute.CurrentState = types.ProductProcessRouteStateReworking
-
-		if _productReworkRecord, _ := clients.ProductReworkRecordClient.Add(context.Background(), &proto.ProductReworkRecordInfo{
-			ProductionStationID: productionStation.Id,
-			ProductInfoID:       productInfo.Id,
-			ProductionProcessID: productInfo.ProductionProcessID,
-			ReworkTime:          timeNowStr,
-			ReworkReason:        req.ReworkReason,
-		}); _productReworkRecord.Code != modelcode.Success {
-			return nil, fmt.Errorf(_productReworkRecord.Message)
-		}
-
-		productInfo.CurrentState = types.ProductStateReworking
-	} else if req.IsFail {
-		productRhythmRecord.IsRework = true
-		lastProductProcessRoute.Remark = req.ReworkReason
-		lastProductProcessRoute.CurrentState = types.ProductProcessRouteStateChecking
-		productInfo.CurrentState = types.ProductStateChecking
-	} else {
-		lastProductProcessRoute.CurrentState = types.ProductProcessRouteStateProcessed
-
-		//切换到下个工艺
-		_productProcessRoutes, _ := clients.ProductProcessRouteClient.Query(context.Background(), &proto.QueryProductProcessRouteRequest{
-			PageSize:      1,
-			SortConfig:    `{"work_index": "asc"}`,
-			ProductInfoID: productInfo.Id,
-			RouteIndex:    lastProductProcessRoute.RouteIndex,
-			CurrentState:  types.ProductProcessRouteStateWaitProcess,
-		})
-		if _productProcessRoutes.Code != modelcode.Success {
-			return nil, fmt.Errorf(_productProcessRoutes.Message)
-		}
-		var nextProductProcessRoute *proto.ProductProcessRouteInfo
-		if len(_productProcessRoutes.Data) > 0 {
-			nextProductProcessRoute = _productProcessRoutes.Data[0]
-		}
-		//兼容，部分产线是直接创建产品工艺路线，部分是根据工单工艺动态创建
-		if nextProductProcessRoute == nil {
-			_productOrderProcesses, _ := clients.ProductOrderProcessClient.Query(context.Background(), &proto.QueryProductOrderProcessRequest{
-				ProductOrderID: productInfo.ProductOrderID,
-				Enable:         true,
-				SortIndex:      lastProductProcessRoute.RouteIndex,
-				SortConfig:     `{"sort_index": "asc"}`,
-				PageSize:       1,
-			})
-			if _productOrderProcesses.Code != modelcode.Success {
-				return nil, fmt.Errorf(_productOrderProcesses.Message)
+	nowTime := time.Now()
+	if err := model.DB.DB().Transaction(func(tx *gorm.DB) error {
+		if req.TrayNo != "" {
+			//根据载具号获取物料载具
+			materialTray := &model.MaterialTray{}
+			if err := tx.Preload("ProductInfo").First(materialTray, "`identifier` = ?", req.TrayNo).Error; err == gorm.ErrRecordNotFound {
+				return fmt.Errorf("无效的物料载具识别码")
+			} else if err != nil {
+				return err
 			}
-			if len(_productOrderProcesses.Data) > 0 {
-				productOrderProcess := _productOrderProcesses.Data[0]
-				nextProductProcessRoute = &proto.ProductProcessRouteInfo{
-					LastProcessID:    lastProductProcessRoute.CurrentProcessID,
-					CurrentProcessID: productOrderProcess.ProductionProcessID,
-					CurrentProcess:   productOrderProcess.ProductionProcess,
-					CreateTime:       timeNowStr,
-					CurrentState:     types.ProductProcessRouteStateWaitProcess,
-					RouteIndex:       productOrderProcess.SortIndex,
-					ProductInfoID:    productInfo.Id,
+
+			if materialTray.ProductInfo == nil {
+				return fmt.Errorf("载具未绑定任何产品")
+			}
+
+			req.ProductSerialNo = materialTray.ProductInfo.ProductSerialNo
+		}
+		if req.PackageNo != "" {
+			//根据包装箱号获取产品包装记录
+			productPackageRecord := &model.ProductPackageRecord{}
+			if err := tx.Preload("ProductInfo").First(productPackageRecord, "`package_no` = ?", req.PackageNo).Error; err == gorm.ErrRecordNotFound {
+				return fmt.Errorf("无效的包装箱号")
+			} else if err != nil {
+				return err
+			}
+
+			if productPackageRecord.ProductInfo == nil {
+				return fmt.Errorf("包装箱未绑定任何产品")
+			}
+
+			req.ProductSerialNo = productPackageRecord.ProductInfo.ProductSerialNo
+		}
+
+		req.ProductSerialNo = strings.Trim(strings.Trim(req.ProductSerialNo, "\000"), "\r")
+		if req.ProductSerialNo == "" {
+			return fmt.Errorf("ProductSerialNo不能为空")
+		}
+
+		productionStation := &model.ProductionStation{}
+		if err := tx.First(productionStation, "`code` = ?", req.ProductionStation).Error; err == gorm.ErrRecordNotFound {
+			return fmt.Errorf("非法的工站代号")
+		} else if err != nil {
+			return err
+		}
+
+		productInfo := &model.ProductInfo{}
+		if err := tx.First(productInfo, "`product_serial_no` = ?", req.ProductSerialNo).Error; err == gorm.ErrRecordNotFound {
+			return fmt.Errorf("读取产品信息失败")
+		} else if err != nil {
+			return err
+		}
+
+		if productInfo.ProductionProcessID == "" {
+			return fmt.Errorf("无法读取产品的当前工序")
+		}
+
+		//上传节拍
+		productRhythmRecord := &model.ProductRhythmRecord{}
+		if err := tx.Where("`production_station_id` = ? AND `product_info_id` = ? AND `work_end_time` IS NULL").First(productRhythmRecord).Error; err == gorm.ErrRecordNotFound {
+			return fmt.Errorf("读取工位当前节拍数据失败")
+		} else if err != nil {
+			return err
+		}
+
+		productRhythmRecord.WorkEndTime = tool.Time2NullTime(nowTime)
+		productRhythmRecord.WorkTime = int32(tool.NullTime2Time(productRhythmRecord.WorkEndTime).Sub(tool.NullTime2Time(productRhythmRecord.WorkStartTime)).Seconds())
+		productRhythmRecord.OverTime = productRhythmRecord.WorkTime - productRhythmRecord.StandardWorkTime
+		if productRhythmRecord.OverTime < 0 {
+			productRhythmRecord.OverTime = 0
+		}
+		productRhythmRecord.WaitTime = req.WaitTime
+
+		//修改工艺记录
+		lastProductProcessRoute := &model.ProductProcessRoute{}
+		if err := tx.Where("`product_info_id` = ? AND `current_process_id` = ? AND `current_state` = ?", productInfo.ID, productInfo.ProductionProcessID, types.ProductProcessRouteStateProcessing).First(lastProductProcessRoute).Error; err == gorm.ErrRecordNotFound {
+			return fmt.Errorf("读取产品当前工艺路线失败")
+		} else if err != nil {
+			return err
+		}
+
+		if req.IsRework {
+			productRhythmRecord.IsRework = true
+			lastProductProcessRoute.CurrentState = types.ProductProcessRouteStateReworking
+
+			if err := tx.Create(&model.ProductReworkRecord{
+				ProductionStationID: productionStation.ID,
+				ProductInfoID:       productInfo.ID,
+				ProductionProcessID: productInfo.ProductionProcessID,
+				ReworkTime:          tool.Time2NullTime(nowTime),
+				ReworkReason:        req.ReworkReason,
+			}).Error; err != nil {
+				return err
+			}
+
+			productInfo.CurrentState = types.ProductStateReworking
+		} else if req.IsFail {
+			productRhythmRecord.IsRework = true
+			lastProductProcessRoute.Remark = req.ReworkReason
+			lastProductProcessRoute.CurrentState = types.ProductProcessRouteStateChecking
+			productInfo.CurrentState = types.ProductStateChecking
+		} else {
+			lastProductProcessRoute.CurrentState = types.ProductProcessRouteStateProcessed
+
+			//切换到下个工艺
+			nextProductProcessRoute := &model.ProductProcessRoute{}
+			if err := tx.Preload("CurrentProcess").Where("`product_info_id` = ? AND `route_index` > ? AND `current_state` = ?", productInfo.ID, lastProductProcessRoute.RouteIndex, types.ProductProcessRouteStateWaitProcess).Order("work_index").First(nextProductProcessRoute).Error; err != nil && err != gorm.ErrRecordNotFound {
+				return err
+			}
+
+			//兼容，部分产线是直接创建产品工艺路线，部分是根据工单工艺动态创建
+			if nextProductProcessRoute.ID == "" {
+				productOrderProcess := &model.ProductOrderProcess{}
+				if err := tx.Preload("ProductionProcess").Where("`product_order_id` = ? AND `enable` = ? AND `sort_index` > ?", productInfo.ProductOrderID, true, lastProductProcessRoute.RouteIndex).Order("sort_index").First(productOrderProcess).Error; err != nil && err != gorm.ErrRecordNotFound {
+					return err
 				}
-				if _productProcessRoute, _ := clients.ProductProcessRouteClient.Add(context.Background(), nextProductProcessRoute); _productProcessRoute.Code != modelcode.Success {
-					return nil, fmt.Errorf(_productProcessRoute.Message)
+
+				if productOrderProcess.ID != "" {
+					nextProductProcessRoute = &model.ProductProcessRoute{
+						LastProcessID:    &lastProductProcessRoute.CurrentProcessID,
+						CurrentProcessID: productOrderProcess.ProductionProcessID,
+						CurrentProcess:   productOrderProcess.ProductionProcess,
+						CurrentState:     types.ProductProcessRouteStateWaitProcess,
+						RouteIndex:       productOrderProcess.SortIndex,
+						ProductInfoID:    productInfo.ID,
+					}
+					if err := tx.Create(nextProductProcessRoute).Error; err != nil {
+						return err
+					}
 				}
 			}
-		}
 
-		if nextProductProcessRoute != nil {
-			nextProductProcessRoute.WorkIndex = lastProductProcessRoute.WorkIndex + 1
-			if nextProductProcessRoute.CurrentProcess != nil {
-				if nextProductProcessRoute.CurrentProcess.ProductState != "" {
+			if nextProductProcessRoute.ID != "" {
+				nextProductProcessRoute.WorkIndex = lastProductProcessRoute.WorkIndex + 1
+				if nextProductProcessRoute.CurrentProcess != nil && nextProductProcessRoute.CurrentProcess.ProductState != "" {
 					//设定当前工序的产品信息状态
 					productInfo.CurrentState = nextProductProcessRoute.CurrentProcess.ProductState
 				}
-			}
-			productInfo.ProductionProcessID = nextProductProcessRoute.CurrentProcessID
+				productInfo.ProductionProcessID = nextProductProcessRoute.CurrentProcessID
 
-			//计算预计下线时间
-			_productOrderProcesses, _ := clients.ProductOrderProcessClient.Query(context.Background(), &proto.QueryProductOrderProcessRequest{
-				ProductOrderID: productInfo.ProductOrderID,
-				Enable:         true,
-				SortIndex:      nextProductProcessRoute.RouteIndex,
-			})
-			if _productOrderProcesses.Code != modelcode.Success {
-				return nil, fmt.Errorf(_productOrderProcesses.Message)
-			}
-			remainingRoutes := int32(_productOrderProcesses.Total)
-			productInfo.RemainingRoutes = remainingRoutes
-			if remainingRoutes > 0 {
-				productInfo.EstimateTime = timeNow.Add(time.Duration(remainingRoutes*productInfo.ProductOrder.StandardWorkTime) * time.Second).Format("2006-01-02 15:04:05")
-			}
-		} else {
-			//没有下一个工序判定为完工
-			productInfo.CurrentState = types.ProductStateCompleted
-			productInfo.FinishedTime = timeNowStr
-			productInfo.ProductionProcessID = ""
-
-			_productOrder, _ := clients.ProductOrderClient.GetDetail(context.Background(), &proto.GetDetailRequest{Id: productInfo.ProductOrderID})
-			if _productOrder.Code != modelcode.Success {
-				return nil, fmt.Errorf(_productOrder.Message)
-			}
-			productOrder := _productOrder.Data
-			var finishedCount int32
-			for _, _productInfo := range productOrder.ProductInfos {
-				if _productInfo.CurrentState == types.ProductStateCompleted {
-					finishedCount++
-				}
-			}
-			productOrder.FinishedQTY = finishedCount
-			totalCount := int32(len(productOrder.ProductInfos))
-			if totalCount == finishedCount {
-				productOrder.CurrentState = types.ProductOrderStateCompleted
-				productOrder.ActualFinishTime = timeNowStr
-
-				_systemEvent, _ := clients.SystemEventClient.Get(context.Background(), &proto.GetSystemEventRequest{Code: types.SystemEventProductOrderFinished})
-				if _systemEvent.Code != modelcode.Success && _systemEvent.Message != gorm.ErrRecordNotFound.Error() {
-					return nil, fmt.Errorf(_systemEvent.Message)
+				//计算预计下线时间
+				var remainingRoutes int64
+				if err := tx.Model(model.ProductOrderProcess{}).Where("`product_order_id` = ? AND `enable` = ? AND `sort_index` > ?", productInfo.ProductOrderID, true, nextProductProcessRoute.RouteIndex).Count(&remainingRoutes).Error; err != nil {
+					return err
 				}
 
-				if _systemEvent.Data != nil {
-					systemEvent := _systemEvent.Data
-					systemEventTrigger := &proto.SystemEventTriggerInfo{
-						SystemEventID: systemEvent.Id,
-						CreateTime:    timeNowStr,
+				productInfo.RemainingRoutes = int32(remainingRoutes)
+				if remainingRoutes > 0 {
+					productInfo.EstimateTime = tool.Time2NullTime(nowTime.Add(time.Duration(int32(remainingRoutes)*productInfo.ProductOrder.StandardWorkTime) * time.Second))
+				}
+			} else {
+				//没有下一个工序判定为完工
+				productInfo.CurrentState = types.ProductStateCompleted
+				productInfo.FinishedTime = tool.Time2NullTime(nowTime)
+				productInfo.ProductionProcessID = ""
+
+				productOrder := &model.ProductOrder{}
+				if err := tx.Preload("ProductInfos").First(productOrder, "`id` = ?", productInfo.ProductOrderID).Error; err != nil && err != gorm.ErrRecordNotFound {
+					return err
+				}
+
+				var finishedCount int32
+				for _, _productInfo := range productOrder.ProductInfos {
+					if _productInfo.CurrentState == types.ProductStateCompleted {
+						finishedCount++
+					}
+				}
+				productOrder.FinishedQTY = finishedCount
+				totalCount := int32(len(productOrder.ProductInfos))
+				if totalCount == finishedCount {
+					productOrder.CurrentState = types.ProductOrderStateCompleted
+					productOrder.ActualFinishTime = tool.Time2NullTime(nowTime)
+
+					systemEvent := &model.SystemEvent{}
+					if err := tx.Preload("SystemEventParameters").First(systemEvent, "`code` = ?", types.SystemEventProductOrderFinished).Error; err != nil && err != gorm.ErrRecordNotFound {
+						return err
+					}
+					if systemEvent.ID != "" {
+						systemEventTrigger := &model.SystemEventTrigger{
+							SystemEventID: systemEvent.ID,
+							EventNo:       uuid.NewString(),
+							CurrentState:  types.SystemEventTriggerStateWaitExecute,
+						}
+						for _, _systemEventParameter := range systemEvent.SystemEventParameters {
+							value := _systemEventParameter.Value
+							value = strings.ReplaceAll(value, "{ProductOrderNo}", productOrder.ProductOrderNo)
+
+							systemEventTrigger.SystemEventTriggerParameters = append(systemEventTrigger.SystemEventTriggerParameters, &model.SystemEventTriggerParameter{
+								DataType:    _systemEventParameter.DataType,
+								Name:        _systemEventParameter.Name,
+								Description: _systemEventParameter.Description,
+								Value:       value,
+							})
+						}
+
+						if err := tx.Create(systemEventTrigger).Error; err != nil {
+							return err
+						}
+					}
+				}
+
+				if err := tx.Save(productOrder).Error; err != nil {
+					return err
+				}
+			}
+
+			//创建产量记录
+			productionStationOutput := &model.ProductionStationOutput{}
+			if err := tx.Where("`production_station_id` = ? AND `product_info_id` = ?", productionStation.ID, productInfo.ID).First(productionStationOutput).Error; err != nil && err != gorm.ErrRecordNotFound {
+				return err
+			}
+			if productionStationOutput.ID == "" {
+				if err := tx.Create(&model.ProductionStationOutput{
+					LoginUserID:         *productionStation.CurrentUserID,
+					ProductionProcessID: productRhythmRecord.ProductionProcessID,
+					ProductInfoID:       productRhythmRecord.ProductInfoID,
+					ProductionStationID: productRhythmRecord.ProductionStationID,
+				}).Error; err != nil {
+					return err
+				}
+			} else {
+				productionStationOutput.LoginUserID = *productionStation.CurrentUserID
+				if err := tx.Save(productionStationOutput).Error; err != nil {
+					return err
+				}
+			}
+
+			// 判断是否要解绑载具
+			if req.UnbindTray {
+				materialTray := &model.MaterialTray{}
+				if err := tx.Preload("ProductInfo").First(materialTray, "`product_info_id` = ?", productInfo.ID).Error; err != nil && err != gorm.ErrRecordNotFound {
+					return err
+				}
+				if materialTray.ID != "" {
+					materialTray.ProductInfoID = nil
+					materialTray.CurrentState = types.MaterialTrayStateWaitBind
+					if err := tx.Save(materialTray).Error; err != nil {
+						return err
+					}
+				}
+			}
+
+			productionProcess := &model.ProductionProcess{}
+			if err := tx.First(productionProcess, "`id` = ?", productRhythmRecord.ProductionProcessID).Error; err != nil && err != gorm.ErrRecordNotFound {
+				return err
+			}
+
+			if productionProcess.ID != "" {
+				if productionProcess.EnableReport {
+					//创建系统事件上报完工
+					systemEvent := &model.SystemEvent{}
+					if err := tx.Preload("SystemEventParameters").First(systemEvent, "`code` = ?", types.SystemEventProductionProcessFinished).Error; err != nil && err != gorm.ErrRecordNotFound {
+						return err
+					}
+					if systemEvent.ID != "" {
+						systemEventTrigger := &model.SystemEventTrigger{
+							SystemEventID: systemEvent.ID,
+							EventNo:       uuid.NewString(),
+							CurrentState:  types.SystemEventTriggerStateWaitExecute,
+						}
+						for _, _systemEventParameter := range systemEvent.SystemEventParameters {
+							value := _systemEventParameter.Value
+							value = strings.ReplaceAll(value, "{ProductionProcess.Identifier}", productionProcess.Identifier)
+							value = strings.ReplaceAll(value, "{ProductionLine.Identifier}", productionStation.ProductionLine.Identifier)
+							value = strings.ReplaceAll(value, "{ProductionStation}", productionStation.Code)
+							value = strings.ReplaceAll(value, "{ProductSerialNo}", productInfo.ProductSerialNo)
+							value = strings.ReplaceAll(value, "{ProductionProcess}", productionProcess.Code)
+
+							systemEventTrigger.SystemEventTriggerParameters = append(systemEventTrigger.SystemEventTriggerParameters, &model.SystemEventTriggerParameter{
+								DataType:    _systemEventParameter.DataType,
+								Name:        _systemEventParameter.Name,
+								Description: _systemEventParameter.Description,
+								Value:       value,
+							})
+						}
+
+						if err := tx.Create(systemEventTrigger).Error; err != nil {
+							return err
+						}
+					}
+				}
+			}
+
+			if productionStation.AllowReport {
+				productionStation.CurrentState = types.ProductionStationStateStandby
+				// 创建系统事件上报工位完成作业
+				systemEvent := &model.SystemEvent{}
+				if err := tx.Preload("SystemEventParameters").First(systemEvent, "`code` = ?", types.SystemEventProductionStationReleased).Error; err != nil && err != gorm.ErrRecordNotFound {
+					return err
+				}
+				if systemEvent.ID != "" {
+					systemEventTrigger := &model.SystemEventTrigger{
+						SystemEventID: systemEvent.ID,
 						EventNo:       uuid.NewString(),
 						CurrentState:  types.SystemEventTriggerStateWaitExecute,
 					}
-					for _, _systemEventParameter := range systemEvent.SystemEventParameters {
-						value := strings.ReplaceAll(_systemEventParameter.Value, "{ProductOrderNo}", productOrder.ProductOrderNo)
-						systemEventTrigger.SystemEventTriggerParameters = append(systemEventTrigger.SystemEventTriggerParameters, &proto.SystemEventTriggerParameterInfo{
-							DataType:    _systemEventParameter.DataType,
-							Name:        _systemEventParameter.Name,
-							Description: _systemEventParameter.Description,
-							Value:       value,
-						})
-					}
-
-					if _systemEventTrigger, _ := clients.SystemEventTriggerClient.Add(context.Background(), systemEventTrigger); _systemEventTrigger.Code != modelcode.Success {
-						return nil, fmt.Errorf(_systemEventTrigger.Message)
-					}
-				}
-			}
-			if _productOrder, _ := clients.ProductOrderClient.Update(context.Background(), productOrder); _productOrder.Code != modelcode.Success {
-				return nil, fmt.Errorf(_productOrder.Message)
-			}
-		}
-
-		//创建产量记录
-		_ProductionStationOutput, _ := clients.ProductionStationOutputClient.Get(context.Background(), &proto.GetProductionStationOutputRequest{
-			ProductionStationID: productionStation.Id,
-			ProductInfoID:       productInfo.Id,
-		})
-		if _ProductionStationOutput.Code != modelcode.Success && _ProductionStationOutput.Message != gorm.ErrRecordNotFound.Error() {
-			return nil, fmt.Errorf(_ProductionStationOutput.Message)
-		}
-
-		productionStationOutput := _ProductionStationOutput.Data
-		if productionStationOutput != nil {
-			productionStationOutput.OutputTime = timeNowStr
-			productionStationOutput.LoginUserID = productionStation.CurrentUserID
-			if _productionStationOutput, _ := clients.ProductionStationOutputClient.Update(context.Background(), productionStationOutput); _productionStationOutput.Code != modelcode.Success {
-				return nil, fmt.Errorf(_productionStationOutput.Message)
-			}
-		} else {
-			productionStationOutput = &proto.ProductionStationOutputInfo{
-				OutputTime:          timeNowStr,
-				LoginUserID:         productionStation.CurrentUserID,
-				ProductionProcessID: productRhythmRecord.ProductionProcessID,
-				ProductInfoID:       productRhythmRecord.ProductInfoID,
-				ProductionStationID: productRhythmRecord.ProductionStationID,
-			}
-			if _productionStationOutput, _ := clients.ProductionStationOutputClient.Add(context.Background(), productionStationOutput); _productionStationOutput.Code != modelcode.Success {
-				return nil, fmt.Errorf(_productionStationOutput.Message)
-			}
-		}
-
-		// 判断是否要解绑托盘
-		if req.UnbindTray {
-			_materialTray, _ := clients.MaterialTrayClient.Get(context.Background(), &proto.GetMaterialTrayRequest{ProductInfoID: productInfo.Id})
-			if _materialTray.Code != modelcode.Success && _materialTray.Message != gorm.ErrRecordNotFound.Error() {
-				return nil, fmt.Errorf(_materialTray.Message)
-			}
-			if _materialTray.Data != nil {
-				materialTray := _materialTray.Data
-				materialTray.ProductInfoID = ""
-				materialTray.CurrentState = types.MaterialTrayStateWaitBind
-				if _materialTray, _ := clients.MaterialTrayClient.Update(context.Background(), materialTray); _materialTray.Code != modelcode.Success {
-					return nil, fmt.Errorf(_materialTray.Message)
-				}
-			}
-		}
-
-		_productionProcess, _ := clients.ProductionProcessClient.GetDetail(context.Background(), &proto.GetDetailRequest{Id: productRhythmRecord.ProductionProcessID})
-		if _productionProcess.Code != modelcode.Success && _productionProcess.Message != gorm.ErrRecordNotFound.Error() {
-			return nil, fmt.Errorf(_productionProcess.Message)
-		}
-		if _productionProcess.Data != nil {
-			productionProcess := _productionProcess.Data
-			if productionProcess.EnableReport {
-				_systemEvent, _ := clients.SystemEventClient.Get(context.Background(), &proto.GetSystemEventRequest{Code: types.SystemEventProductionProcessFinished, Enable: true})
-				if _systemEvent.Code != modelcode.Success && _systemEvent.Message != gorm.ErrRecordNotFound.Error() {
-					return nil, fmt.Errorf(_systemEvent.Message)
-				}
-				if _systemEvent.Data != nil {
-					systemEvent := _systemEvent.Data
-					systemEventTrigger := &proto.SystemEventTriggerInfo{
-						SystemEventID: systemEvent.Id,
-						CreateTime:    timeNowStr,
-						EventNo:       uuid.NewString(),
-						CurrentState:  types.SystemEventTriggerStateWaitExecute,
-					}
-
 					for _, _systemEventParameter := range systemEvent.SystemEventParameters {
 						value := _systemEventParameter.Value
-						value = strings.ReplaceAll(value, "{ProductionProcess.Identifier}", productionProcess.Identifier)
-						value = strings.ReplaceAll(value, "{ProductionLine.Identifier}", productionStation.ProductionLine.Identifier)
 						value = strings.ReplaceAll(value, "{ProductionStation}", productionStation.Code)
-						value = strings.ReplaceAll(value, "{ProductSerialNo}", productInfo.ProductSerialNo)
-						value = strings.ReplaceAll(value, "{ProductionProcess}", productionProcess.Code)
 
-						systemEventTrigger.SystemEventTriggerParameters = append(systemEventTrigger.SystemEventTriggerParameters, &proto.SystemEventTriggerParameterInfo{
+						systemEventTrigger.SystemEventTriggerParameters = append(systemEventTrigger.SystemEventTriggerParameters, &model.SystemEventTriggerParameter{
 							DataType:    _systemEventParameter.DataType,
 							Name:        _systemEventParameter.Name,
 							Description: _systemEventParameter.Description,
@@ -1367,58 +1347,29 @@ func ExitProductionStation(req *proto.ExitProductionStationRequest) (*proto.Comm
 						})
 					}
 
-					if _systemEventTrigger, _ := clients.SystemEventTriggerClient.Add(context.Background(), systemEventTrigger); _systemEventTrigger.Code != modelcode.Success {
-						return nil, fmt.Errorf(_systemEventTrigger.Message)
+					if err := tx.Create(systemEventTrigger).Error; err != nil {
+						return err
 					}
 				}
 			}
 		}
 
-		if productionStation.AllowReport {
-			productionStation.CurrentState = types.ProductionStationStateStandby
-			// 创建系统事件上报工位完成作业
-			_systemEvent, _ := clients.SystemEventClient.Get(context.Background(), &proto.GetSystemEventRequest{Code: types.SystemEventProductionStationReleased, Enable: true})
-			if _systemEvent.Code != modelcode.Success && _systemEvent.Message != gorm.ErrRecordNotFound.Error() {
-				return nil, fmt.Errorf(_systemEvent.Message)
-			}
-			if _systemEvent.Data != nil {
-				systemEvent := _systemEvent.Data
-				systemEventTrigger := &proto.SystemEventTriggerInfo{
-					SystemEventID: systemEvent.Id,
-					CreateTime:    timeNowStr,
-					EventNo:       uuid.NewString(),
-					CurrentState:  types.SystemEventTriggerStateWaitExecute,
-				}
-
-				for _, _systemEventParameter := range systemEvent.SystemEventParameters {
-					value := strings.ReplaceAll(_systemEventParameter.Value, "{ProductionStation}", productionStation.Code)
-
-					systemEventTrigger.SystemEventTriggerParameters = append(systemEventTrigger.SystemEventTriggerParameters, &proto.SystemEventTriggerParameterInfo{
-						DataType:    _systemEventParameter.DataType,
-						Name:        _systemEventParameter.Name,
-						Description: _systemEventParameter.Description,
-						Value:       value,
-					})
-				}
-
-				if _systemEventTrigger, _ := clients.SystemEventTriggerClient.Add(context.Background(), systemEventTrigger); _systemEventTrigger.Code != modelcode.Success {
-					return nil, fmt.Errorf(_systemEventTrigger.Message)
-				}
-			}
+		if err := tx.Save(productRhythmRecord).Error; err != nil {
+			return err
 		}
+		if err := tx.Save(lastProductProcessRoute).Error; err != nil {
+			return err
+		}
+		if err := tx.Save(productInfo).Error; err != nil {
+			return err
+		}
+
+		return nil
+	}); err != nil {
+		return err
 	}
 
-	if _productRhythmRecord, _ := clients.ProductRhythmRecordClient.Update(context.Background(), productRhythmRecord); _productRhythmRecord.Code != modelcode.Success {
-		return nil, fmt.Errorf(_productRhythmRecord.Message)
-	}
-	if _productProcessRoute, _ := clients.ProductProcessRouteClient.Update(context.Background(), lastProductProcessRoute); _productProcessRoute.Code != modelcode.Success {
-		return nil, fmt.Errorf(_productProcessRoute.Message)
-	}
-	if _productInfo, _ := clients.ProductInfoClient.Update(context.Background(), productInfo); _productInfo.Code != modelcode.Success {
-		return nil, fmt.Errorf(_productInfo.Message)
-	}
-
-	return &proto.CommonResponse{Code: 0}, nil
+	return nil
 }
 
 // 设置失败后续处理

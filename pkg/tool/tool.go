@@ -83,3 +83,7 @@ func Contains(v string, list []string) bool {
 func Time2NullTime(time time.Time) sql.NullTime {
 	return sql.NullTime{Time: time, Valid: true}
 }
+
+func NullTime2Time(time sql.NullTime) time.Time {
+	return time.Time
+}
