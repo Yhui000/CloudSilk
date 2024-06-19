@@ -1448,7 +1448,7 @@ func CheckProductProcessRouteFailure(req *proto.CheckProductProcessRouteFailureR
 					return err
 				}
 
-				if productOrderProcess.ID == "" {
+				if productOrderProcess.ID != "" {
 					nextProductProcessRoute = &model.ProductProcessRoute{
 						LastProcessID:    &lastProductProcessRoute.CurrentProcessID,
 						CurrentProcessID: productOrderProcess.ProductionProcessID,
@@ -1492,14 +1492,15 @@ func CheckProductProcessRouteFailure(req *proto.CheckProductProcessRouteFailureR
 				productInfo.FinishedTime = tool.Time2NullTime(nowTime)
 				productInfo.ProductionProcessID = nil
 			}
-			if err := tx.Save(productInfo).Error; err != nil {
-				return err
-			}
-			if err := tx.Save(lastProductProcessRoute).Error; err != nil {
-				return err
-			}
 		default:
 			return fmt.Errorf("无效的处理方式")
+		}
+
+		if err := tx.Save(productInfo).Error; err != nil {
+			return err
+		}
+		if err := tx.Save(lastProductProcessRoute).Error; err != nil {
+			return err
 		}
 
 		return nil
