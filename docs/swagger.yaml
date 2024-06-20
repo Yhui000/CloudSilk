@@ -43,6 +43,13 @@ definitions:
       productionProcessStepID:
         type: string
     type: object
+  proto.BindMaterialTrayRequest:
+    properties:
+      materialTray:
+        type: string
+      productSerialNo:
+        type: string
+    type: object
   proto.CheckProductProcessRouteFailureRequest:
     properties:
       handleMethod:
@@ -22684,6 +22691,33 @@ paths:
           schema:
             $ref: '#/definitions/proto.GetAllProductionStationResponse'
       summary: 查询产线工位信息
+      tags:
+      - WebAPI
+  /api/mom/webapi/material/bindmaterialtray:
+    post:
+      consumes:
+      - application/json
+      description: 绑定物料载具
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      - description: BindMaterialTrayRequest
+        in: body
+        name: account
+        required: true
+        schema:
+          $ref: '#/definitions/proto.BindMaterialTrayRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.CommonResponse'
+      summary: 绑定物料载具
       tags:
       - WebAPI
   /api/mom/webapi/production/checkproductprocessroutefailure:
