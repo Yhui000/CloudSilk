@@ -765,6 +765,1322 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/mom/efficiency/productionefficiency/add": {
+            "post": {
+                "description": "新增",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "生产效率统计"
+                ],
+                "summary": "新增",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Add ProductionEfficiency",
+                        "name": "account",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/proto.ProductionEfficiencyInfo"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/proto.CommonResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/mom/efficiency/productionefficiency/all": {
+            "get": {
+                "description": "查询所有",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "生产效率统计"
+                ],
+                "summary": "查询所有",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/proto.GetAllProductionEfficiencyResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/mom/efficiency/productionefficiency/delete": {
+            "delete": {
+                "description": "删除",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "生产效率统计"
+                ],
+                "summary": "删除",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Delete ProductionEfficiency",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/proto.DelRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/proto.CommonResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/mom/efficiency/productionefficiency/detail": {
+            "get": {
+                "description": "查询明细",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "生产效率统计"
+                ],
+                "summary": "查询明细",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/proto.GetProductionEfficiencyDetailResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/mom/efficiency/productionefficiency/query": {
+            "get": {
+                "description": "分页查询",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/octet-stream"
+                ],
+                "tags": [
+                    "生产效率统计"
+                ],
+                "summary": "分页查询",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "从1开始",
+                        "name": "pageIndex",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "默认每页10条",
+                        "name": "pageSize",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "排序字段",
+                        "name": "orderField",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "是否倒序排序",
+                        "name": "desc",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "创建时间开始",
+                        "name": "outputDate0",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "创建时间结束",
+                        "name": "outputDate1",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "生产产线ID",
+                        "name": "productionLineID",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/proto.QueryProductionEfficiencyResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/mom/efficiency/productionefficiency/update": {
+            "put": {
+                "description": "更新",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "生产效率统计"
+                ],
+                "summary": "更新",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Update ProductionEfficiency",
+                        "name": "account",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/proto.ProductionEfficiencyInfo"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/proto.CommonResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/mom/efficiency/productionstationefficiency/add": {
+            "post": {
+                "description": "新增",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "工位效率统计"
+                ],
+                "summary": "新增",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Add ProductionStationEfficiency",
+                        "name": "account",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/proto.ProductionStationEfficiencyInfo"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/proto.CommonResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/mom/efficiency/productionstationefficiency/all": {
+            "get": {
+                "description": "查询所有",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "工位效率统计"
+                ],
+                "summary": "查询所有",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/proto.GetAllProductionStationEfficiencyResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/mom/efficiency/productionstationefficiency/delete": {
+            "delete": {
+                "description": "删除",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "工位效率统计"
+                ],
+                "summary": "删除",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Delete ProductionStationEfficiency",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/proto.DelRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/proto.CommonResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/mom/efficiency/productionstationefficiency/detail": {
+            "get": {
+                "description": "查询明细",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "工位效率统计"
+                ],
+                "summary": "查询明细",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/proto.GetProductionStationEfficiencyDetailResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/mom/efficiency/productionstationefficiency/query": {
+            "get": {
+                "description": "分页查询",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/octet-stream"
+                ],
+                "tags": [
+                    "工位效率统计"
+                ],
+                "summary": "分页查询",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "从1开始",
+                        "name": "pageIndex",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "默认每页10条",
+                        "name": "pageSize",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "排序字段",
+                        "name": "orderField",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "是否倒序排序",
+                        "name": "desc",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "创建时间开始",
+                        "name": "outputDate0",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "创建时间结束",
+                        "name": "outputDate1",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "生产产线ID",
+                        "name": "productionLineID",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/proto.QueryProductionStationEfficiencyResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/mom/efficiency/productionstationefficiency/update": {
+            "put": {
+                "description": "更新",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "工位效率统计"
+                ],
+                "summary": "更新",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Update ProductionStationEfficiency",
+                        "name": "account",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/proto.ProductionStationEfficiencyInfo"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/proto.CommonResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/mom/label/labeladaptationrule/add": {
+            "post": {
+                "description": "新增",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "标签适配规则管理"
+                ],
+                "summary": "新增",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Add LabelAdaptationRule",
+                        "name": "account",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/proto.LabelAdaptationRuleInfo"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/proto.CommonResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/mom/label/labeladaptationrule/all": {
+            "get": {
+                "description": "查询所有",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "标签适配规则管理"
+                ],
+                "summary": "查询所有",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/proto.GetAllLabelAdaptationRuleResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/mom/label/labeladaptationrule/delete": {
+            "delete": {
+                "description": "删除",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "标签适配规则管理"
+                ],
+                "summary": "删除",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Delete LabelAdaptationRule",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/proto.DelRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/proto.CommonResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/mom/label/labeladaptationrule/detail": {
+            "get": {
+                "description": "查询明细",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "标签适配规则管理"
+                ],
+                "summary": "查询明细",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/proto.GetLabelAdaptationRuleDetailResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/mom/label/labeladaptationrule/query": {
+            "get": {
+                "description": "分页查询",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/octet-stream"
+                ],
+                "tags": [
+                    "标签适配规则管理"
+                ],
+                "summary": "分页查询",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "从1开始",
+                        "name": "pageIndex",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "默认每页10条",
+                        "name": "pageSize",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "排序字段",
+                        "name": "orderField",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "是否倒序排序",
+                        "name": "desc",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/proto.QueryLabelAdaptationRuleResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/mom/label/labeladaptationrule/update": {
+            "put": {
+                "description": "更新",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "标签适配规则管理"
+                ],
+                "summary": "更新",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Update LabelAdaptationRule",
+                        "name": "account",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/proto.LabelAdaptationRuleInfo"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/proto.CommonResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/mom/label/labelprintqueue/add": {
+            "post": {
+                "description": "新增",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "标签打印队列管理"
+                ],
+                "summary": "新增",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Add LabelPrintQueue",
+                        "name": "account",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/proto.LabelPrintQueueInfo"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/proto.CommonResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/mom/label/labelprintqueue/all": {
+            "get": {
+                "description": "查询所有",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "标签打印队列管理"
+                ],
+                "summary": "查询所有",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/proto.GetAllLabelPrintQueueResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/mom/label/labelprintqueue/delete": {
+            "delete": {
+                "description": "删除",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "标签打印队列管理"
+                ],
+                "summary": "删除",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Delete LabelPrintQueue",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/proto.DelRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/proto.CommonResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/mom/label/labelprintqueue/detail": {
+            "get": {
+                "description": "查询明细",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "标签打印队列管理"
+                ],
+                "summary": "查询明细",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/proto.GetLabelPrintQueueDetailResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/mom/label/labelprintqueue/query": {
+            "get": {
+                "description": "分页查询",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/octet-stream"
+                ],
+                "tags": [
+                    "标签打印队列管理"
+                ],
+                "summary": "分页查询",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "从1开始",
+                        "name": "pageIndex",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "默认每页10条",
+                        "name": "pageSize",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "排序字段",
+                        "name": "orderField",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "是否倒序排序",
+                        "name": "desc",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "任务编号",
+                        "name": "taskNo",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "创建时间开始",
+                        "name": "createTime0",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "创建时间结束",
+                        "name": "createTime1",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/proto.QueryLabelPrintQueueResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/mom/label/labelprintqueue/update": {
+            "put": {
+                "description": "更新",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "标签打印队列管理"
+                ],
+                "summary": "更新",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Update LabelPrintQueue",
+                        "name": "account",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/proto.LabelPrintQueueInfo"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/proto.CommonResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/mom/label/labelprinttask/add": {
+            "post": {
+                "description": "新增",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "标签打印任务管理"
+                ],
+                "summary": "新增",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Add LabelPrintTask",
+                        "name": "account",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/proto.LabelPrintTaskInfo"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/proto.CommonResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/mom/label/labelprinttask/all": {
+            "get": {
+                "description": "查询所有",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "标签打印任务管理"
+                ],
+                "summary": "查询所有",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/proto.GetAllLabelPrintTaskResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/mom/label/labelprinttask/delete": {
+            "delete": {
+                "description": "删除",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "标签打印任务管理"
+                ],
+                "summary": "删除",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Delete LabelPrintTask",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/proto.DelRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/proto.CommonResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/mom/label/labelprinttask/detail": {
+            "get": {
+                "description": "查询明细",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "标签打印任务管理"
+                ],
+                "summary": "查询明细",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/proto.GetLabelPrintTaskDetailResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/mom/label/labelprinttask/query": {
+            "get": {
+                "description": "分页查询",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/octet-stream"
+                ],
+                "tags": [
+                    "标签打印任务管理"
+                ],
+                "summary": "分页查询",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "从1开始",
+                        "name": "pageIndex",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "默认每页10条",
+                        "name": "pageSize",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "排序字段",
+                        "name": "orderField",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "是否倒序排序",
+                        "name": "desc",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "代号或描述",
+                        "name": "code",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "生产产线ID",
+                        "name": "productionLineID",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/proto.QueryLabelPrintTaskResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/mom/label/labelprinttask/update": {
+            "put": {
+                "description": "更新",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "标签打印任务管理"
+                ],
+                "summary": "更新",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Update LabelPrintTask",
+                        "name": "account",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/proto.LabelPrintTaskInfo"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/proto.CommonResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/mom/label/labeltemplate/add": {
             "post": {
                 "description": "新增",
@@ -3338,6 +4654,86 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/proto.CommonResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/mom/product/productfactoryreport/query": {
+            "get": {
+                "description": "分页查询",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/octet-stream"
+                ],
+                "tags": [
+                    "产品出厂报告管理"
+                ],
+                "summary": "分页查询",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "从1开始",
+                        "name": "pageIndex",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "默认每页10条",
+                        "name": "pageSize",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "排序字段",
+                        "name": "orderField",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "是否倒序排序",
+                        "name": "desc",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "生产工单号",
+                        "name": "productOrderNo",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "产品序列号",
+                        "name": "productSerialNo",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "下线时间开始",
+                        "name": "finishedTime0",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "下线时间结束",
+                        "name": "finishedTime1",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/proto.QueryProductInfoResponse"
                         }
                     }
                 }
@@ -9660,6 +11056,292 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/mom/product/productreworkprocess/add": {
+            "post": {
+                "description": "新增",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "返工工序管理"
+                ],
+                "summary": "新增",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Add ProductReworkProcess",
+                        "name": "account",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/proto.ProductReworkProcessInfo"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/proto.CommonResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/mom/product/productreworkprocess/all": {
+            "get": {
+                "description": "查询所有",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "返工工序管理"
+                ],
+                "summary": "查询所有",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/proto.GetAllProductReworkProcessResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/mom/product/productreworkprocess/delete": {
+            "delete": {
+                "description": "删除",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "返工工序管理"
+                ],
+                "summary": "删除",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Delete ProductReworkProcess",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/proto.DelRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/proto.CommonResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/mom/product/productreworkprocess/detail": {
+            "get": {
+                "description": "查询明细",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "返工工序管理"
+                ],
+                "summary": "查询明细",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/proto.GetProductReworkProcessDetailResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/mom/product/productreworkprocess/query": {
+            "get": {
+                "description": "分页查询",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/octet-stream"
+                ],
+                "tags": [
+                    "返工工序管理"
+                ],
+                "summary": "分页查询",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "从1开始",
+                        "name": "pageIndex",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "默认每页10条",
+                        "name": "pageSize",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "排序字段",
+                        "name": "orderField",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "是否倒序排序",
+                        "name": "desc",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "生产产线ID",
+                        "name": "productionLineID",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "产品序列号",
+                        "name": "productSerialNo",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "生产工单号",
+                        "name": "productOrderNo",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "创建时间开始",
+                        "name": "createTime0",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "创建时间结束",
+                        "name": "createTime1",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "故障信息",
+                        "name": "reworkBrief",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/proto.QueryProductReworkProcessResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/mom/product/productreworkprocess/update": {
+            "put": {
+                "description": "更新",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "返工工序管理"
+                ],
+                "summary": "更新",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Update ProductReworkProcess",
+                        "name": "account",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/proto.ProductReworkProcessInfo"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/proto.CommonResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/mom/product/productreworkrecord/add": {
             "post": {
                 "description": "新增",
@@ -9933,6 +11615,292 @@ const docTemplate = `{
                         "required": true,
                         "schema": {
                             "$ref": "#/definitions/proto.ProductReworkRecordInfo"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/proto.CommonResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/mom/product/productreworkroute/add": {
+            "post": {
+                "description": "新增",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "返工路线管理"
+                ],
+                "summary": "新增",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Add ProductReworkRoute",
+                        "name": "account",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/proto.ProductReworkRouteInfo"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/proto.CommonResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/mom/product/productreworkroute/all": {
+            "get": {
+                "description": "查询所有",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "返工路线管理"
+                ],
+                "summary": "查询所有",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/proto.GetAllProductReworkRouteResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/mom/product/productreworkroute/delete": {
+            "delete": {
+                "description": "删除",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "返工路线管理"
+                ],
+                "summary": "删除",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Delete ProductReworkRoute",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/proto.DelRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/proto.CommonResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/mom/product/productreworkroute/detail": {
+            "get": {
+                "description": "查询明细",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "返工路线管理"
+                ],
+                "summary": "查询明细",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/proto.GetProductReworkRouteDetailResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/mom/product/productreworkroute/query": {
+            "get": {
+                "description": "分页查询",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/octet-stream"
+                ],
+                "tags": [
+                    "返工路线管理"
+                ],
+                "summary": "分页查询",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "从1开始",
+                        "name": "pageIndex",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "默认每页10条",
+                        "name": "pageSize",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "排序字段",
+                        "name": "orderField",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "是否倒序排序",
+                        "name": "desc",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "生产产线ID",
+                        "name": "productionLineID",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "产品序列号",
+                        "name": "productSerialNo",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "生产工单号",
+                        "name": "productOrderNo",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "创建时间开始",
+                        "name": "createTime0",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "创建时间结束",
+                        "name": "createTime1",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "故障信息",
+                        "name": "reworkBrief",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/proto.QueryProductReworkRouteResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/mom/product/productreworkroute/update": {
+            "put": {
+                "description": "更新",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "返工路线管理"
+                ],
+                "summary": "更新",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Update ProductReworkRoute",
+                        "name": "account",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/proto.ProductReworkRouteInfo"
                         }
                     }
                 ],
@@ -21747,22 +23715,6 @@ const docTemplate = `{
                 }
             }
         },
-        "proto.AvailableMaterialInfo": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "string"
-                },
-                "materialInfoID": {
-                    "description": "物料信息ID",
-                    "type": "string"
-                },
-                "materialSupplierID": {
-                    "description": "物料供应商ID",
-                    "type": "string"
-                }
-            }
-        },
         "proto.AvailableProcessInfo": {
             "type": "object",
             "properties": {
@@ -22420,6 +24372,57 @@ const docTemplate = `{
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/proto.InvocationTraceInfo"
+                    }
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "proto.GetAllLabelAdaptationRuleResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "$ref": "#/definitions/proto.Code"
+                },
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/proto.LabelAdaptationRuleInfo"
+                    }
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "proto.GetAllLabelPrintQueueResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "$ref": "#/definitions/proto.Code"
+                },
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/proto.LabelPrintQueueInfo"
+                    }
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "proto.GetAllLabelPrintTaskResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "$ref": "#/definitions/proto.Code"
+                },
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/proto.LabelPrintTaskInfo"
                     }
                 },
                 "message": {
@@ -23175,6 +25178,23 @@ const docTemplate = `{
                 }
             }
         },
+        "proto.GetAllProductReworkProcessResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "$ref": "#/definitions/proto.Code"
+                },
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/proto.ProductReworkProcessInfo"
+                    }
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
         "proto.GetAllProductReworkRecordResponse": {
             "type": "object",
             "properties": {
@@ -23185,6 +25205,23 @@ const docTemplate = `{
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/proto.ProductReworkRecordInfo"
+                    }
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "proto.GetAllProductReworkRouteResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "$ref": "#/definitions/proto.Code"
+                },
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/proto.ProductReworkRouteInfo"
                     }
                 },
                 "message": {
@@ -23287,6 +25324,23 @@ const docTemplate = `{
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/proto.ProductionCrosswayInfo"
+                    }
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "proto.GetAllProductionEfficiencyResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "$ref": "#/definitions/proto.Code"
+                },
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/proto.ProductionEfficiencyInfo"
                     }
                 },
                 "message": {
@@ -23423,6 +25477,23 @@ const docTemplate = `{
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/proto.ProductionStationBreakdownInfo"
+                    }
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "proto.GetAllProductionStationEfficiencyResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "$ref": "#/definitions/proto.Code"
+                },
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/proto.ProductionStationEfficiencyInfo"
                     }
                 },
                 "message": {
@@ -23754,6 +25825,48 @@ const docTemplate = `{
                 },
                 "data": {
                     "$ref": "#/definitions/proto.InvocationTraceInfo"
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "proto.GetLabelAdaptationRuleDetailResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "$ref": "#/definitions/proto.Code"
+                },
+                "data": {
+                    "$ref": "#/definitions/proto.LabelAdaptationRuleInfo"
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "proto.GetLabelPrintQueueDetailResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "$ref": "#/definitions/proto.Code"
+                },
+                "data": {
+                    "$ref": "#/definitions/proto.LabelPrintQueueInfo"
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "proto.GetLabelPrintTaskDetailResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "$ref": "#/definitions/proto.Code"
+                },
+                "data": {
+                    "$ref": "#/definitions/proto.LabelPrintTaskInfo"
                 },
                 "message": {
                     "type": "string"
@@ -24376,6 +26489,20 @@ const docTemplate = `{
                 }
             }
         },
+        "proto.GetProductReworkProcessDetailResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "$ref": "#/definitions/proto.Code"
+                },
+                "data": {
+                    "$ref": "#/definitions/proto.ProductReworkProcessInfo"
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
         "proto.GetProductReworkRecordDetailResponse": {
             "type": "object",
             "properties": {
@@ -24384,6 +26511,20 @@ const docTemplate = `{
                 },
                 "data": {
                     "$ref": "#/definitions/proto.ProductReworkRecordInfo"
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "proto.GetProductReworkRouteDetailResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "$ref": "#/definitions/proto.Code"
+                },
+                "data": {
+                    "$ref": "#/definitions/proto.ProductReworkRouteInfo"
                 },
                 "message": {
                     "type": "string"
@@ -24468,6 +26609,20 @@ const docTemplate = `{
                 },
                 "data": {
                     "$ref": "#/definitions/proto.ProductionCrosswayInfo"
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "proto.GetProductionEfficiencyDetailResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "$ref": "#/definitions/proto.Code"
+                },
+                "data": {
+                    "$ref": "#/definitions/proto.ProductionEfficiencyInfo"
                 },
                 "message": {
                     "type": "string"
@@ -24611,6 +26766,20 @@ const docTemplate = `{
                 },
                 "data": {
                     "$ref": "#/definitions/proto.ProductionStationInfo"
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "proto.GetProductionStationEfficiencyDetailResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "$ref": "#/definitions/proto.Code"
+                },
+                "data": {
+                    "$ref": "#/definitions/proto.ProductionStationEfficiencyInfo"
                 },
                 "message": {
                     "type": "string"
@@ -24859,6 +27028,47 @@ const docTemplate = `{
                 }
             }
         },
+        "proto.LabelAdaptationRuleInfo": {
+            "type": "object",
+            "properties": {
+                "attributeExpressions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/proto.AttributeExpressionInfo"
+                    }
+                },
+                "doubleCheck": {
+                    "description": "需要复核",
+                    "type": "boolean"
+                },
+                "enable": {
+                    "description": "是否启用",
+                    "type": "boolean"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "initialValue": {
+                    "description": "默认适配",
+                    "type": "boolean"
+                },
+                "labelTemplate": {
+                    "$ref": "#/definitions/proto.LabelTemplateInfo"
+                },
+                "labelTemplateID": {
+                    "description": "适配标签模板ID",
+                    "type": "string"
+                },
+                "priority": {
+                    "description": "优先级",
+                    "type": "integer"
+                },
+                "remark": {
+                    "description": "备注",
+                    "type": "string"
+                }
+            }
+        },
         "proto.LabelParameterInfo": {
             "type": "object",
             "properties": {
@@ -24876,6 +27086,185 @@ const docTemplate = `{
                 },
                 "name": {
                     "description": "名称",
+                    "type": "string"
+                }
+            }
+        },
+        "proto.LabelPrintQueueExecutionInfo": {
+            "type": "object",
+            "properties": {
+                "createTime": {
+                    "description": "创建时间",
+                    "type": "string"
+                },
+                "failureReason": {
+                    "description": "失败原因",
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "labelPrintQueueID": {
+                    "description": "打印队列ID",
+                    "type": "string"
+                },
+                "success": {
+                    "description": "是否成功",
+                    "type": "boolean"
+                }
+            }
+        },
+        "proto.LabelPrintQueueInfo": {
+            "type": "object",
+            "properties": {
+                "createTime": {
+                    "description": "创建时间",
+                    "type": "string"
+                },
+                "createUserID": {
+                    "description": "创建人员",
+                    "type": "string"
+                },
+                "currentState": {
+                    "description": "当前状态",
+                    "type": "string"
+                },
+                "filePath": {
+                    "description": "模板文件",
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "labelParameters": {
+                    "description": "标签打印队列参数",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/proto.LabelPrintQueueParameterInfo"
+                    }
+                },
+                "lastUpdateTime": {
+                    "description": "状态变更时间",
+                    "type": "string"
+                },
+                "printCopies": {
+                    "description": "打印份数",
+                    "type": "integer"
+                },
+                "printExecutions": {
+                    "description": "标签打印队列执行",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/proto.LabelPrintQueueExecutionInfo"
+                    }
+                },
+                "printTimes": {
+                    "description": "打印次数",
+                    "type": "integer"
+                },
+                "printer": {
+                    "$ref": "#/definitions/proto.PrinterInfo"
+                },
+                "printerID": {
+                    "description": "打印机ID",
+                    "type": "string"
+                },
+                "remoteServiceTask": {
+                    "$ref": "#/definitions/proto.RemoteServiceTaskInfo"
+                },
+                "remoteServiceTaskID": {
+                    "description": "远程任务ID",
+                    "type": "string"
+                },
+                "taskNo": {
+                    "description": "任务编号",
+                    "type": "string"
+                }
+            }
+        },
+        "proto.LabelPrintQueueParameterInfo": {
+            "type": "object",
+            "properties": {
+                "fixedValue": {
+                    "description": "设定值",
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "labelPrintQueueID": {
+                    "description": "打印队列ID",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "名称",
+                    "type": "string"
+                },
+                "remark": {
+                    "description": "备注",
+                    "type": "string"
+                }
+            }
+        },
+        "proto.LabelPrintTaskInfo": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "代号",
+                    "type": "string"
+                },
+                "description": {
+                    "description": "描述",
+                    "type": "string"
+                },
+                "enable": {
+                    "description": "是否启用",
+                    "type": "boolean"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "labelType": {
+                    "$ref": "#/definitions/proto.LabelTypeInfo"
+                },
+                "labelTypeID": {
+                    "description": "标签类型ID",
+                    "type": "string"
+                },
+                "printCopies": {
+                    "description": "打印份数",
+                    "type": "integer"
+                },
+                "printer": {
+                    "$ref": "#/definitions/proto.PrinterInfo"
+                },
+                "printerID": {
+                    "description": "打印机ID",
+                    "type": "string"
+                },
+                "productCategory": {
+                    "$ref": "#/definitions/proto.ProductCategoryInfo"
+                },
+                "productCategoryID": {
+                    "description": "产品类别ID",
+                    "type": "string"
+                },
+                "productionLine": {
+                    "$ref": "#/definitions/proto.ProductionLineInfo"
+                },
+                "productionLineID": {
+                    "description": "生产产线ID",
+                    "type": "string"
+                },
+                "remark": {
+                    "description": "备注",
+                    "type": "string"
+                },
+                "remoteServiceTask": {
+                    "$ref": "#/definitions/proto.RemoteServiceTaskInfo"
+                },
+                "remoteServiceTaskID": {
+                    "description": "远程任务ID",
                     "type": "string"
                 }
             }
@@ -25110,6 +27499,22 @@ const docTemplate = `{
                 }
             }
         },
+        "proto.MaterialSupplierAvailableMaterialInfo": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "materialInfoID": {
+                    "description": "物料信息ID",
+                    "type": "string"
+                },
+                "materialSupplierID": {
+                    "description": "物料供应商ID",
+                    "type": "string"
+                }
+            }
+        },
         "proto.MaterialSupplierInfo": {
             "type": "object",
             "properties": {
@@ -25117,7 +27522,7 @@ const docTemplate = `{
                     "description": "持有物料信息",
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/proto.AvailableMaterialInfo"
+                        "$ref": "#/definitions/proto.MaterialSupplierAvailableMaterialInfo"
                     }
                 },
                 "code": {
@@ -27577,6 +29982,90 @@ const docTemplate = `{
                 }
             }
         },
+        "proto.ProductReworkProcessAvailableProcessInfo": {
+            "type": "object",
+            "properties": {
+                "ProductReworkProcessID": {
+                    "type": "string"
+                },
+                "ProductionProcess": {
+                    "$ref": "#/definitions/proto.ProductionProcessInfo"
+                },
+                "ProductionProcessID": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                }
+            }
+        },
+        "proto.ProductReworkProcessAvailableStationInfo": {
+            "type": "object",
+            "properties": {
+                "ProductReworkProcessID": {
+                    "type": "string"
+                },
+                "ProductionStation": {
+                    "$ref": "#/definitions/proto.ProductionStationInfo"
+                },
+                "ProductionStationID": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                }
+            }
+        },
+        "proto.ProductReworkProcessInfo": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "代号",
+                    "type": "string"
+                },
+                "description": {
+                    "description": "描述",
+                    "type": "string"
+                },
+                "enable": {
+                    "description": "是否启用",
+                    "type": "boolean"
+                },
+                "enableReport": {
+                    "description": "是否报工",
+                    "type": "boolean"
+                },
+                "id": {
+                    "description": "ID",
+                    "type": "string"
+                },
+                "productionLine": {
+                    "$ref": "#/definitions/proto.ProductionLineInfo"
+                },
+                "productionLineID": {
+                    "description": "生产产线ID",
+                    "type": "string"
+                },
+                "productionProcesses": {
+                    "description": "支持生产工序",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/proto.ProductReworkProcessAvailableProcessInfo"
+                    }
+                },
+                "productionStations": {
+                    "description": "可用生产工站",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/proto.ProductReworkProcessAvailableStationInfo"
+                    }
+                },
+                "remark": {
+                    "description": "备注",
+                    "type": "string"
+                }
+            }
+        },
         "proto.ProductReworkRecordInfo": {
             "type": "object",
             "properties": {
@@ -27645,6 +30134,33 @@ const docTemplate = `{
                 "reworkUserID": {
                     "description": "返工人员ID",
                     "type": "string"
+                }
+            }
+        },
+        "proto.ProductReworkRouteInfo": {
+            "type": "object",
+            "properties": {
+                "FollowProcessID": {
+                    "type": "string"
+                },
+                "MaterialCategoryID": {
+                    "type": "string"
+                },
+                "ProductionLineID": {
+                    "type": "string"
+                },
+                "followProcess": {
+                    "$ref": "#/definitions/proto.ProductionProcessInfo"
+                },
+                "id": {
+                    "description": "ID",
+                    "type": "string"
+                },
+                "materialCategory": {
+                    "$ref": "#/definitions/proto.MaterialCategoryInfo"
+                },
+                "productionLine": {
+                    "$ref": "#/definitions/proto.ProductionLineInfo"
                 }
             }
         },
@@ -27732,29 +30248,22 @@ const docTemplate = `{
                     "description": "超时时长(秒)",
                     "type": "integer"
                 },
+                "productInfo": {
+                    "$ref": "#/definitions/proto.ProductInfoInfo"
+                },
                 "productInfoID": {
                     "description": "产品信息ID",
                     "type": "string"
                 },
-                "productOrderNo": {
-                    "description": "生产工单号",
-                    "type": "string"
-                },
-                "productSerialNo": {
-                    "description": "产品序列号",
-                    "type": "string"
-                },
-                "productionProcessDescription": {
-                    "description": "生产工序",
-                    "type": "string"
+                "productionProcess": {
+                    "$ref": "#/definitions/proto.ProductionProcessInfo"
                 },
                 "productionProcessID": {
                     "description": "生产工序ID",
                     "type": "string"
                 },
-                "productionStationDescription": {
-                    "description": "生产工站",
-                    "type": "string"
+                "productionStation": {
+                    "$ref": "#/definitions/proto.ProductionStationInfo"
                 },
                 "productionStationID": {
                     "description": "生产工站ID",
@@ -28014,6 +30523,109 @@ const docTemplate = `{
                 },
                 "productionStationID": {
                     "type": "string"
+                }
+            }
+        },
+        "proto.ProductionEfficiencyInfo": {
+            "type": "object",
+            "properties": {
+                "actualAvailableDuration": {
+                    "description": "实际稼动时长",
+                    "type": "number"
+                },
+                "actualEffectiveDuration": {
+                    "description": "实际作业时长",
+                    "type": "number"
+                },
+                "averageRhythm": {
+                    "description": "平均节拍",
+                    "type": "number"
+                },
+                "breakdownDuration": {
+                    "description": "故障时长",
+                    "type": "number"
+                },
+                "estimateAvailableDuration": {
+                    "description": "预计稼动时长",
+                    "type": "number"
+                },
+                "estimateRhythm": {
+                    "description": "理论节拍",
+                    "type": "number"
+                },
+                "fpy": {
+                    "description": "一次通过率",
+                    "type": "number"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "lastUpdateTime": {
+                    "description": "最后更新时间",
+                    "type": "string"
+                },
+                "numberOfBreakdown": {
+                    "description": "故障次数",
+                    "type": "integer"
+                },
+                "numberOfFail": {
+                    "description": "失败次数",
+                    "type": "integer"
+                },
+                "numberOfPass": {
+                    "description": "合格次数",
+                    "type": "integer"
+                },
+                "numberOfShutdown": {
+                    "description": "计划外停机次数",
+                    "type": "integer"
+                },
+                "numberOfWork": {
+                    "description": "作业次数",
+                    "type": "integer"
+                },
+                "oee": {
+                    "description": "设备综合效率",
+                    "type": "number"
+                },
+                "oef": {
+                    "description": "设备故障率",
+                    "type": "number"
+                },
+                "oep": {
+                    "description": "性能稼动率",
+                    "type": "number"
+                },
+                "oeu": {
+                    "description": "时间稼动率",
+                    "type": "number"
+                },
+                "outputDate": {
+                    "description": "产出日期",
+                    "type": "string"
+                },
+                "outputOfThisDay": {
+                    "description": "当日产量",
+                    "type": "integer"
+                },
+                "plannedShutdownDuration": {
+                    "description": "计划内停机时长",
+                    "type": "number"
+                },
+                "productionStation": {
+                    "$ref": "#/definitions/proto.ProductionStationInfo"
+                },
+                "productionStationID": {
+                    "description": "生产工站ID",
+                    "type": "string"
+                },
+                "startupDuration": {
+                    "description": "开机时长",
+                    "type": "number"
+                },
+                "unplannedShutdownDuration": {
+                    "description": "计划外停机时长",
+                    "type": "number"
                 }
             }
         },
@@ -28526,6 +31138,109 @@ const docTemplate = `{
                 }
             }
         },
+        "proto.ProductionStationEfficiencyInfo": {
+            "type": "object",
+            "properties": {
+                "actualAvailableDuration": {
+                    "description": "实际稼动时长",
+                    "type": "number"
+                },
+                "actualEffectiveDuration": {
+                    "description": "实际作业时长",
+                    "type": "number"
+                },
+                "averageRhythm": {
+                    "description": "平均节拍",
+                    "type": "number"
+                },
+                "breakdownDuration": {
+                    "description": "故障时长",
+                    "type": "number"
+                },
+                "estimateAvailableDuration": {
+                    "description": "预计稼动时长",
+                    "type": "number"
+                },
+                "estimateRhythm": {
+                    "description": "理论节拍",
+                    "type": "number"
+                },
+                "fpy": {
+                    "description": "一次通过率",
+                    "type": "number"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "lastUpdateTime": {
+                    "description": "最后更新时间",
+                    "type": "string"
+                },
+                "numberOfBreakdown": {
+                    "description": "故障次数",
+                    "type": "integer"
+                },
+                "numberOfFail": {
+                    "description": "失败次数",
+                    "type": "integer"
+                },
+                "numberOfPass": {
+                    "description": "合格次数",
+                    "type": "integer"
+                },
+                "numberOfShutdown": {
+                    "description": "计划外停机次数",
+                    "type": "integer"
+                },
+                "numberOfWork": {
+                    "description": "作业次数",
+                    "type": "integer"
+                },
+                "oee": {
+                    "description": "设备综合效率",
+                    "type": "number"
+                },
+                "oef": {
+                    "description": "设备故障率",
+                    "type": "number"
+                },
+                "oep": {
+                    "description": "性能稼动率",
+                    "type": "number"
+                },
+                "oeu": {
+                    "description": "时间稼动率",
+                    "type": "number"
+                },
+                "outputDate": {
+                    "description": "产出日期",
+                    "type": "string"
+                },
+                "outputOfThisDay": {
+                    "description": "当日产量",
+                    "type": "integer"
+                },
+                "plannedShutdownDuration": {
+                    "description": "计划内停机时长",
+                    "type": "number"
+                },
+                "productionStation": {
+                    "$ref": "#/definitions/proto.ProductionStationInfo"
+                },
+                "productionStationID": {
+                    "description": "生产工站ID",
+                    "type": "string"
+                },
+                "startupDuration": {
+                    "description": "开机时长",
+                    "type": "number"
+                },
+                "unplannedShutdownDuration": {
+                    "description": "计划外停机时长",
+                    "type": "number"
+                }
+            }
+        },
         "proto.ProductionStationInfo": {
             "type": "object",
             "properties": {
@@ -28915,6 +31630,84 @@ const docTemplate = `{
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/proto.InvocationTraceInfo"
+                    }
+                },
+                "message": {
+                    "type": "string"
+                },
+                "pages": {
+                    "type": "integer"
+                },
+                "records": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
+        "proto.QueryLabelAdaptationRuleResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "$ref": "#/definitions/proto.Code"
+                },
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/proto.LabelAdaptationRuleInfo"
+                    }
+                },
+                "message": {
+                    "type": "string"
+                },
+                "pages": {
+                    "type": "integer"
+                },
+                "records": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
+        "proto.QueryLabelPrintQueueResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "$ref": "#/definitions/proto.Code"
+                },
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/proto.LabelPrintQueueInfo"
+                    }
+                },
+                "message": {
+                    "type": "string"
+                },
+                "pages": {
+                    "type": "integer"
+                },
+                "records": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
+        "proto.QueryLabelPrintTaskResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "$ref": "#/definitions/proto.Code"
+                },
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/proto.LabelPrintTaskInfo"
                     }
                 },
                 "message": {
@@ -30075,6 +32868,32 @@ const docTemplate = `{
                 }
             }
         },
+        "proto.QueryProductReworkProcessResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "$ref": "#/definitions/proto.Code"
+                },
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/proto.ProductReworkProcessInfo"
+                    }
+                },
+                "message": {
+                    "type": "string"
+                },
+                "pages": {
+                    "type": "integer"
+                },
+                "records": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
         "proto.QueryProductReworkRecordResponse": {
             "type": "object",
             "properties": {
@@ -30085,6 +32904,32 @@ const docTemplate = `{
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/proto.ProductReworkRecordInfo"
+                    }
+                },
+                "message": {
+                    "type": "string"
+                },
+                "pages": {
+                    "type": "integer"
+                },
+                "records": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
+        "proto.QueryProductReworkRouteResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "$ref": "#/definitions/proto.Code"
+                },
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/proto.ProductReworkRouteInfo"
                     }
                 },
                 "message": {
@@ -30241,6 +33086,32 @@ const docTemplate = `{
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/proto.ProductionCrosswayInfo"
+                    }
+                },
+                "message": {
+                    "type": "string"
+                },
+                "pages": {
+                    "type": "integer"
+                },
+                "records": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
+        "proto.QueryProductionEfficiencyResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "$ref": "#/definitions/proto.Code"
+                },
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/proto.ProductionEfficiencyInfo"
                     }
                 },
                 "message": {
@@ -30449,6 +33320,32 @@ const docTemplate = `{
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/proto.ProductionStationBreakdownInfo"
+                    }
+                },
+                "message": {
+                    "type": "string"
+                },
+                "pages": {
+                    "type": "integer"
+                },
+                "records": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
+        "proto.QueryProductionStationEfficiencyResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "$ref": "#/definitions/proto.Code"
+                },
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/proto.ProductionStationEfficiencyInfo"
                     }
                 },
                 "message": {

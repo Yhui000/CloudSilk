@@ -10,6 +10,7 @@ import (
 	"github.com/CloudSilk/CloudSilk/docs"
 	"github.com/CloudSilk/CloudSilk/pkg/clients"
 	"github.com/CloudSilk/CloudSilk/pkg/model"
+	"github.com/CloudSilk/CloudSilk/pkg/servers/efficiency"
 	"github.com/CloudSilk/CloudSilk/pkg/servers/label"
 	"github.com/CloudSilk/CloudSilk/pkg/servers/material"
 	"github.com/CloudSilk/CloudSilk/pkg/servers/product"
@@ -119,6 +120,7 @@ func startMom(r *gin.Engine) {
 		&material.Server{},
 		&user.Server{},
 		&trace.Server{},
+		&efficiency.Server{},
 		&webapi.Server{},
 	}
 	for _, server := range servers {
