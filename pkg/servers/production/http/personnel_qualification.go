@@ -7,7 +7,7 @@ import (
 	"github.com/CloudSilk/CloudSilk/pkg/clients"
 	"github.com/CloudSilk/CloudSilk/pkg/model"
 	"github.com/CloudSilk/CloudSilk/pkg/proto"
-	"github.com/CloudSilk/CloudSilk/pkg/servers/user/logic"
+	"github.com/CloudSilk/CloudSilk/pkg/servers/production/logic"
 	"github.com/CloudSilk/pkg/utils/log"
 	"github.com/CloudSilk/pkg/utils/middleware"
 	usercenter "github.com/CloudSilk/usercenter/proto"
@@ -23,7 +23,7 @@ import (
 // @Param authorization header string true "jwt token"
 // @Param account body proto.PersonnelQualificationInfo true "Add PersonnelQualification"
 // @Success 200 {object} proto.CommonResponse
-// @Router /api/mom/user/personnelqualification/add [post]
+// @Router /api/mom/production/personnelqualification/add [post]
 func AddPersonnelQualification(c *gin.Context) {
 	transID := middleware.GetTransID(c)
 	req := &proto.PersonnelQualificationInfo{}
@@ -65,7 +65,7 @@ func AddPersonnelQualification(c *gin.Context) {
 // @Param authorization header string true "jwt token"
 // @Param account body proto.PersonnelQualificationInfo true "Update PersonnelQualification"
 // @Success 200 {object} proto.CommonResponse
-// @Router /api/mom/user/personnelqualification/update [put]
+// @Router /api/mom/production/personnelqualification/update [put]
 func UpdatePersonnelQualification(c *gin.Context) {
 	transID := middleware.GetTransID(c)
 	req := &proto.PersonnelQualificationInfo{}
@@ -109,7 +109,7 @@ func UpdatePersonnelQualification(c *gin.Context) {
 // @Param productionLineID query string false "生产产线ID"
 // @Param name query string false "认证人员信息"
 // @Success 200 {object} proto.QueryPersonnelQualificationResponse
-// @Router /api/mom/user/personnelqualification/query [get]
+// @Router /api/mom/production/personnelqualification/query [get]
 func QueryPersonnelQualification(c *gin.Context) {
 	req := &proto.QueryPersonnelQualificationRequest{}
 	resp := &proto.QueryPersonnelQualificationResponse{
@@ -155,7 +155,7 @@ func QueryPersonnelQualification(c *gin.Context) {
 // @Produce  json
 // @Param authorization header string true "jwt token"
 // @Success 200 {object} proto.GetAllPersonnelQualificationResponse
-// @Router /api/mom/user/personnelqualification/all [get]
+// @Router /api/mom/production/personnelqualification/all [get]
 func GetAllPersonnelQualification(c *gin.Context) {
 	resp := &proto.GetAllPersonnelQualificationResponse{
 		Code: proto.Code_Success,
@@ -180,7 +180,7 @@ func GetAllPersonnelQualification(c *gin.Context) {
 // @Param id query string true "ID"
 // @Param authorization header string true "jwt token"
 // @Success 200 {object} proto.GetPersonnelQualificationDetailResponse
-// @Router /api/mom/user/personnelqualification/detail [get]
+// @Router /api/mom/production/personnelqualification/detail [get]
 func GetPersonnelQualificationDetail(c *gin.Context) {
 	resp := &proto.GetPersonnelQualificationDetailResponse{
 		Code: proto.Code_Success,
@@ -212,7 +212,7 @@ func GetPersonnelQualificationDetail(c *gin.Context) {
 // @Param authorization header string true "jwt token"
 // @Param data body proto.DelRequest true "Delete PersonnelQualification"
 // @Success 200 {object} proto.CommonResponse
-// @Router /api/mom/user/personnelqualification/delete [delete]
+// @Router /api/mom/production/personnelqualification/delete [delete]
 func DeletePersonnelQualification(c *gin.Context) {
 	transID := middleware.GetTransID(c)
 	req := &proto.DelRequest{}
@@ -243,7 +243,7 @@ func DeletePersonnelQualification(c *gin.Context) {
 }
 
 func RegisterPersonnelQualificationRouter(r *gin.Engine) {
-	g := r.Group("/api/mom/user/personnelqualification")
+	g := r.Group("/api/mom/production/personnelqualification")
 
 	g.POST("add", AddPersonnelQualification)
 	g.PUT("update", UpdatePersonnelQualification)

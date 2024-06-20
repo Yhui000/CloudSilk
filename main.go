@@ -19,7 +19,6 @@ import (
 	"github.com/CloudSilk/CloudSilk/pkg/servers/production_base"
 	"github.com/CloudSilk/CloudSilk/pkg/servers/system"
 	"github.com/CloudSilk/CloudSilk/pkg/servers/trace"
-	"github.com/CloudSilk/CloudSilk/pkg/servers/user"
 	"github.com/CloudSilk/CloudSilk/pkg/servers/webapi"
 	"github.com/CloudSilk/CloudSilk/pkg/servers/webapi/http"
 	"github.com/CloudSilk/curd/gen"
@@ -118,7 +117,6 @@ func startMom(r *gin.Engine) {
 		&label.Server{},
 		&system.Server{},
 		&material.Server{},
-		&user.Server{},
 		&trace.Server{},
 		&efficiency.Server{},
 		&webapi.Server{},

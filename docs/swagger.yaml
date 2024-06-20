@@ -30,6 +30,17 @@ definitions:
         description: 优先级
         type: integer
     type: object
+  proto.AvailableMaterialInfo:
+    properties:
+      id:
+        type: string
+      materialInfoID:
+        description: 物料信息ID
+        type: string
+      materialSupplierID:
+        description: 物料供应商ID
+        type: string
+    type: object
   proto.AvailableProcessInfo:
     properties:
       id:
@@ -2547,23 +2558,12 @@ definitions:
       productIssueRecordID:
         type: string
     type: object
-  proto.MaterialSupplierAvailableMaterialInfo:
-    properties:
-      id:
-        type: string
-      materialInfoID:
-        description: 物料信息ID
-        type: string
-      materialSupplierID:
-        description: 物料供应商ID
-        type: string
-    type: object
   proto.MaterialSupplierInfo:
     properties:
       availableMaterials:
         description: 持有物料信息
         items:
-          $ref: '#/definitions/proto.MaterialSupplierAvailableMaterialInfo'
+          $ref: '#/definitions/proto.AvailableMaterialInfo'
         type: array
       code:
         description: 代号
@@ -17130,6 +17130,352 @@ paths:
       summary: 更新
       tags:
       - 产品型号Bom管理
+  /api/mom/production/personnelqualification/add:
+    post:
+      consumes:
+      - application/json
+      description: 新增
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      - description: Add PersonnelQualification
+        in: body
+        name: account
+        required: true
+        schema:
+          $ref: '#/definitions/proto.PersonnelQualificationInfo'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.CommonResponse'
+      summary: 新增
+      tags:
+      - 人员资质管理
+  /api/mom/production/personnelqualification/all:
+    get:
+      consumes:
+      - application/json
+      description: 查询所有
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.GetAllPersonnelQualificationResponse'
+      summary: 查询所有
+      tags:
+      - 人员资质管理
+  /api/mom/production/personnelqualification/delete:
+    delete:
+      consumes:
+      - application/json
+      description: 删除
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      - description: Delete PersonnelQualification
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/proto.DelRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.CommonResponse'
+      summary: 删除
+      tags:
+      - 人员资质管理
+  /api/mom/production/personnelqualification/detail:
+    get:
+      consumes:
+      - application/json
+      description: 查询明细
+      parameters:
+      - description: ID
+        in: query
+        name: id
+        required: true
+        type: string
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.GetPersonnelQualificationDetailResponse'
+      summary: 查询明细
+      tags:
+      - 人员资质管理
+  /api/mom/production/personnelqualification/query:
+    get:
+      consumes:
+      - application/json
+      description: 分页查询
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      - description: 从1开始
+        in: query
+        name: pageIndex
+        type: integer
+      - description: 默认每页10条
+        in: query
+        name: pageSize
+        type: integer
+      - description: 排序字段
+        in: query
+        name: orderField
+        type: string
+      - description: 是否倒序排序
+        in: query
+        name: desc
+        type: boolean
+      - description: 生产产线ID
+        in: query
+        name: productionLineID
+        type: string
+      - description: 认证人员信息
+        in: query
+        name: name
+        type: string
+      produces:
+      - application/octet-stream
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.QueryPersonnelQualificationResponse'
+      summary: 分页查询
+      tags:
+      - 人员资质管理
+  /api/mom/production/personnelqualification/update:
+    put:
+      consumes:
+      - application/json
+      description: 更新
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      - description: Update PersonnelQualification
+        in: body
+        name: account
+        required: true
+        schema:
+          $ref: '#/definitions/proto.PersonnelQualificationInfo'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.CommonResponse'
+      summary: 更新
+      tags:
+      - 人员资质管理
+  /api/mom/production/personnelqualificationtype/add:
+    post:
+      consumes:
+      - application/json
+      description: 新增
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      - description: Add PersonnelQualificationType
+        in: body
+        name: account
+        required: true
+        schema:
+          $ref: '#/definitions/proto.PersonnelQualificationTypeInfo'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.CommonResponse'
+      summary: 新增
+      tags:
+      - 人员资质类型
+  /api/mom/production/personnelqualificationtype/all:
+    get:
+      consumes:
+      - application/json
+      description: 查询所有
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.GetAllPersonnelQualificationTypeResponse'
+      summary: 查询所有
+      tags:
+      - 人员资质类型
+  /api/mom/production/personnelqualificationtype/delete:
+    delete:
+      consumes:
+      - application/json
+      description: 删除
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      - description: Delete PersonnelQualificationType
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/proto.DelRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.CommonResponse'
+      summary: 删除
+      tags:
+      - 人员资质类型
+  /api/mom/production/personnelqualificationtype/detail:
+    get:
+      consumes:
+      - application/json
+      description: 查询明细
+      parameters:
+      - description: ID
+        in: query
+        name: id
+        required: true
+        type: string
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.GetPersonnelQualificationTypeDetailResponse'
+      summary: 查询明细
+      tags:
+      - 人员资质类型
+  /api/mom/production/personnelqualificationtype/query:
+    get:
+      consumes:
+      - application/json
+      description: 分页查询
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      - description: 从1开始
+        in: query
+        name: pageIndex
+        type: integer
+      - description: 默认每页10条
+        in: query
+        name: pageSize
+        type: integer
+      - description: 排序字段
+        in: query
+        name: orderField
+        type: string
+      - description: 是否倒序排序
+        in: query
+        name: desc
+        type: boolean
+      - description: 生产产线ID
+        in: query
+        name: productionLineID
+        type: string
+      - description: 认证人员信息
+        in: query
+        name: name
+        type: string
+      produces:
+      - application/octet-stream
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.QueryPersonnelQualificationTypeResponse'
+      summary: 分页查询
+      tags:
+      - 人员资质类型
+  /api/mom/production/personnelqualificationtype/update:
+    put:
+      consumes:
+      - application/json
+      description: 更新
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      - description: Update PersonnelQualificationType
+        in: body
+        name: account
+        required: true
+        schema:
+          $ref: '#/definitions/proto.PersonnelQualificationTypeInfo'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.CommonResponse'
+      summary: 更新
+      tags:
+      - 人员资质类型
   /api/mom/production/processstepparameter/add:
     post:
       consumes:
@@ -22201,352 +22547,6 @@ paths:
       summary: 更新
       tags:
       - 后台操作日志管理
-  /api/mom/user/personnelqualification/add:
-    post:
-      consumes:
-      - application/json
-      description: 新增
-      parameters:
-      - description: jwt token
-        in: header
-        name: authorization
-        required: true
-        type: string
-      - description: Add PersonnelQualification
-        in: body
-        name: account
-        required: true
-        schema:
-          $ref: '#/definitions/proto.PersonnelQualificationInfo'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/proto.CommonResponse'
-      summary: 新增
-      tags:
-      - 人员资质管理
-  /api/mom/user/personnelqualification/all:
-    get:
-      consumes:
-      - application/json
-      description: 查询所有
-      parameters:
-      - description: jwt token
-        in: header
-        name: authorization
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/proto.GetAllPersonnelQualificationResponse'
-      summary: 查询所有
-      tags:
-      - 人员资质管理
-  /api/mom/user/personnelqualification/delete:
-    delete:
-      consumes:
-      - application/json
-      description: 删除
-      parameters:
-      - description: jwt token
-        in: header
-        name: authorization
-        required: true
-        type: string
-      - description: Delete PersonnelQualification
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/proto.DelRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/proto.CommonResponse'
-      summary: 删除
-      tags:
-      - 人员资质管理
-  /api/mom/user/personnelqualification/detail:
-    get:
-      consumes:
-      - application/json
-      description: 查询明细
-      parameters:
-      - description: ID
-        in: query
-        name: id
-        required: true
-        type: string
-      - description: jwt token
-        in: header
-        name: authorization
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/proto.GetPersonnelQualificationDetailResponse'
-      summary: 查询明细
-      tags:
-      - 人员资质管理
-  /api/mom/user/personnelqualification/query:
-    get:
-      consumes:
-      - application/json
-      description: 分页查询
-      parameters:
-      - description: jwt token
-        in: header
-        name: authorization
-        required: true
-        type: string
-      - description: 从1开始
-        in: query
-        name: pageIndex
-        type: integer
-      - description: 默认每页10条
-        in: query
-        name: pageSize
-        type: integer
-      - description: 排序字段
-        in: query
-        name: orderField
-        type: string
-      - description: 是否倒序排序
-        in: query
-        name: desc
-        type: boolean
-      - description: 生产产线ID
-        in: query
-        name: productionLineID
-        type: string
-      - description: 认证人员信息
-        in: query
-        name: name
-        type: string
-      produces:
-      - application/octet-stream
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/proto.QueryPersonnelQualificationResponse'
-      summary: 分页查询
-      tags:
-      - 人员资质管理
-  /api/mom/user/personnelqualification/update:
-    put:
-      consumes:
-      - application/json
-      description: 更新
-      parameters:
-      - description: jwt token
-        in: header
-        name: authorization
-        required: true
-        type: string
-      - description: Update PersonnelQualification
-        in: body
-        name: account
-        required: true
-        schema:
-          $ref: '#/definitions/proto.PersonnelQualificationInfo'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/proto.CommonResponse'
-      summary: 更新
-      tags:
-      - 人员资质管理
-  /api/mom/user/personnelqualificationtype/add:
-    post:
-      consumes:
-      - application/json
-      description: 新增
-      parameters:
-      - description: jwt token
-        in: header
-        name: authorization
-        required: true
-        type: string
-      - description: Add PersonnelQualificationType
-        in: body
-        name: account
-        required: true
-        schema:
-          $ref: '#/definitions/proto.PersonnelQualificationTypeInfo'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/proto.CommonResponse'
-      summary: 新增
-      tags:
-      - 人员资质类型
-  /api/mom/user/personnelqualificationtype/all:
-    get:
-      consumes:
-      - application/json
-      description: 查询所有
-      parameters:
-      - description: jwt token
-        in: header
-        name: authorization
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/proto.GetAllPersonnelQualificationTypeResponse'
-      summary: 查询所有
-      tags:
-      - 人员资质类型
-  /api/mom/user/personnelqualificationtype/delete:
-    delete:
-      consumes:
-      - application/json
-      description: 删除
-      parameters:
-      - description: jwt token
-        in: header
-        name: authorization
-        required: true
-        type: string
-      - description: Delete PersonnelQualificationType
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/proto.DelRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/proto.CommonResponse'
-      summary: 删除
-      tags:
-      - 人员资质类型
-  /api/mom/user/personnelqualificationtype/detail:
-    get:
-      consumes:
-      - application/json
-      description: 查询明细
-      parameters:
-      - description: ID
-        in: query
-        name: id
-        required: true
-        type: string
-      - description: jwt token
-        in: header
-        name: authorization
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/proto.GetPersonnelQualificationTypeDetailResponse'
-      summary: 查询明细
-      tags:
-      - 人员资质类型
-  /api/mom/user/personnelqualificationtype/query:
-    get:
-      consumes:
-      - application/json
-      description: 分页查询
-      parameters:
-      - description: jwt token
-        in: header
-        name: authorization
-        required: true
-        type: string
-      - description: 从1开始
-        in: query
-        name: pageIndex
-        type: integer
-      - description: 默认每页10条
-        in: query
-        name: pageSize
-        type: integer
-      - description: 排序字段
-        in: query
-        name: orderField
-        type: string
-      - description: 是否倒序排序
-        in: query
-        name: desc
-        type: boolean
-      - description: 生产产线ID
-        in: query
-        name: productionLineID
-        type: string
-      - description: 认证人员信息
-        in: query
-        name: name
-        type: string
-      produces:
-      - application/octet-stream
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/proto.QueryPersonnelQualificationTypeResponse'
-      summary: 分页查询
-      tags:
-      - 人员资质类型
-  /api/mom/user/personnelqualificationtype/update:
-    put:
-      consumes:
-      - application/json
-      description: 更新
-      parameters:
-      - description: jwt token
-        in: header
-        name: authorization
-        required: true
-        type: string
-      - description: Update PersonnelQualificationType
-        in: body
-        name: account
-        required: true
-        schema:
-          $ref: '#/definitions/proto.PersonnelQualificationTypeInfo'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/proto.CommonResponse'
-      summary: 更新
-      tags:
-      - 人员资质类型
   /api/mom/webapi/admin/login:
     post:
       consumes:

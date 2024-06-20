@@ -17,7 +17,7 @@ type PersonnelQualification struct {
 	EffectiveDate                sql.NullTime                `json:"effectiveDate" gorm:"comment:生效日期"`
 	ExpirationDate               sql.NullTime                `json:"expirationDate" gorm:"comment:失效日期"`
 	AuthorizedUserID             string                      `json:"authorizedUserID" gorm:"index;size:36;comment:授权人员ID"`
-	AuthorizedTime               time.Time                   `json:"authorizedTime" gorm:"comment:授权时间"`
+	AuthorizedTime               time.Time                   `json:"authorizedTime" gorm:"autoCreateTime:nano;comment:授权时间"`
 	Remark                       string                      `json:"remark" gorm:"size:1000;comment:备注"`
 }
 

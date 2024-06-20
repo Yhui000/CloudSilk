@@ -3,9 +3,9 @@ package provider
 import (
 	"context"
 
-	"github.com/CloudSilk/CloudSilk/pkg/servers/user/logic"
 	"github.com/CloudSilk/CloudSilk/pkg/model"
 	"github.com/CloudSilk/CloudSilk/pkg/proto"
+	"github.com/CloudSilk/CloudSilk/pkg/servers/production/logic"
 )
 
 type PersonnelQualificationProvider struct {
