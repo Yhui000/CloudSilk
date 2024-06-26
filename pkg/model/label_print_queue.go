@@ -104,6 +104,7 @@ func LabelPrintQueueToPB(in *LabelPrintQueue) *proto.LabelPrintQueueInfo {
 		CreateTime:          utils.FormatTime(in.CreateTime),
 		CreateUserID:        in.CreateUserID,
 		PrinterID:           in.PrinterID,
+		Printer:             PrinterToPB(in.Printer),
 		CurrentState:        in.CurrentState,
 		LastUpdateTime:      utils.FormatTime(in.LastUpdateTime),
 		RemoteServiceTaskID: remoteServiceTaskID,

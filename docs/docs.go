@@ -27194,6 +27194,9 @@ const docTemplate = `{
                     "description": "创建人员",
                     "type": "string"
                 },
+                "createUserName": {
+                    "type": "string"
+                },
                 "currentState": {
                     "description": "当前状态",
                     "type": "string"
@@ -27924,6 +27927,9 @@ const docTemplate = `{
                 "name": {
                     "description": "名称",
                     "type": "string"
+                },
+                "printServer": {
+                    "$ref": "#/definitions/proto.PrintServerInfo"
                 },
                 "printServerID": {
                     "description": "打印服务器ID",

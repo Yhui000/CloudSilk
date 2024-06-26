@@ -100,6 +100,7 @@ func PrinterToPB(in *Printer) *apipb.PrinterInfo {
 		Name:          in.Name,
 		Enable:        in.Enable,
 		PrintServerID: in.PrintServerID,
+		PrintServer:   PrintServerToPB(in.PrintServer),
 	}
 	return m
 }
