@@ -14,16 +14,16 @@ type LabelPrintQueue struct {
 	PrintTimes          int32                       `gorm:"comment:打印次数"`
 	FilePath            string                      `gorm:"size:1000;comment:模板文件"`
 	PrintCopies         int32                       `gorm:"comment:打印份数"`
-	CreateTime          time.Time                   `gorm:"comment:创建时间"`
+	CreateTime          time.Time                   `gorm:"autoCreateTime:nano;comment:创建时间"`
 	CreateUserID        string                      `gorm:"size:36;comment:创建人员ID"`
 	PrinterID           string                      `gorm:"size:36;comment:打印机ID"`
 	Printer             *Printer                    `gorm:"constraint:OnDelete:CASCADE"`
 	CurrentState        string                      `gorm:"size:50;comment:当前状态"`
-	LastUpdateTime      time.Time                   `gorm:"comment:状态变更时间"`
+	LastUpdateTime      time.Time                   `gorm:"autoUpdateTime:nano;comment:状态变更时间"`
 	RemoteServiceTaskID *string                     `gorm:"size:36;comment:远程任务ID"`
-	RemoteServiceTask   *RemoteServiceTask          `gorm:"comment:constraint:OnDelete:SET NULL"` //远程任务
-	LabelParameters     []*LabelPrintQueueParameter `gorm:"comment:constraint:OnDelete:CASCADE"`  //标签打印队列参数
-	PrintExecutions     []*LabelPrintQueueExecution `gorm:"comment:constraint:OnDelete:CASCADE"`  //标签打印队列执行
+	RemoteServiceTask   *RemoteServiceTask          `gorm:"constraint:OnDelete:SET NULL"` //远程任务
+	LabelParameters     []*LabelPrintQueueParameter `gorm:"constraint:OnDelete:CASCADE"`  //标签打印队列参数
+	PrintExecutions     []*LabelPrintQueueExecution `gorm:"constraint:OnDelete:CASCADE"`  //标签打印队列执行
 }
 
 // 标签打印队列参数

@@ -19,12 +19,11 @@ func UpdatePersonnelQualification(m *model.PersonnelQualification) error {
 func QueryPersonnelQualification(req *proto.QueryPersonnelQualificationRequest, resp *proto.QueryPersonnelQualificationResponse, preload bool) {
 	db := model.DB.DB().Model(&model.PersonnelQualification{})
 	if req.ProductionLineID != "" {
-		db = db.Joins("JOIN personnel_qualification_types ON personnel_qualifications.qualification_type_id=personnel_qualification_types.id").
-			Joins("JOIN production_processes ON personnel_qualification_types.production_process_id=production_processes.id").
+		db = db.Joins("JOIN production_processes ON personnel_qualifications.production_process_id=production_processes.id").
 			Where("production_processes.production_line_id = ?", req.ProductionLineID)
 	}
-	if req.Name != "" {
-		db = db.Where("`name` like ? or `card_no` like ? or `staff_no` like ?", "%"+req.Name+"%", "%"+req.Name+"%", "%"+req.Name+"%")
+	if req.CertifiedUserID != "" {
+		db = db.Where("`certified_user_id` = ?", req.CertifiedUserID)
 	}
 
 	orderStr, err := utils.GenerateOrderString(req.SortConfig, "created_at desc")

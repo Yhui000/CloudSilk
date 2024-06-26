@@ -35,7 +35,7 @@ func UpdateProductInfo(m *model.ProductInfo) error {
 func QueryProductInfo(req *proto.QueryProductInfoRequest, resp *proto.QueryProductInfoResponse, preload bool) {
 	db := model.DB.DB().Model(&model.ProductInfo{}).Preload("ProductOrder").Preload("ProductOrder.ProductModel").Preload(clause.Associations)
 	if req.ProductOrderNo != "" {
-		db = db.Joins("JOIN product_orders ON product_infos.product_order_id = product_order.id").
+		db = db.Joins("JOIN product_orders ON product_infos.product_order_id = product_orders.id").
 			Where("product_orders.product_order_no LIKE ?", "%"+req.ProductOrderNo+"%")
 	}
 	if req.ProductSerialNo != "" {
@@ -106,9 +106,9 @@ func DeleteProductInfo(id string) (err error) {
 }
 
 func QueryProductFactoryReport(req *proto.QueryProductInfoRequest, resp *proto.QueryProductInfoResponse, preload bool) {
-	db := model.DB.DB().Model(&model.ProductInfo{}).Preload("ProductOrder").Preload("ProductOrder.ProductModel").Preload(clause.Associations)
+	db := model.DB.DB().Model(&model.ProductInfo{}).Preload("ProductOrder").Preload("ProductOrder.ProductModel").Preload(clause.Associations).Where("product_infos.finished_time IS NOT NULL")
 	if req.ProductOrderNo != "" {
-		db = db.Joins("JOIN product_orders ON product_infos.product_order_id = product_order.id").
+		db = db.Joins("JOIN product_orders ON product_infos.product_order_id = product_orders.id").
 			Where("product_orders.product_order_no LIKE ?", "%"+req.ProductOrderNo+"%")
 	}
 	if req.ProductSerialNo != "" {

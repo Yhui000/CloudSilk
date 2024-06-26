@@ -18,6 +18,9 @@ func UpdateLabelPrintTask(m *model.LabelPrintTask) error {
 
 func QueryLabelPrintTask(req *proto.QueryLabelPrintTaskRequest, resp *proto.QueryLabelPrintTaskResponse, preload bool) {
 	db := model.DB.DB().Model(&model.LabelPrintTask{}).Preload("ProductionLine").Preload("ProductCategory").Preload("LabelType").Preload("Printer").Preload("RemoteServiceTask").Preload(clause.Associations)
+	if req.ProductionLineID != "" {
+		db = db.Where("`production_line_id` = ?", req.ProductionLineID)
+	}
 	if req.Code != "" {
 		db = db.Where("code LIKE ? OR description LIKE ?", "%"+req.Code+"%", "%"+req.Code+"%")
 	}

@@ -23,9 +23,11 @@ message ProductReworkProcessInfo {
     string productionLineID=7;
     ProductionLineInfo productionLine=8;
     //可用生产工站
-    repeated ProductReworkProcessAvailableStationInfo productionStations=9;
+    repeated string availableStationIDs=9;
+    repeated ProductReworkProcessAvailableStationInfo productionStations=10;
     //支持生产工序
-    repeated ProductReworkProcessAvailableProcessInfo productionProcesses=10;
+    repeated string availableProcessIDs=11;
+    repeated ProductReworkProcessAvailableProcessInfo productionProcesses=12;
 }
 
 message ProductReworkProcessAvailableStationInfo{
@@ -49,9 +51,12 @@ message QueryProductReworkProcessRequest{
     int64 pageSize=2;
     // @inject_tag: uri:"sortConfig" form:"sortConfig"
     string sortConfig=3;
+	//生产产线ID
+    // @inject_tag: uri:"productionLineID" form:"productionLineID"
+    string productionLineID=4;
 	//代号或描述
     // @inject_tag: uri:"code" form:"code"
-    string code=4;
+    string code=5;
 }
 
 message QueryProductReworkProcessResponse{

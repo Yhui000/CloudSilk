@@ -9,7 +9,7 @@ type LabelAdaptationRule struct {
 	ModelID
 	Priority             int32                  `gorm:"comment:优先级"`
 	LabelTemplateID      *string                `gorm:"size:36;comment:适配标签模板ID"`
-	LabelTemplate        *LabelTemplate         `gorm:"comment:constraint:OnDelete:SET NULL"` //适配标签模板
+	LabelTemplate        *LabelTemplate         `gorm:"constraint:OnDelete:SET NULL"` //适配标签模板
 	Enable               bool                   `gorm:"comment:是否启用"`
 	InitialValue         bool                   `gorm:"comment:默认适配"`
 	DoubleCheck          bool                   `gorm:"comment:需要复核"`

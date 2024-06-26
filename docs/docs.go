@@ -11294,32 +11294,8 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "产品序列号",
-                        "name": "productSerialNo",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "生产工单号",
-                        "name": "productOrderNo",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "创建时间开始",
-                        "name": "createTime0",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "创建时间结束",
-                        "name": "createTime1",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "故障信息",
-                        "name": "reworkBrief",
+                        "description": "代号或描述",
+                        "name": "code",
                         "in": "query"
                     }
                 ],
@@ -11866,32 +11842,8 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "产品序列号",
-                        "name": "productSerialNo",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "生产工单号",
-                        "name": "productOrderNo",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "创建时间开始",
-                        "name": "createTime0",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "创建时间结束",
-                        "name": "createTime1",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "故障信息",
-                        "name": "reworkBrief",
+                        "description": "代号或描述",
+                        "name": "code",
                         "in": "query"
                     }
                 ],
@@ -30121,6 +30073,20 @@ const docTemplate = `{
         "proto.ProductReworkProcessInfo": {
             "type": "object",
             "properties": {
+                "availableProcessIDs": {
+                    "description": "支持生产工序",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "availableStationIDs": {
+                    "description": "可用生产工站",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
                 "code": {
                     "description": "代号",
                     "type": "string"
@@ -30149,14 +30115,12 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "productionProcesses": {
-                    "description": "支持生产工序",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/proto.ProductReworkProcessAvailableProcessInfo"
                     }
                 },
                 "productionStations": {
-                    "description": "可用生产工站",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/proto.ProductReworkProcessAvailableStationInfo"
@@ -30242,17 +30206,11 @@ const docTemplate = `{
         "proto.ProductReworkRouteInfo": {
             "type": "object",
             "properties": {
-                "FollowProcessID": {
-                    "type": "string"
-                },
-                "MaterialCategoryID": {
-                    "type": "string"
-                },
-                "ProductionLineID": {
-                    "type": "string"
-                },
                 "followProcess": {
                     "$ref": "#/definitions/proto.ProductionProcessInfo"
+                },
+                "followProcessID": {
+                    "type": "string"
                 },
                 "id": {
                     "description": "ID",
@@ -30261,8 +30219,14 @@ const docTemplate = `{
                 "materialCategory": {
                     "$ref": "#/definitions/proto.MaterialCategoryInfo"
                 },
+                "materialCategoryID": {
+                    "type": "string"
+                },
                 "productionLine": {
                     "$ref": "#/definitions/proto.ProductionLineInfo"
+                },
+                "productionLineID": {
+                    "type": "string"
                 }
             }
         },

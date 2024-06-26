@@ -18,9 +18,12 @@ func UpdateProductReworkRoute(m *model.ProductReworkRoute) error {
 
 func QueryProductReworkRoute(req *proto.QueryProductReworkRouteRequest, resp *proto.QueryProductReworkRouteResponse, preload bool) {
 	db := model.DB.DB().Model(&model.ProductReworkRoute{}).Preload("ProductionLine").Preload("MaterialCategory").Preload("FollowProcess").Preload(clause.Associations)
+	if req.ProductionLineID != "" {
+		db = db.Where("`production_line_id` = ?", req.ProductionLineID)
+	}
 	if req.Code != "" {
-		db = db.Joins("JOIN material_categorys ON product_rework_routes.material_category_id = material_categorys.id").
-			Where("material_categorys.code LIKE ? OR material_categorys.description LIKE ?", "%"+req.Code+"%", "%"+req.Code+"%")
+		db = db.Joins("JOIN material_categories ON product_rework_routes.material_category_id = material_categories.id").
+			Where("material_categories.code LIKE ? OR material_categories.description LIKE ?", "%"+req.Code+"%", "%"+req.Code+"%")
 	}
 
 	orderStr, err := utils.GenerateOrderString(req.SortConfig, "created_at desc")

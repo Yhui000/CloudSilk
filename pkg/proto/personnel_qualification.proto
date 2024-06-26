@@ -46,8 +46,8 @@ message QueryPersonnelQualificationRequest{
     string sortConfig=3;
     // @inject_tag: uri:"productionLineID" form:"productionLineID"
     string productionLineID=4;
-    // @inject_tag: uri:"name" form:"name"
-    string name=5;
+    // @inject_tag: uri:"certifiedUserID" form:"certifiedUserID"
+    string certifiedUserID=5;
     // @inject_tag: uri:"productionProcessID" form:"productionProcessID"
     string productionProcessID=6;
     // @inject_tag: uri:"productModelID" form:"productModelID"

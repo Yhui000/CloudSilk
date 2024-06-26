@@ -44,6 +44,25 @@ func AddProductReworkProcess(c *gin.Context) {
 		return
 	}
 
+	if len(req.AvailableStationIDs) > 0 {
+		var availableStations []*proto.ProductReworkProcessAvailableStationInfo
+		for _, productionStationID := range req.AvailableStationIDs {
+			availableStations = append(availableStations, &proto.ProductReworkProcessAvailableStationInfo{
+				ProductionStationID: productionStationID,
+			})
+		}
+		req.ProductionStations = availableStations
+	}
+	if len(req.AvailableProcessIDs) > 0 {
+		var availableProcesss []*proto.ProductReworkProcessAvailableProcessInfo
+		for _, productionProcessID := range req.AvailableProcessIDs {
+			availableProcesss = append(availableProcesss, &proto.ProductReworkProcessAvailableProcessInfo{
+				ProductionProcessID: productionProcessID,
+			})
+		}
+		req.ProductionProcesses = availableProcesss
+	}
+
 	id, err := logic.CreateProductReworkProcess(model.PBToProductReworkProcess(req))
 	if err != nil {
 		resp.Code = proto.Code_InternalServerError
@@ -85,6 +104,26 @@ func UpdateProductReworkProcess(c *gin.Context) {
 		c.JSON(http.StatusOK, resp)
 		return
 	}
+
+	if len(req.AvailableStationIDs) > 0 {
+		var availableStations []*proto.ProductReworkProcessAvailableStationInfo
+		for _, productionStationID := range req.AvailableStationIDs {
+			availableStations = append(availableStations, &proto.ProductReworkProcessAvailableStationInfo{
+				ProductionStationID: productionStationID,
+			})
+		}
+		req.ProductionStations = availableStations
+	}
+	if len(req.AvailableProcessIDs) > 0 {
+		var availableProcesss []*proto.ProductReworkProcessAvailableProcessInfo
+		for _, productionProcessID := range req.AvailableProcessIDs {
+			availableProcesss = append(availableProcesss, &proto.ProductReworkProcessAvailableProcessInfo{
+				ProductionProcessID: productionProcessID,
+			})
+		}
+		req.ProductionProcesses = availableProcesss
+	}
+
 	err = logic.UpdateProductReworkProcess(model.PBToProductReworkProcess(req))
 	if err != nil {
 		resp.Code = proto.Code_InternalServerError
@@ -105,11 +144,7 @@ func UpdateProductReworkProcess(c *gin.Context) {
 // @Param orderField query string false "排序字段"
 // @Param desc query bool false "是否倒序排序"
 // @Param productionLineID query string false "生产产线ID"
-// @Param productSerialNo query string false "产品序列号"
-// @Param productOrderNo query string false "生产工单号"
-// @Param createTime0 query string false "创建时间开始"
-// @Param createTime1 query string false "创建时间结束"
-// @Param reworkBrief query string false "故障信息"
+// @Param code query string false "代号或描述"
 // @Success 200 {object} proto.QueryProductReworkProcessResponse
 // @Router /api/mom/product/productreworkprocess/query [get]
 func QueryProductReworkProcess(c *gin.Context) {

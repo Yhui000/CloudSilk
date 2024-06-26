@@ -4355,6 +4355,16 @@ definitions:
     type: object
   proto.ProductReworkProcessInfo:
     properties:
+      availableProcessIDs:
+        description: 支持生产工序
+        items:
+          type: string
+        type: array
+      availableStationIDs:
+        description: 可用生产工站
+        items:
+          type: string
+        type: array
       code:
         description: 代号
         type: string
@@ -4376,12 +4386,10 @@ definitions:
         description: 生产产线ID
         type: string
       productionProcesses:
-        description: 支持生产工序
         items:
           $ref: '#/definitions/proto.ProductReworkProcessAvailableProcessInfo'
         type: array
       productionStations:
-        description: 可用生产工站
         items:
           $ref: '#/definitions/proto.ProductReworkProcessAvailableStationInfo'
         type: array
@@ -4443,21 +4451,21 @@ definitions:
     type: object
   proto.ProductReworkRouteInfo:
     properties:
-      FollowProcessID:
-        type: string
-      MaterialCategoryID:
-        type: string
-      ProductionLineID:
-        type: string
       followProcess:
         $ref: '#/definitions/proto.ProductionProcessInfo'
+      followProcessID:
+        type: string
       id:
         description: ID
         type: string
       materialCategory:
         $ref: '#/definitions/proto.MaterialCategoryInfo'
+      materialCategoryID:
+        type: string
       productionLine:
         $ref: '#/definitions/proto.ProductionLineInfo'
+      productionLineID:
+        type: string
     type: object
   proto.ProductReworkSolutionInfo:
     properties:
@@ -14774,25 +14782,9 @@ paths:
         in: query
         name: productionLineID
         type: string
-      - description: 产品序列号
+      - description: 代号或描述
         in: query
-        name: productSerialNo
-        type: string
-      - description: 生产工单号
-        in: query
-        name: productOrderNo
-        type: string
-      - description: 创建时间开始
-        in: query
-        name: createTime0
-        type: string
-      - description: 创建时间结束
-        in: query
-        name: createTime1
-        type: string
-      - description: 故障信息
-        in: query
-        name: reworkBrief
+        name: code
         type: string
       produces:
       - application/octet-stream
@@ -15152,25 +15144,9 @@ paths:
         in: query
         name: productionLineID
         type: string
-      - description: 产品序列号
+      - description: 代号或描述
         in: query
-        name: productSerialNo
-        type: string
-      - description: 生产工单号
-        in: query
-        name: productOrderNo
-        type: string
-      - description: 创建时间开始
-        in: query
-        name: createTime0
-        type: string
-      - description: 创建时间结束
-        in: query
-        name: createTime1
-        type: string
-      - description: 故障信息
-        in: query
-        name: reworkBrief
+        name: code
         type: string
       produces:
       - application/octet-stream
