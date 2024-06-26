@@ -4,11 +4,13 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/CloudSilk/CloudSilk/pkg/clients"
 	"github.com/CloudSilk/CloudSilk/pkg/model"
 	"github.com/CloudSilk/CloudSilk/pkg/proto"
 	"github.com/CloudSilk/CloudSilk/pkg/servers/label/logic"
 	"github.com/CloudSilk/pkg/utils/log"
 	"github.com/CloudSilk/pkg/utils/middleware"
+	usercenter "github.com/CloudSilk/usercenter/proto"
 	"github.com/gin-gonic/gin"
 )
 
@@ -122,6 +124,23 @@ func QueryLabelPrintQueue(c *gin.Context) {
 		return
 	}
 	logic.QueryLabelPrintQueue(req, resp, false)
+	if resp.Code == proto.Code_Success {
+		r := &usercenter.QueryUserRequest{}
+		for _, u := range resp.Data {
+			r.Ids = append(r.Ids, u.CreateUserID)
+		}
+		r.PageSize = int64(len(r.Ids))
+		users, err := clients.UserClient.Query(context.Background(), r)
+		if err == nil && users.Code == usercenter.Code_Success {
+			for _, u := range resp.Data {
+				for _, u2 := range users.Data {
+					if u.CreateUserID == u2.Id {
+						u.CreateUserName = u2.Nickname
+					}
+				}
+			}
+		}
+	}
 
 	c.JSON(http.StatusOK, resp)
 }

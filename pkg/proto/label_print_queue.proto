@@ -21,6 +21,7 @@ message LabelPrintQueueInfo {
     string createTime=6;
     //创建人员
     string createUserID=7;
+    string createUserName=16;
     //打印机ID
     string printerID=8;
     PrinterInfo printer=9;

@@ -31,7 +31,7 @@ func UpdateLabelPrintQueue(m *model.LabelPrintQueue) error {
 }
 
 func QueryLabelPrintQueue(req *proto.QueryLabelPrintQueueRequest, resp *proto.QueryLabelPrintQueueResponse, preload bool) {
-	db := model.DB.DB().Model(&model.LabelPrintQueue{}).Preload("LabelType").Preload(clause.Associations)
+	db := model.DB.DB().Model(&model.LabelPrintQueue{}).Preload("Printer").Preload("Printer.PrintServer").Preload("RemoteServiceTask").Preload(clause.Associations)
 	if req.TaskNo != "" {
 		db.Where("task_no LIKE ?", "%"+req.TaskNo+"%")
 	}
