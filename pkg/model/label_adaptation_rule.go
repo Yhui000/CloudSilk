@@ -4,6 +4,7 @@ import (
 	"github.com/CloudSilk/CloudSilk/pkg/proto"
 )
 
+// 标签适配规则
 type LabelAdaptationRule struct {
 	ModelID
 	Priority             int32                  `gorm:"comment:优先级"`

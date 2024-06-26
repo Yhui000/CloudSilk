@@ -15,7 +15,7 @@ type LabelPrintQueue struct {
 	FilePath            string                      `gorm:"size:1000;comment:模板文件"`
 	PrintCopies         int32                       `gorm:"comment:打印份数"`
 	CreateTime          time.Time                   `gorm:"comment:创建时间"`
-	CreateUserID        string                      `gorm:"size:36;comment:创建人员"`
+	CreateUserID        string                      `gorm:"size:36;comment:创建人员ID"`
 	PrinterID           string                      `gorm:"size:36;comment:打印机ID"`
 	Printer             *Printer                    `gorm:"constraint:OnDelete:CASCADE"`
 	CurrentState        string                      `gorm:"size:50;comment:当前状态"`

@@ -9,8 +9,8 @@ import (
 	"github.com/CloudSilk/CloudSilk/pkg/proto"
 	"github.com/CloudSilk/CloudSilk/pkg/servers/production/logic"
 	"github.com/CloudSilk/pkg/utils/log"
-	"github.com/CloudSilk/pkg/utils/middleware"
 	usercenter "github.com/CloudSilk/usercenter/proto"
+	"github.com/CloudSilk/usercenter/utils/middleware"
 	"github.com/gin-gonic/gin"
 )
 
@@ -26,7 +26,9 @@ import (
 // @Router /api/mom/production/personnelqualification/add [post]
 func AddPersonnelQualification(c *gin.Context) {
 	transID := middleware.GetTransID(c)
-	req := &proto.PersonnelQualificationInfo{}
+	req := &proto.PersonnelQualificationInfo{
+		AuthorizedUserID: middleware.GetUserID(c),
+	}
 	resp := &proto.CommonResponse{
 		Code: proto.Code_Success,
 	}

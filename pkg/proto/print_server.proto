@@ -53,6 +53,12 @@ message GetAllPrintServerResponse{
     repeated PrintServerInfo data=3;
 }
 
+message GetAllPrinterResponse{
+    Code code=1;
+    string message=2;
+    repeated PrinterInfo data=3;
+}
+
 message GetPrintServerDetailResponse{
     Code code=1;
     string message=2;

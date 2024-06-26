@@ -7,6 +7,7 @@ import (
 	"github.com/CloudSilk/pkg/utils"
 )
 
+// 工位效率统计
 type ProductionStationEfficiency struct {
 	ModelID
 	OutputDate                time.Time          `gorm:"autoCreateTime:nano;comment:产出日期"`

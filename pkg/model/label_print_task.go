@@ -4,6 +4,7 @@ import (
 	"github.com/CloudSilk/CloudSilk/pkg/proto"
 )
 
+// 标签打印任务
 type LabelPrintTask struct {
 	ModelID
 	Code                string             `gorm:"size:50;comment:代号"`

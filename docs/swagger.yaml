@@ -677,6 +677,17 @@ definitions:
       message:
         type: string
     type: object
+  proto.GetAllPrinterResponse:
+    properties:
+      code:
+        $ref: '#/definitions/proto.Code'
+      data:
+        items:
+          $ref: '#/definitions/proto.PrinterInfo'
+        type: array
+      message:
+        type: string
+    type: object
   proto.GetAllProcessStepParameterResponse:
     properties:
       code:
@@ -2722,10 +2733,11 @@ definitions:
       id:
         description: ID
         type: string
-      personnelQualificationType:
-        $ref: '#/definitions/proto.PersonnelQualificationTypeInfo'
-      personnelQualificationTypeID:
-        description: 资质类型ID
+      productModelID:
+        description: 产品型号ID
+        type: string
+      productionProcessID:
+        description: 生产工序ID
         type: string
       remark:
         description: 备注
@@ -10092,6 +10104,27 @@ paths:
           schema:
             $ref: '#/definitions/proto.GetAllPrintServerResponse'
       summary: 查询所有
+      tags:
+      - 打印服务器管理
+  /api/mom/printserver/all/printer:
+    get:
+      consumes:
+      - application/json
+      description: 查询所有打印机
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.GetAllPrinterResponse'
+      summary: 查询所有打印机
       tags:
       - 打印服务器管理
   /api/mom/printserver/delete:

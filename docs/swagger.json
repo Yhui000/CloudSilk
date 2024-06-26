@@ -4209,6 +4209,38 @@
                 }
             }
         },
+        "/api/mom/printserver/all/printer": {
+            "get": {
+                "description": "查询所有打印机",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "打印服务器管理"
+                ],
+                "summary": "查询所有打印机",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/proto.GetAllPrinterResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/mom/printserver/delete": {
             "delete": {
                 "description": "删除",
@@ -24691,6 +24723,23 @@
                 }
             }
         },
+        "proto.GetAllPrinterResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "$ref": "#/definitions/proto.Code"
+                },
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/proto.PrinterInfo"
+                    }
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
         "proto.GetAllProcessStepParameterResponse": {
             "type": "object",
             "properties": {
@@ -27793,11 +27842,12 @@
                     "description": "ID",
                     "type": "string"
                 },
-                "personnelQualificationType": {
-                    "$ref": "#/definitions/proto.PersonnelQualificationTypeInfo"
+                "productModelID": {
+                    "description": "产品型号ID",
+                    "type": "string"
                 },
-                "personnelQualificationTypeID": {
-                    "description": "资质类型ID",
+                "productionProcessID": {
+                    "description": "生产工序ID",
                     "type": "string"
                 },
                 "remark": {
