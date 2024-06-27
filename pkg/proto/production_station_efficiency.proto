@@ -19,7 +19,7 @@ message ProductionStationEfficiencyInfo {
 	//失败次数
 	int32 numberOfFail=6;
 	//一次通过率
-	float fpy=7;
+	float fPY=7;
 	//理论节拍
 	float estimateRhythm=8;
 	//平均节拍
@@ -39,17 +39,17 @@ message ProductionStationEfficiencyInfo {
 	//计划外停机时长
 	float unplannedShutdownDuration=16;
 	//设备故障率
-	float oef=17;
+	float oEF=17;
 	//实际稼动时长
 	float actualAvailableDuration=18;
 	//实际作业时长
 	float actualEffectiveDuration=19;
 	//时间稼动率
-	float oeu=20;
+	float oEU=20;
 	//性能稼动率
-	float oep=21;
+	float oEP=21;
 	//设备综合效率
-	float oee=22;
+	float oEE=22;
 	//最后更新时间
 	string lastUpdateTime=23;
 	//生产工站ID

@@ -10,7 +10,7 @@ import (
 // 工位效率统计
 type ProductionStationEfficiency struct {
 	ModelID
-	OutputDate                time.Time          `gorm:"autoCreateTime:nano;comment:产出日期"`
+	OutputDate                time.Time          `gorm:"type:date;comment:产出日期"`
 	OutputOfThisDay           int32              `gorm:"comment:当日产量"`
 	NumberOfWork              int32              `gorm:"comment:作业次数"`
 	NumberOfPass              int32              `gorm:"comment:合格次数"`
@@ -54,7 +54,7 @@ func PBToProductionStationEfficiency(in *proto.ProductionStationEfficiencyInfo) 
 		NumberOfWork:              in.NumberOfWork,
 		NumberOfPass:              in.NumberOfPass,
 		NumberOfFail:              in.NumberOfFail,
-		FPY:                       in.Fpy,
+		FPY:                       in.FPY,
 		EstimateRhythm:            in.EstimateRhythm,
 		AverageRhythm:             in.AverageRhythm,
 		StartupDuration:           in.StartupDuration,
@@ -64,12 +64,12 @@ func PBToProductionStationEfficiency(in *proto.ProductionStationEfficiencyInfo) 
 		BreakdownDuration:         in.BreakdownDuration,
 		NumberOfShutdown:          in.NumberOfShutdown,
 		UnplannedShutdownDuration: in.UnplannedShutdownDuration,
-		OEF:                       in.Oef,
+		OEF:                       in.OEF,
 		ActualAvailableDuration:   in.ActualAvailableDuration,
 		ActualEffectiveDuration:   in.ActualEffectiveDuration,
-		OEU:                       in.Oeu,
-		OEP:                       in.Oep,
-		OEE:                       in.Oee,
+		OEU:                       in.OEU,
+		OEP:                       in.OEP,
+		OEE:                       in.OEE,
 		ProductionStationID:       in.ProductionStationID,
 	}
 }
@@ -94,7 +94,7 @@ func ProductionStationEfficiencyToPB(in *ProductionStationEfficiency) *proto.Pro
 		NumberOfWork:              in.NumberOfWork,
 		NumberOfPass:              in.NumberOfPass,
 		NumberOfFail:              in.NumberOfFail,
-		Fpy:                       in.FPY,
+		FPY:                       in.FPY,
 		EstimateRhythm:            in.EstimateRhythm,
 		AverageRhythm:             in.AverageRhythm,
 		StartupDuration:           in.StartupDuration,
@@ -104,12 +104,12 @@ func ProductionStationEfficiencyToPB(in *ProductionStationEfficiency) *proto.Pro
 		BreakdownDuration:         in.BreakdownDuration,
 		NumberOfShutdown:          in.NumberOfShutdown,
 		UnplannedShutdownDuration: in.UnplannedShutdownDuration,
-		Oef:                       in.OEF,
+		OEF:                       in.OEF,
 		ActualAvailableDuration:   in.ActualAvailableDuration,
 		ActualEffectiveDuration:   in.ActualEffectiveDuration,
-		Oeu:                       in.OEU,
-		Oep:                       in.OEP,
-		Oee:                       in.OEE,
+		OEU:                       in.OEU,
+		OEP:                       in.OEP,
+		OEE:                       in.OEE,
 		LastUpdateTime:            utils.FormatTime(in.LastUpdateTime),
 		ProductionStationID:       in.ProductionStationID,
 		ProductionStation:         ProductionStationToPB(in.ProductionStation),

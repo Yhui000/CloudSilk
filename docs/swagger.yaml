@@ -2077,6 +2077,13 @@ definitions:
       message:
         type: string
     type: object
+  proto.GetProductionStationEfficiencyRequest:
+    properties:
+      outputDate:
+        type: string
+      productionStation:
+        type: string
+    type: object
   proto.GetProductionStationOutputDetailResponse:
     properties:
       code:
@@ -5193,7 +5200,7 @@ definitions:
       estimateRhythm:
         description: 理论节拍
         type: number
-      fpy:
+      fPY:
         description: 一次通过率
         type: number
       id:
@@ -5216,16 +5223,16 @@ definitions:
       numberOfWork:
         description: 作业次数
         type: integer
-      oee:
+      oEE:
         description: 设备综合效率
         type: number
-      oef:
+      oEF:
         description: 设备故障率
         type: number
-      oep:
+      oEP:
         description: 性能稼动率
         type: number
-      oeu:
+      oEU:
         description: 时间稼动率
         type: number
       outputDate:
@@ -7338,6 +7345,53 @@ definitions:
       reworkBrief:
         description: 返工简述
         type: string
+    type: object
+  proto.UpdateProductionStationEfficiencyRequest:
+    properties:
+      actualAvailableDuration:
+        type: number
+      actualEffectiveDuration:
+        type: number
+      averageRhythm:
+        type: number
+      breakdownDuration:
+        type: number
+      estimateAvailableDuration:
+        type: number
+      estimateRhythm:
+        type: number
+      fPY:
+        type: number
+      numberOfBreakdown:
+        type: integer
+      numberOfFail:
+        type: integer
+      numberOfPass:
+        type: integer
+      numberOfShutdown:
+        type: integer
+      numberOfWork:
+        type: integer
+      oEE:
+        type: number
+      oEF:
+        type: number
+      oEP:
+        type: number
+      oEU:
+        type: number
+      outputDate:
+        type: string
+      outputOfThisDay:
+        type: integer
+      plannedShutdownDuration:
+        type: number
+      productionStation:
+        type: string
+      startupDuration:
+        type: number
+      unplannedShutdownDuration:
+        type: number
     type: object
 info:
   contact: {}
@@ -22974,6 +23028,60 @@ paths:
           schema:
             $ref: '#/definitions/proto.CommonResponse'
       summary: 更新产品返工记录
+      tags:
+      - WebAPI
+  /api/mom/webapi/statistic/getproductionstationefficiency:
+    post:
+      consumes:
+      - application/json
+      description: 获取工位效率统计
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      - description: GetProductionStationEfficiencyRequest
+        in: body
+        name: account
+        required: true
+        schema:
+          $ref: '#/definitions/proto.GetProductionStationEfficiencyRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.CommonResponse'
+      summary: 获取工位效率统计
+      tags:
+      - WebAPI
+  /api/mom/webapi/statistic/updateproductionstationefficiency:
+    post:
+      consumes:
+      - application/json
+      description: 更新工位效率统计
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      - description: UpdateProductionStationEfficiencyRequest
+        in: body
+        name: account
+        required: true
+        schema:
+          $ref: '#/definitions/proto.UpdateProductionStationEfficiencyRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.CommonResponse'
+      summary: 更新工位效率统计
       tags:
       - WebAPI
 swagger: "2.0"

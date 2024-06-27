@@ -23692,6 +23692,88 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/api/mom/webapi/statistic/getproductionstationefficiency": {
+            "post": {
+                "description": "获取工位效率统计",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "WebAPI"
+                ],
+                "summary": "获取工位效率统计",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "GetProductionStationEfficiencyRequest",
+                        "name": "account",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/proto.GetProductionStationEfficiencyRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/proto.CommonResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/mom/webapi/statistic/updateproductionstationefficiency": {
+            "post": {
+                "description": "更新工位效率统计",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "WebAPI"
+                ],
+                "summary": "更新工位效率统计",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "UpdateProductionStationEfficiencyRequest",
+                        "name": "account",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/proto.UpdateProductionStationEfficiencyRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/proto.CommonResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -26851,6 +26933,17 @@ const docTemplate = `{
                     "$ref": "#/definitions/proto.ProductionStationEfficiencyInfo"
                 },
                 "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "proto.GetProductionStationEfficiencyRequest": {
+            "type": "object",
+            "properties": {
+                "outputDate": {
+                    "type": "string"
+                },
+                "productionStation": {
                     "type": "string"
                 }
             }
@@ -31237,7 +31330,7 @@ const docTemplate = `{
                     "description": "理论节拍",
                     "type": "number"
                 },
-                "fpy": {
+                "fPY": {
                     "description": "一次通过率",
                     "type": "number"
                 },
@@ -31268,19 +31361,19 @@ const docTemplate = `{
                     "description": "作业次数",
                     "type": "integer"
                 },
-                "oee": {
+                "oEE": {
                     "description": "设备综合效率",
                     "type": "number"
                 },
-                "oef": {
+                "oEF": {
                     "description": "设备故障率",
                     "type": "number"
                 },
-                "oep": {
+                "oEP": {
                     "description": "性能稼动率",
                     "type": "number"
                 },
-                "oeu": {
+                "oEU": {
                     "description": "时间稼动率",
                     "type": "number"
                 },
@@ -34421,6 +34514,77 @@ const docTemplate = `{
                 "reworkBrief": {
                     "description": "返工简述",
                     "type": "string"
+                }
+            }
+        },
+        "proto.UpdateProductionStationEfficiencyRequest": {
+            "type": "object",
+            "properties": {
+                "actualAvailableDuration": {
+                    "type": "number"
+                },
+                "actualEffectiveDuration": {
+                    "type": "number"
+                },
+                "averageRhythm": {
+                    "type": "number"
+                },
+                "breakdownDuration": {
+                    "type": "number"
+                },
+                "estimateAvailableDuration": {
+                    "type": "number"
+                },
+                "estimateRhythm": {
+                    "type": "number"
+                },
+                "fPY": {
+                    "type": "number"
+                },
+                "numberOfBreakdown": {
+                    "type": "integer"
+                },
+                "numberOfFail": {
+                    "type": "integer"
+                },
+                "numberOfPass": {
+                    "type": "integer"
+                },
+                "numberOfShutdown": {
+                    "type": "integer"
+                },
+                "numberOfWork": {
+                    "type": "integer"
+                },
+                "oEE": {
+                    "type": "number"
+                },
+                "oEF": {
+                    "type": "number"
+                },
+                "oEP": {
+                    "type": "number"
+                },
+                "oEU": {
+                    "type": "number"
+                },
+                "outputDate": {
+                    "type": "string"
+                },
+                "outputOfThisDay": {
+                    "type": "integer"
+                },
+                "plannedShutdownDuration": {
+                    "type": "number"
+                },
+                "productionStation": {
+                    "type": "string"
+                },
+                "startupDuration": {
+                    "type": "number"
+                },
+                "unplannedShutdownDuration": {
+                    "type": "number"
                 }
             }
         }
