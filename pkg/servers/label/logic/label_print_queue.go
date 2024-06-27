@@ -3,12 +3,16 @@ package logic
 import (
 	"github.com/CloudSilk/CloudSilk/pkg/model"
 	"github.com/CloudSilk/CloudSilk/pkg/proto"
+	"github.com/CloudSilk/CloudSilk/pkg/types"
 	"github.com/CloudSilk/pkg/utils"
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
 
 func CreateLabelPrintQueue(m *model.LabelPrintQueue) (string, error) {
+	m.TaskNo = uuid.NewString()
+	m.CurrentState = types.LabelPrintQueueStateWaitPrint
 	err := model.DB.DB().Create(m).Error
 	return m.ID, err
 }
@@ -22,7 +26,7 @@ func UpdateLabelPrintQueue(m *model.LabelPrintQueue) error {
 			return err
 		}
 
-		if err := tx.Omit("created_at", "created_time").Save(m).Error; err != nil {
+		if err := tx.Omit("created_at", "create_time").Save(m).Error; err != nil {
 			return err
 		}
 
