@@ -70,6 +70,7 @@ func AutoMigrate() {
 		&MaterialReturnCauseAvailableType{},
 		&MaterialReturnSolution{},
 		&MaterialReturnSolutionAvailableCause{},
+		&MaterialContainer{},
 
 		&ProductInfo{},
 		&ProductOrderAttribute{},
