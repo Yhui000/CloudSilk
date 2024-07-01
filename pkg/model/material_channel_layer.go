@@ -7,7 +7,7 @@ import (
 	"github.com/CloudSilk/pkg/utils"
 )
 
-// 物料货架
+// 物料通道层
 type MaterialChannelLayer struct {
 	ModelID
 	SortIndex             int32              `gorm:"comment:顺序"`
