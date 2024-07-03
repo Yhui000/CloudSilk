@@ -24,7 +24,7 @@ import (
 // @Router /api/mom/material/agvtaskqueue/add [post]
 func AddAGVTaskQueue(c *gin.Context) {
 	transID := middleware.GetTransID(c)
-	req := &proto.AGVTaskQueueInfo{}
+	req := &proto.AGVTaskQueueInfo{CreateUserID: middleware.GetUserID(c)}
 	resp := &proto.CommonResponse{
 		Code: proto.Code_Success,
 	}

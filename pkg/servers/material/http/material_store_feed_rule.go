@@ -104,7 +104,7 @@ func UpdateMaterialStoreFeedRule(c *gin.Context) {
 // @Param pageSize query int false "默认每页10条"
 // @Param orderField query string false "排序字段"
 // @Param desc query bool false "是否倒序排序"
-// @Param code query string false "代号或描述"
+// @Param materialInfo query string false "物料号或描述"
 // @Success 200 {object} proto.QueryMaterialStoreFeedRuleResponse
 // @Router /api/mom/material/materialstorefeedrule/query [get]
 func QueryMaterialStoreFeedRule(c *gin.Context) {

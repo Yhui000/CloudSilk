@@ -3,11 +3,13 @@ package logic
 import (
 	"github.com/CloudSilk/CloudSilk/pkg/model"
 	"github.com/CloudSilk/CloudSilk/pkg/proto"
+	"github.com/CloudSilk/CloudSilk/pkg/types"
 	"github.com/CloudSilk/pkg/utils"
 	"gorm.io/gorm/clause"
 )
 
 func CreateAGVTaskQueue(m *model.AGVTaskQueue) (string, error) {
+	m.CurrentState = types.AGVTaskQueueStateWaitDispatch
 	err := model.DB.DB().Create(m).Error
 	return m.ID, err
 }

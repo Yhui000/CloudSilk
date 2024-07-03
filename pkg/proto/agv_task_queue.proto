@@ -30,10 +30,10 @@ message AGVTaskQueueInfo {
     string aGVTaskTypeID=10;
     AGVTaskTypeInfo aGVTaskType=11;
 	//起点库位ID 
-    string DepartureID=12;
+    string departureID=12;
  	MaterialShelfBinInfo departure=13;
 	//终点库位ID 
-    string DestinationID=14;
+    string destinationID=14;
     MaterialShelfBinInfo destination=15;
 }
 

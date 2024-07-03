@@ -61,13 +61,19 @@ func GetAllMaterialReturnCauses() (list []*model.MaterialReturnCause, err error)
 
 func GetMaterialReturnCauseByID(id string) (*model.MaterialReturnCause, error) {
 	m := &model.MaterialReturnCause{}
-	err := model.DB.DB().Preload("MaterialCategories").Preload("MaterialReturnTypes").Preload(clause.Associations).Where("id = ?", id).First(m).Error
+	err := model.DB.DB().
+		Preload("MaterialCategories").Preload("MaterialCategories.MaterialCategory").
+		Preload("MaterialReturnTypes").Preload("MaterialReturnTypes.MaterialReturnType").
+		Preload(clause.Associations).Where("id = ?", id).First(m).Error
 	return m, err
 }
 
 func GetMaterialReturnCauseByIDs(ids []string) ([]*model.MaterialReturnCause, error) {
 	var m []*model.MaterialReturnCause
-	err := model.DB.DB().Preload("MaterialCategories").Preload("MaterialReturnTypes").Preload(clause.Associations).Where("id in (?)", ids).Find(&m).Error
+	err := model.DB.DB().
+		Preload("MaterialCategories").Preload("MaterialCategories.MaterialCategory").
+		Preload("MaterialReturnTypes").Preload("MaterialReturnTypes.MaterialReturnType").
+		Preload(clause.Associations).Where("id in (?)", ids).Find(&m).Error
 	return m, err
 }
 

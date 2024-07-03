@@ -1,19 +1,51 @@
 package logic
 
 import (
+	"fmt"
+
 	"github.com/CloudSilk/CloudSilk/pkg/model"
 	"github.com/CloudSilk/CloudSilk/pkg/proto"
+	"github.com/CloudSilk/CloudSilk/pkg/types"
 	"github.com/CloudSilk/pkg/utils"
+	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
 
 func CreateMaterialContainer(m *model.MaterialContainer) (string, error) {
-	err := model.DB.DB().Create(m).Error
-	return m.ID, err
+	if err := model.DB.DB().Transaction(func(tx *gorm.DB) error {
+		if m.MaterialShelfBinID != nil {
+			if err := tx.Model(model.MaterialShelfBin{}).Where("`id` = ?", m.MaterialShelfBinID).Update("current_state", types.MaterialShelfStateFilled).Error; err != nil {
+				return err
+			}
+		}
+
+		m.CurrentState = fmt.Sprintf("%d", types.MaterialShelfStateFilled)
+		if err := tx.Create(m).Error; err != nil {
+			return err
+		}
+
+		return nil
+	}); err != nil {
+		return "", err
+	}
+
+	return m.ID, nil
 }
 
 func UpdateMaterialContainer(m *model.MaterialContainer) error {
-	return model.DB.DB().Omit("created_at").Save(m).Error
+	return model.DB.DB().Transaction(func(tx *gorm.DB) error {
+		if m.MaterialShelfBinID != nil {
+			if err := tx.Model(model.MaterialShelfBin{}).Where("`id` = ?", m.MaterialShelfBinID).Update("current_state", types.MaterialShelfStateFilled).Error; err != nil {
+				return err
+			}
+		}
+
+		if err := tx.Omit("created_at").Save(m).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
 }
 
 func QueryMaterialContainer(req *proto.QueryMaterialContainerRequest, resp *proto.QueryMaterialContainerResponse, preload bool) {

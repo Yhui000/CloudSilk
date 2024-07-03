@@ -58,13 +58,13 @@ func GetAllMaterialStores() (list []*model.MaterialStore, err error) {
 
 func GetMaterialStoreByID(id string) (*model.MaterialStore, error) {
 	m := &model.MaterialStore{}
-	err := model.DB.DB().Preload("ProductionLines").Preload(clause.Associations).Where("id = ?", id).First(m).Error
+	err := model.DB.DB().Preload("ProductionLines").Preload("ProductionLines.ProductionLine").Preload(clause.Associations).Where("id = ?", id).First(m).Error
 	return m, err
 }
 
 func GetMaterialStoreByIDs(ids []string) ([]*model.MaterialStore, error) {
 	var m []*model.MaterialStore
-	err := model.DB.DB().Preload("ProductionLines").Preload(clause.Associations).Where("id in (?)", ids).Find(&m).Error
+	err := model.DB.DB().Preload("ProductionLines").Preload("ProductionLines.ProductionLine").Preload(clause.Associations).Where("id in (?)", ids).Find(&m).Error
 	return m, err
 }
 

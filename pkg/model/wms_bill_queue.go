@@ -15,7 +15,7 @@ type WMSBillQueue struct {
 	MaterialStore    *MaterialStore `gorm:"constraint:OnDelete:CASCADE"`
 	ProductOrderID   string         `gorm:"size:36;comment:生产工单号ID"`
 	ProductOrder     *ProductOrder  `gorm:"constraint:OnDelete:CASCADE"`
-	CreateTime       time.Time      `gorm:"autoCteateTime:nano;comment:申请时间"`
+	CreateTime       time.Time      `gorm:"autoCreateTime:nano;comment:申请时间"`
 	CreateUserID     string         `gorm:"size:36;comment:申请人员ID"`
 	CurrentState     string         `gorm:"size:50;comment:当前状态"`
 	TransactionState string         `gorm:"size:50;comment:事务状态"`

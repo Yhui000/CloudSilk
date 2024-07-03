@@ -6693,8 +6693,8 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "代号或描述",
-                        "name": "code",
+                        "description": "物料号或描述",
+                        "name": "materialInfo",
                         "in": "query"
                     }
                 ],
@@ -27430,14 +27430,6 @@ const docTemplate = `{
         "proto.AGVTaskQueueInfo": {
             "type": "object",
             "properties": {
-                "DepartureID": {
-                    "description": "起点库位ID",
-                    "type": "string"
-                },
-                "DestinationID": {
-                    "description": "终点库位ID",
-                    "type": "string"
-                },
                 "aGVTaskType": {
                     "$ref": "#/definitions/proto.AGVTaskTypeInfo"
                 },
@@ -27464,8 +27456,16 @@ const docTemplate = `{
                 "departure": {
                     "$ref": "#/definitions/proto.MaterialShelfBinInfo"
                 },
+                "departureID": {
+                    "description": "起点库位ID",
+                    "type": "string"
+                },
                 "destination": {
                     "$ref": "#/definitions/proto.MaterialShelfBinInfo"
+                },
+                "destinationID": {
+                    "description": "终点库位ID",
+                    "type": "string"
                 },
                 "id": {
                     "description": "ID",
@@ -27579,6 +27579,9 @@ const docTemplate = `{
             "properties": {
                 "id": {
                     "type": "string"
+                },
+                "materialInfo": {
+                    "$ref": "#/definitions/proto.MaterialInfoInfo"
                 },
                 "materialInfoID": {
                     "description": "物料信息ID",
@@ -31728,6 +31731,64 @@ const docTemplate = `{
                 }
             }
         },
+        "proto.MaterialChannelInfo": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "代号",
+                    "type": "string"
+                },
+                "currentState": {
+                    "description": "当前状态",
+                    "type": "string"
+                },
+                "description": {
+                    "description": "描述",
+                    "type": "string"
+                },
+                "enableMonitor": {
+                    "description": "启用监控",
+                    "type": "boolean"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "lastUpdateTime": {
+                    "description": "状态变更时间",
+                    "type": "string"
+                },
+                "materialChannelLayer": {
+                    "$ref": "#/definitions/proto.MaterialChannelLayerInfo"
+                },
+                "materialChannelLayerID": {
+                    "description": "物料通道层ID",
+                    "type": "string"
+                },
+                "materialInfo": {
+                    "$ref": "#/definitions/proto.MaterialInfoInfo"
+                },
+                "materialInfoID": {
+                    "description": "物料信息ID",
+                    "type": "string"
+                },
+                "remark": {
+                    "description": "备注",
+                    "type": "string"
+                },
+                "size": {
+                    "description": "尺寸",
+                    "type": "string"
+                },
+                "sortIndex": {
+                    "description": "顺序",
+                    "type": "integer"
+                },
+                "spec": {
+                    "description": "规格",
+                    "type": "number"
+                }
+            }
+        },
         "proto.MaterialChannelLayerInfo": {
             "type": "object",
             "properties": {
@@ -31742,13 +31803,14 @@ const docTemplate = `{
                     "description": "亮灯寄存器地址",
                     "type": "integer"
                 },
+                "materialChannels": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/proto.MaterialChannelInfo"
+                    }
+                },
                 "productionStation": {
-                    "description": "隶属工站",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/proto.ProductionStationInfo"
-                        }
-                    ]
+                    "$ref": "#/definitions/proto.ProductionStationInfo"
                 },
                 "productionStationID": {
                     "description": "隶属工站ID",
@@ -32003,6 +32065,9 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
+                "materialCategory": {
+                    "$ref": "#/definitions/proto.MaterialCategoryInfo"
+                },
                 "materialCategoryID": {
                     "type": "string"
                 },
@@ -32019,6 +32084,9 @@ const docTemplate = `{
                 },
                 "materialReturnCauseID": {
                     "type": "string"
+                },
+                "materialReturnType": {
+                    "$ref": "#/definitions/proto.MaterialReturnTypeInfo"
                 },
                 "materialReturnTypeID": {
                     "type": "string"
@@ -32137,10 +32205,10 @@ const docTemplate = `{
                     "description": "物料追溯号",
                     "type": "string"
                 },
-                "productionStation": {
-                    "$ref": "#/definitions/proto.ProductionStationInfo"
+                "productionLine": {
+                    "$ref": "#/definitions/proto.ProductionLineInfo"
                 },
-                "productionStationID": {
+                "productionLineID": {
                     "description": "发现工站ID",
                     "type": "string"
                 },
@@ -32175,6 +32243,9 @@ const docTemplate = `{
             "properties": {
                 "id": {
                     "type": "string"
+                },
+                "materialReturnCause": {
+                    "$ref": "#/definitions/proto.MaterialReturnCauseInfo"
                 },
                 "materialReturnCauseID": {
                     "type": "string"

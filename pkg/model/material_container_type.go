@@ -10,7 +10,7 @@ type MaterialContainerType struct {
 	Length      int64   `grom:"comment:长(mm)"`
 	Width       int64   `grom:"comment:宽(mm)"`
 	Height      int64   `grom:"comment:高(mm)"`
-	WeightLimit float64 `grom:"comment:限重(kg)"`
+	WeightLimit float32 `grom:"comment:限重(kg)"`
 	HeightLimit int64   `grom:"comment:限高(mm)"`
 	Remark      string  `grom:"size:500;comment:备注"`
 }
@@ -31,6 +31,11 @@ func PBToMaterialContainerType(in *proto.MaterialContainerTypeInfo) *MaterialCon
 		ModelID:     ModelID{ID: in.Id},
 		Code:        in.Code,
 		Description: in.Description,
+		Length:      in.Length,
+		Width:       in.Width,
+		Height:      in.Height,
+		WeightLimit: in.WeightLimit,
+		HeightLimit: in.HeightLimit,
 		Remark:      in.Remark,
 	}
 }
@@ -51,6 +56,11 @@ func MaterialContainerTypeToPB(in *MaterialContainerType) *proto.MaterialContain
 		Id:          in.ID,
 		Code:        in.Code,
 		Description: in.Description,
+		Length:      in.Length,
+		Width:       in.Width,
+		Height:      in.Height,
+		WeightLimit: in.WeightLimit,
+		HeightLimit: in.HeightLimit,
 		Remark:      in.Remark,
 	}
 	return m

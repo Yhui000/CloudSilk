@@ -4,6 +4,7 @@ package proto;
 option go_package="./;proto";
 
 import "mom_common.proto";
+import "material_return_cause.proto";
 
 message MaterialReturnSolutionInfo{
     string id=1;
@@ -21,6 +22,7 @@ message MaterialReturnSolutionAvailableCauseInfo{
     string id=1;
     string materialReturnSolutionID=2;
     string materialReturnCauseID=3;
+    MaterialReturnCauseInfo materialReturnCause=4;
 }
 
 message QueryMaterialReturnSolutionRequest{

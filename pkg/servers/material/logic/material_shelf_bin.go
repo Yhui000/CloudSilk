@@ -1,13 +1,17 @@
 package logic
 
 import (
+	"fmt"
+
 	"github.com/CloudSilk/CloudSilk/pkg/model"
 	"github.com/CloudSilk/CloudSilk/pkg/proto"
+	"github.com/CloudSilk/CloudSilk/pkg/types"
 	"github.com/CloudSilk/pkg/utils"
 	"gorm.io/gorm/clause"
 )
 
 func CreateMaterialShelfBin(m *model.MaterialShelfBin) (string, error) {
+	m.CurrentState = fmt.Sprintf("%d", types.MaterialShelfStateEmptied)
 	err := model.DB.DB().Create(m).Error
 	return m.ID, err
 }

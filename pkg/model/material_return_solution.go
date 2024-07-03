@@ -16,8 +16,9 @@ type MaterialReturnSolution struct {
 // 物料退料方案-退料原因
 type MaterialReturnSolutionAvailableCause struct {
 	ModelID
-	MaterialReturnSolutionID string `gorm:"index;size:36;comment:物料退料方案ID"`
-	MaterialReturnCauseID    string `gorm:"size:36;comment:物料退料原因ID"`
+	MaterialReturnSolutionID string               `gorm:"index;size:36;comment:物料退料方案ID"`
+	MaterialReturnCauseID    string               `gorm:"size:36;comment:物料退料原因ID"`
+	MaterialReturnCause      *MaterialReturnCause `gorm:"constraint:OnDelete:CASCADE"`
 }
 
 func PBToMaterialReturnSolutions(in []*proto.MaterialReturnSolutionInfo) []*MaterialReturnSolution {
@@ -102,6 +103,7 @@ func MaterialReturnSolutionAvailableCauseToPB(in *MaterialReturnSolutionAvailabl
 		Id:                       in.ID,
 		MaterialReturnSolutionID: in.MaterialReturnSolutionID,
 		MaterialReturnCauseID:    in.MaterialReturnCauseID,
+		MaterialReturnCause:      MaterialReturnCauseToPB(in.MaterialReturnCause),
 	}
 	return m
 }

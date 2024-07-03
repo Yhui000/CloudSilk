@@ -18,8 +18,8 @@ type MaterialReturnRequestForm struct {
 	MaterialSupplier         *MaterialSupplier       `gorm:"constraint:OnDelete:SET NULL"`
 	MaterialInfoID           string                  `gorm:"size:36;comment:物料信息ID"`
 	MaterialInfo             *MaterialInfo           `gorm:"constraint:OnDelete:CASCADE"`
-	ProductionStationID      *string                 `gorm:"size:36;comment:发现工站ID"`
-	ProductionStation        *ProductionStation      `gorm:"constraint:OnDelete:SET NULL"`
+	ProductionLineID         string                  `gorm:"size:36;comment:发现产线ID"`
+	ProductionLine           *ProductionLine         `gorm:"constraint:OnDelete:CASCADE"`
 	MaterialTraceNo          string                  `gorm:"size:100;comment:物料追溯号"`
 	Quantity                 float32                 `gorm:"comment:退料数量"`
 	ReturnID                 string                  `gorm:"size:36;comment:退料来源ID"`
@@ -52,12 +52,9 @@ func PBToMaterialReturnRequestForm(in *proto.MaterialReturnRequestFormInfo) *Mat
 		return nil
 	}
 
-	var materialSupplierID, productionStationID, materialReturnTypeID, materialReturnCauseID, materialReturnSolutionID, checkUserID *string
+	var materialSupplierID, materialReturnTypeID, materialReturnCauseID, materialReturnSolutionID, checkUserID *string
 	if in.MaterialSupplierID != "" {
 		materialSupplierID = &in.MaterialSupplierID
-	}
-	if in.ProductionStationID != "" {
-		productionStationID = &in.ProductionStationID
 	}
 	if in.MaterialReturnTypeID != "" {
 		materialReturnTypeID = &in.MaterialReturnTypeID
@@ -78,7 +75,7 @@ func PBToMaterialReturnRequestForm(in *proto.MaterialReturnRequestFormInfo) *Mat
 		CreateUserID:             in.CreateUserID,
 		MaterialSupplierID:       materialSupplierID,
 		MaterialInfoID:           in.MaterialInfoID,
-		ProductionStationID:      productionStationID,
+		ProductionLineID:         in.ProductionLineID,
 		MaterialTraceNo:          in.MaterialTraceNo,
 		Quantity:                 in.Quantity,
 		ReturnID:                 in.ReturnID,
@@ -108,12 +105,9 @@ func MaterialReturnRequestFormToPB(in *MaterialReturnRequestForm) *proto.Materia
 		return nil
 	}
 
-	var materialSupplierID, productionStationID, materialReturnTypeID, materialReturnCauseID, materialReturnSolutionID, checkUserID string
+	var materialSupplierID, materialReturnTypeID, materialReturnCauseID, materialReturnSolutionID, checkUserID string
 	if in.MaterialSupplierID != nil {
 		materialSupplierID = *in.MaterialSupplierID
-	}
-	if in.ProductionStationID != nil {
-		productionStationID = *in.ProductionStationID
 	}
 	if in.MaterialReturnTypeID != nil {
 		materialReturnTypeID = *in.MaterialReturnTypeID
@@ -137,8 +131,8 @@ func MaterialReturnRequestFormToPB(in *MaterialReturnRequestForm) *proto.Materia
 		MaterialSupplier:         MaterialSupplierToPB(in.MaterialSupplier),
 		MaterialInfoID:           in.MaterialInfoID,
 		MaterialInfo:             MaterialInfoToPB(in.MaterialInfo),
-		ProductionStationID:      productionStationID,
-		ProductionStation:        ProductionStationToPB(in.ProductionStation),
+		ProductionLineID:         in.ProductionLineID,
+		ProductionLine:           ProductionLineToPB(in.ProductionLine),
 		MaterialTraceNo:          in.MaterialTraceNo,
 		Quantity:                 in.Quantity,
 		ReturnID:                 in.ReturnID,

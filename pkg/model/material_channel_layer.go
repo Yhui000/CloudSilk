@@ -58,6 +58,7 @@ func PBToMaterialChannelLayer(in *proto.MaterialChannelLayerInfo) *MaterialChann
 		LightRegisterAddress:  in.LightRegisterAddress,
 		Remark:                in.Remark,
 		ProductionStationID:   in.ProductionStationID,
+		MaterialChannels:      PBToMaterialChannels(in.MaterialChannels),
 	}
 }
 
@@ -82,6 +83,7 @@ func MaterialChannelLayerToPB(in *MaterialChannelLayer) *proto.MaterialChannelLa
 		Remark:                in.Remark,
 		ProductionStationID:   in.ProductionStationID,
 		ProductionStation:     ProductionStationToPB(in.ProductionStation),
+		MaterialChannels:      MaterialChannelsToPB(in.MaterialChannels),
 	}
 	return m
 }

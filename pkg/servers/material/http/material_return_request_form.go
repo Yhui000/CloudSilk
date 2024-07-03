@@ -24,7 +24,7 @@ import (
 // @Router /api/mom/material/materialreturnrequestform/add [post]
 func AddMaterialReturnRequestForm(c *gin.Context) {
 	transID := middleware.GetTransID(c)
-	req := &proto.MaterialReturnRequestFormInfo{}
+	req := &proto.MaterialReturnRequestFormInfo{CreateUserID: middleware.GetUserID(c)}
 	resp := &proto.CommonResponse{
 		Code: proto.Code_Success,
 	}

@@ -4,6 +4,8 @@ package proto;
 option go_package="./;proto";
 
 import "mom_common.proto";
+import "material_category.proto";
+import "material_return_type.proto";
 
 message MaterialReturnCauseInfo{
     string id=1;
@@ -23,12 +25,14 @@ message MaterialReturnCauseAvailableCategoryInfo{
     string id=1;
     string materialReturnCauseID=2;
     string materialCategoryID=3;
+    MaterialCategoryInfo materialCategory=4;
 }
 
 message MaterialReturnCauseAvailableTypeInfo{
     string id=1;
     string materialReturnCauseID=2;
     string materialReturnTypeID=3;
+    MaterialReturnTypeInfo materialReturnType=4;
 }
 
 message QueryMaterialReturnCauseRequest{

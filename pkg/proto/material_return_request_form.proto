@@ -26,8 +26,8 @@ message MaterialReturnRequestFormInfo{
     string materialInfoID=7;
     MaterialInfoInfo materialInfo=8;
     //发现工站ID
-    string productionStationID=9;
-    ProductionStationInfo productionStation=10;
+    string productionLineID=9;
+    ProductionLineInfo productionLine=10;
     //物料追溯号
     string materialTraceNo=11;
     //退料数量

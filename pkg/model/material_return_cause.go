@@ -17,15 +17,17 @@ type MaterialReturnCause struct {
 // 物料退料原因-物料类别
 type MaterialReturnCauseAvailableCategory struct {
 	ModelID
-	MaterialReturnCauseID string `gorm:"index;size:36;comment:物料退料原因ID"`
-	MaterialCategoryID    string `gorm:"size:36;comment:物料类别ID"`
+	MaterialReturnCauseID string            `gorm:"index;size:36;comment:物料退料原因ID"`
+	MaterialCategoryID    string            `gorm:"size:36;comment:物料类别ID"`
+	MaterialCategory      *MaterialCategory `gorm:"constraint:OnDelete:CASCADE"`
 }
 
 // 物料退料原因-归属类型
 type MaterialReturnCauseAvailableType struct {
 	ModelID
-	MaterialReturnCauseID string `gorm:"index;size:36;comment:物料退料原因ID"`
-	MaterialReturnTypeID  string `gorm:"size:36;comment:物料退料类型ID"`
+	MaterialReturnCauseID string              `gorm:"index;size:36;comment:物料退料原因ID"`
+	MaterialReturnTypeID  string              `gorm:"size:36;comment:物料退料类型ID"`
+	MaterialReturnType    *MaterialReturnType `gorm:"constraint:OnDelete:CASCADE"`
 }
 
 func PBToMaterialReturnCauses(in []*proto.MaterialReturnCauseInfo) []*MaterialReturnCause {
@@ -112,6 +114,7 @@ func MaterialReturnCauseAvailableCategoryToPB(in *MaterialReturnCauseAvailableCa
 		Id:                    in.ID,
 		MaterialReturnCauseID: in.MaterialReturnCauseID,
 		MaterialCategoryID:    in.MaterialCategoryID,
+		MaterialCategory:      MaterialCategoryToPB(in.MaterialCategory),
 	}
 	return m
 }
@@ -153,6 +156,7 @@ func MaterialReturnCauseAvailableTypeToPB(in *MaterialReturnCauseAvailableType) 
 		Id:                    in.ID,
 		MaterialReturnCauseID: in.MaterialReturnCauseID,
 		MaterialReturnTypeID:  in.MaterialReturnTypeID,
+		MaterialReturnType:    MaterialReturnTypeToPB(in.MaterialReturnType),
 	}
 	return m
 }
