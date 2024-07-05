@@ -2,6 +2,7 @@ package model
 
 import "github.com/CloudSilk/CloudSilk/pkg/proto"
 
+// 物料仓库补料规则
 type MaterialStoreFeedRule struct {
 	ModelID
 	SortIndex            int32                  `gorm:"comment:排序"`

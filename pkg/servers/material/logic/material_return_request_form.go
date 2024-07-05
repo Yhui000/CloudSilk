@@ -1,9 +1,14 @@
 package logic
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/CloudSilk/CloudSilk/pkg/model"
 	"github.com/CloudSilk/CloudSilk/pkg/proto"
+	"github.com/CloudSilk/CloudSilk/pkg/types"
 	"github.com/CloudSilk/pkg/utils"
+	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
 
@@ -58,57 +63,64 @@ func DeleteMaterialReturnRequestForm(id string) (err error) {
 	return model.DB.DB().Delete(&model.MaterialReturnRequestForm{}, "`id` = ?", id).Error
 }
 
-// func ApplyMaterialReturnRequestForm(ids []string) (err error) {
-// 	var materialReturnRequestForms []*model.MaterialReturnRequestForm
-// 	if err = model.DB.DB().Preload("MaterialReturnType").Preload("MaterialReturnCause").Preload("MaterialInfo").Preload("MaterialSupplier").Preload("ProductionLine").Where("id in (?)", ids).Find(&m).Error; err != nil {
-// 		return
-// 	}
+func ApplyMaterialReturnRequestForm(ids []string) (err error) {
+	var materialReturnRequestForms []*model.MaterialReturnRequestForm
+	if err = model.DB.DB().Preload("MaterialReturnType").Preload("MaterialReturnCause").Preload("MaterialInfo").Preload("MaterialSupplier").Preload("ProductionLine").Where("id in (?)", ids).Find(&materialReturnRequestForms).Error; err != nil {
+		return
+	}
 
-// 	productionLineID := ""
-// 	for i, v := range materialReturnRequestForms {
-// 		if v.CheckTime.Valid {
-// 			return fmt.Errorf("请勿选择已复核的记录，只能选择没有复核时间和复核人员的记录发送退料申请邮件")
-// 		}
+	productionLineID := ""
+	for i, v := range materialReturnRequestForms {
+		if v.CheckTime.Valid {
+			return fmt.Errorf("请勿选择已复核的记录，只能选择没有复核时间和复核人员的记录发送退料申请邮件")
+		}
 
-// 		if i == 0 {
-// 			productionLineID = v.ProductionLineID
-// 		} else if v.ProductionLineID != productionLineID {
-// 			return fmt.Errorf("请勿跨产线选择退料申请记录，一次批量申请只能选择同一个产线的记录")
-// 		}
+		if i == 0 {
+			productionLineID = v.ProductionLineID
+		} else if v.ProductionLineID != productionLineID {
+			return fmt.Errorf("请勿跨产线选择退料申请记录，一次批量申请只能选择同一个产线的记录")
+		}
 
-// 		if v.CurrentState == types.MaterialReturnRequestFormStateApplied || v.CurrentState == types.MaterialReturnRequestFormStateNoRequired {
-// 			return fmt.Errorf("该申请单已申请或不需申请,请核对")
-// 		}
-// 	}
+		if v.CurrentState == types.MaterialReturnRequestFormStateApplied || v.CurrentState == types.MaterialReturnRequestFormStateNoRequired {
+			return fmt.Errorf("该申请单已申请或不需申请,请核对")
+		}
+	}
 
-// 	if productionLineID == "" {
-// 		return fmt.Errorf("产线或工位不能为空，请核对！")
-// 	}
+	if productionLineID == "" {
+		return fmt.Errorf("产线或工位不能为空，请核对！")
+	}
 
-// 	configCode := "10005"
-// 	materialReturnRemindConfig := &model.SystemParamsConfig{}
-// 	if err = model.DB.DB().First(materialReturnRemindConfig, "`code` = ?", configCode).Error; err == gorm.ErrRecordNotFound {
-// 		return fmt.Errorf("未能找到代号为%s的系统配置，请添加此配置项！", configCode)
-// 	} else if err != nil {
-// 		return
-// 	}
+	configCode := "10005"
+	materialReturnRemindConfig := &model.SystemParamsConfig{}
+	if err = model.DB.DB().First(materialReturnRemindConfig, "`code` = ?", configCode).Error; err == gorm.ErrRecordNotFound {
+		return fmt.Errorf("未能找到代号为%s的系统配置，请添加此配置项！", configCode)
+	} else if err != nil {
+		return
+	}
 
-// 	spConfigCode := "SP001"
-// 	spConfig := &model.SystemParamsConfig{}
-// 	if err = model.DB.DB().First(spConfig, "`code` = ?", spConfigCode).Error; err == gorm.ErrRecordNotFound {
-// 		return fmt.Errorf("未能找到代号为%s的系统配置，请添加此配置项！", spConfigCode)
-// 	} else if err != nil {
-// 		return
-// 	}
+	spConfigCode := "SP001"
+	spConfig := &model.SystemParamsConfig{}
+	if err = model.DB.DB().First(spConfig, "`code` = ?", spConfigCode).Error; err == gorm.ErrRecordNotFound {
+		return fmt.Errorf("未能找到代号为%s的系统配置，请添加此配置项！", spConfigCode)
+	} else if err != nil {
+		return
+	}
 
-// 	messageSendTaskCodes := []string{}
-// 	for _, v := range strings.Split(materialReturnRemindConfig.Value, ",") {
-// 		if v != "" {
-// 			messageSendTaskCodes = append(messageSendTaskCodes, v)
-// 		}
-// 	}
+	messageSendTaskCodes := []string{}
+	for _, v := range strings.Split(materialReturnRemindConfig.Value, ",") {
+		if v != "" {
+			messageSendTaskCodes = append(messageSendTaskCodes, v)
+		}
+	}
 
-// 	productionLine := materialReturnRequestForms[0].ProductionLine
+	productionLine := materialReturnRequestForms[0].ProductionLine
 
-// 	return nil
-// }
+	messageSendTask := &model.MessageSendTask{}
+	if err := model.DB.DB().Where("`code` IN ? AND `production_line_id` = ?", messageSendTaskCodes, productionLine.ID).First(messageSendTask).Error; err == gorm.ErrRecordNotFound {
+		return fmt.Errorf("消息发送任务不存在，请核对！")
+	} else if err != nil {
+		return err
+	}
+
+	return nil
+}

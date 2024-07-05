@@ -81,6 +81,7 @@ func AutoMigrate() {
 		&AGVTaskType{},
 		&AGVTaskQueue{},
 		&WMSBillQueue{},
+		&AGVParkingSpace{},
 
 		&ProductInfo{},
 		&ProductOrderAttribute{},
@@ -184,6 +185,12 @@ func AutoMigrate() {
 
 		&ProductionStationEfficiency{},
 		&ProductionEfficiency{},
+
+		&MessageType{},
+		&MessageTemplate{},
+		&MessageParameter{},
+		&MessageSendTask{},
+		&MessageSendQueue{},
 	)
 }
 

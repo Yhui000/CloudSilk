@@ -7,6 +7,7 @@ import (
 	"github.com/CloudSilk/pkg/utils"
 )
 
+//WMS过帐队列
 type WMSBillQueue struct {
 	ModelID
 	BillNo           string         `gorm:"size:50;comment:拣货单号"`

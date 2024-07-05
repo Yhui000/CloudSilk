@@ -1,4 +1,50 @@
 definitions:
+  proto.AGVParkingSpaceInfo:
+    properties:
+      code:
+        description: 代号
+        type: string
+      currentState:
+        description: 当前状态
+        type: string
+      description:
+        description: 描述
+        type: string
+      enableDispatch:
+        description: 允许签派
+        type: boolean
+      enablePark:
+        description: 允许停靠
+        type: boolean
+      id:
+        description: ID
+        type: string
+      identifier:
+        description: 识别码
+        type: string
+      lastUpdateTime:
+        description: 状态变更时间
+        type: string
+      materialShelf:
+        $ref: '#/definitions/proto.MaterialShelfInfo'
+      materialShelfID:
+        description: 当前货架ID
+        type: string
+      productionLine:
+        $ref: '#/definitions/proto.ProductionLineInfo'
+      productionLineID:
+        description: 隶属产线ID
+        type: string
+      remark:
+        description: 备注
+        type: string
+      shelfType:
+        description: 货架类型
+        type: integer
+      spaceType:
+        description: 泊位类型
+        type: integer
+    type: object
   proto.AGVTaskQueueInfo:
     properties:
       aGVTaskType:
@@ -511,6 +557,15 @@ definitions:
         description: 等待时长
         type: integer
     type: object
+  proto.GetAGVParkingSpaceDetailResponse:
+    properties:
+      code:
+        $ref: '#/definitions/proto.Code'
+      data:
+        $ref: '#/definitions/proto.AGVParkingSpaceInfo'
+      message:
+        type: string
+    type: object
   proto.GetAGVTaskQueueDetailResponse:
     properties:
       code:
@@ -526,6 +581,17 @@ definitions:
         $ref: '#/definitions/proto.Code'
       data:
         $ref: '#/definitions/proto.AGVTaskTypeInfo'
+      message:
+        type: string
+    type: object
+  proto.GetAllAGVParkingSpaceResponse:
+    properties:
+      code:
+        $ref: '#/definitions/proto.Code'
+      data:
+        items:
+          $ref: '#/definitions/proto.AGVParkingSpaceInfo'
+        type: array
       message:
         type: string
     type: object
@@ -6235,6 +6301,23 @@ definitions:
         description: 顺序
         type: integer
     type: object
+  proto.QueryAGVParkingSpaceResponse:
+    properties:
+      code:
+        $ref: '#/definitions/proto.Code'
+      data:
+        items:
+          $ref: '#/definitions/proto.AGVParkingSpaceInfo'
+        type: array
+      message:
+        type: string
+      pages:
+        type: integer
+      records:
+        type: integer
+      total:
+        type: integer
+    type: object
   proto.QueryAGVTaskQueueResponse:
     properties:
       code:
@@ -10204,6 +10287,179 @@ paths:
       summary: 更新
       tags:
       - 标签类型管理
+  /api/mom/material/agvparkingspace/add:
+    post:
+      consumes:
+      - application/json
+      description: 新增
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      - description: Add AGVParkingSpace
+        in: body
+        name: account
+        required: true
+        schema:
+          $ref: '#/definitions/proto.AGVParkingSpaceInfo'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.CommonResponse'
+      summary: 新增
+      tags:
+      - AGV停靠泊位管理
+  /api/mom/material/agvparkingspace/all:
+    get:
+      consumes:
+      - application/json
+      description: 查询所有
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.GetAllAGVParkingSpaceResponse'
+      summary: 查询所有
+      tags:
+      - AGV停靠泊位管理
+  /api/mom/material/agvparkingspace/delete:
+    delete:
+      consumes:
+      - application/json
+      description: 删除
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      - description: Delete AGVParkingSpace
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/proto.DelRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.CommonResponse'
+      summary: 删除
+      tags:
+      - AGV停靠泊位管理
+  /api/mom/material/agvparkingspace/detail:
+    get:
+      consumes:
+      - application/json
+      description: 查询明细
+      parameters:
+      - description: ID
+        in: query
+        name: id
+        required: true
+        type: string
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.GetAGVParkingSpaceDetailResponse'
+      summary: 查询明细
+      tags:
+      - AGV停靠泊位管理
+  /api/mom/material/agvparkingspace/query:
+    get:
+      consumes:
+      - application/json
+      description: 分页查询
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      - description: 从1开始
+        in: query
+        name: pageIndex
+        type: integer
+      - description: 默认每页10条
+        in: query
+        name: pageSize
+        type: integer
+      - description: 排序字段
+        in: query
+        name: orderField
+        type: string
+      - description: 是否倒序排序
+        in: query
+        name: desc
+        type: boolean
+      - description: 代号或描述
+        in: query
+        name: code
+        type: string
+      - description: 隶属产线ID
+        in: query
+        name: productionLineID
+        type: string
+      produces:
+      - application/octet-stream
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.QueryAGVParkingSpaceResponse'
+      summary: 分页查询
+      tags:
+      - AGV停靠泊位管理
+  /api/mom/material/agvparkingspace/update:
+    put:
+      consumes:
+      - application/json
+      description: 更新
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      - description: Update AGVParkingSpace
+        in: body
+        name: account
+        required: true
+        schema:
+          $ref: '#/definitions/proto.AGVParkingSpaceInfo'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.CommonResponse'
+      summary: 更新
+      tags:
+      - AGV停靠泊位管理
   /api/mom/material/agvtaskqueue/add:
     post:
       consumes:
