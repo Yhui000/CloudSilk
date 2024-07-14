@@ -63,6 +63,7 @@ func AutoMigrate() {
 		&MaterialTrayBindingRecord{},
 		&MaterialChannelLayer{},
 		&MaterialChannel{},
+		&MaterialChannelProposingRecord{},
 		&MaterialReturnRequestForm{},
 		&MaterialReturnType{},
 		&MaterialReturnCause{},
@@ -74,6 +75,7 @@ func AutoMigrate() {
 		&MaterialContainerType{},
 		&MaterialShelf{},
 		&MaterialShelfBin{},
+		&MaterialShelfAvailableSpace{},
 		// &MaterialStore{},
 		&MaterialStoreAvailableLine{},
 		&MaterialInventory{},
@@ -82,7 +84,6 @@ func AutoMigrate() {
 		&AGVTaskQueue{},
 		&WMSBillQueue{},
 		&AGVParkingSpace{},
-		&MaterialChannelProposingRecord{},
 
 		&ProductInfo{},
 		&ProductOrderAttribute{},

@@ -20,6 +20,7 @@ type MaterialShelf struct {
 	ProductionLineID  string                         `gorm:"size:36;comment:隶属产线ID"`
 	ProductionLine    *ProductionLine                `gorm:"constraint:OnDelete:CASCADE"` //隶属产线
 	AGVParkingSpaceID *string                        `gorm:"size:36;comment:当前泊位ID"`
+	AGVParkingSpace   *AGVParkingSpace               `gorm:"constraint:OnDelete:SET NULL"`
 	ParkableSpaces    []*MaterialShelfAvailableSpace `gorm:"constraint:OnDelete:CASCADE"` //可停靠泊位
 }
 
