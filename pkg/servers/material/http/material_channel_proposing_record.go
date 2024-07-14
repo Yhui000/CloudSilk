@@ -12,19 +12,19 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// AddMaterialShelf godoc
+// AddMaterialChannelProposingRecord godoc
 // @Summary 新增
 // @Description 新增
-// @Tags 物料货架管理
+// @Tags 通道叫料记录管理
 // @Accept  json
 // @Produce  json
 // @Param authorization header string true "jwt token"
-// @Param account body proto.MaterialShelfInfo true "Add MaterialShelf"
+// @Param account body proto.MaterialChannelProposingRecordInfo true "Add MaterialChannelProposingRecord"
 // @Success 200 {object} proto.CommonResponse
-// @Router /api/mom/material/materialshelf/add [post]
-func AddMaterialShelf(c *gin.Context) {
+// @Router /api/mom/material/materialchannelproposingrecord/add [post]
+func AddMaterialChannelProposingRecord(c *gin.Context) {
 	transID := middleware.GetTransID(c)
-	req := &proto.MaterialShelfInfo{}
+	req := &proto.MaterialChannelProposingRecordInfo{}
 	resp := &proto.CommonResponse{
 		Code: proto.Code_Success,
 	}
@@ -33,7 +33,7 @@ func AddMaterialShelf(c *gin.Context) {
 		resp.Code = proto.Code_BadRequest
 		resp.Message = err.Error()
 		c.JSON(http.StatusOK, resp)
-		log.Warnf(context.Background(), "TransID:%s,新建物料货架请求参数无效:%v", transID, err)
+		log.Warnf(context.Background(), "TransID:%s,新建通道叫料记录请求参数无效:%v", transID, err)
 		return
 	}
 	err = middleware.Validate.Struct(req)
@@ -44,7 +44,7 @@ func AddMaterialShelf(c *gin.Context) {
 		return
 	}
 
-	id, err := logic.CreateMaterialShelf(model.PBToMaterialShelf(req))
+	id, err := logic.CreateMaterialChannelProposingRecord(model.PBToMaterialChannelProposingRecord(req))
 	if err != nil {
 		resp.Code = proto.Code_InternalServerError
 		resp.Message = err.Error()
@@ -54,19 +54,19 @@ func AddMaterialShelf(c *gin.Context) {
 	c.JSON(http.StatusOK, resp)
 }
 
-// UpdateMaterialShelf godoc
+// UpdateMaterialChannelProposingRecord godoc
 // @Summary 更新
 // @Description 更新
-// @Tags 物料货架管理
+// @Tags 通道叫料记录管理
 // @Accept  json
 // @Produce  json
 // @Param authorization header string true "jwt token"
-// @Param account body proto.MaterialShelfInfo true "Update MaterialShelf"
+// @Param account body proto.MaterialChannelProposingRecordInfo true "Update MaterialChannelProposingRecord"
 // @Success 200 {object} proto.CommonResponse
-// @Router /api/mom/material/materialshelf/update [put]
-func UpdateMaterialShelf(c *gin.Context) {
+// @Router /api/mom/material/materialchannelproposingrecord/update [put]
+func UpdateMaterialChannelProposingRecord(c *gin.Context) {
 	transID := middleware.GetTransID(c)
-	req := &proto.MaterialShelfInfo{}
+	req := &proto.MaterialChannelProposingRecordInfo{}
 	resp := &proto.CommonResponse{
 		Code: proto.Code_Success,
 	}
@@ -75,7 +75,7 @@ func UpdateMaterialShelf(c *gin.Context) {
 		resp.Code = proto.Code_BadRequest
 		resp.Message = err.Error()
 		c.JSON(http.StatusOK, resp)
-		log.Warnf(context.Background(), "TransID:%s,更新物料货架请求参数无效:%v", transID, err)
+		log.Warnf(context.Background(), "TransID:%s,更新通道叫料记录请求参数无效:%v", transID, err)
 		return
 	}
 	err = middleware.Validate.Struct(req)
@@ -85,7 +85,7 @@ func UpdateMaterialShelf(c *gin.Context) {
 		c.JSON(http.StatusOK, resp)
 		return
 	}
-	err = logic.UpdateMaterialShelf(model.PBToMaterialShelf(req))
+	err = logic.UpdateMaterialChannelProposingRecord(model.PBToMaterialChannelProposingRecord(req))
 	if err != nil {
 		resp.Code = proto.Code_InternalServerError
 		resp.Message = err.Error()
@@ -93,10 +93,10 @@ func UpdateMaterialShelf(c *gin.Context) {
 	c.JSON(http.StatusOK, resp)
 }
 
-// QueryMaterialShelf godoc
+// QueryMaterialChannelProposingRecord godoc
 // @Summary 分页查询
 // @Description 分页查询
-// @Tags 物料货架管理
+// @Tags 通道叫料记录管理
 // @Accept  json
 // @Produce  octet-stream
 // @Param authorization header string true "jwt token"
@@ -104,12 +104,12 @@ func UpdateMaterialShelf(c *gin.Context) {
 // @Param pageSize query int false "默认每页10条"
 // @Param orderField query string false "排序字段"
 // @Param desc query bool false "是否倒序排序"
-// @Param productionLineID query string false "隶属产线ID"
-// @Success 200 {object} proto.QueryMaterialShelfResponse
-// @Router /api/mom/material/materialshelf/query [get]
-func QueryMaterialShelf(c *gin.Context) {
-	req := &proto.QueryMaterialShelfRequest{}
-	resp := &proto.QueryMaterialShelfResponse{
+// @Param code query string false "代号或描述"
+// @Success 200 {object} proto.QueryMaterialChannelProposingRecordResponse
+// @Router /api/mom/material/materialchannelproposingrecord/query [get]
+func QueryMaterialChannelProposingRecord(c *gin.Context) {
+	req := &proto.QueryMaterialChannelProposingRecordRequest{}
+	resp := &proto.QueryMaterialChannelProposingRecordResponse{
 		Code: proto.Code_Success,
 	}
 	err := c.BindQuery(req)
@@ -119,47 +119,47 @@ func QueryMaterialShelf(c *gin.Context) {
 		c.JSON(http.StatusOK, resp)
 		return
 	}
-	logic.QueryMaterialShelf(req, resp, false)
+	logic.QueryMaterialChannelProposingRecord(req, resp, false)
 
 	c.JSON(http.StatusOK, resp)
 }
 
-// GetAllMaterialShelf godoc
+// GetAllMaterialChannelProposingRecord godoc
 // @Summary 查询所有
 // @Description 查询所有
-// @Tags 物料货架管理
+// @Tags 通道叫料记录管理
 // @Accept  json
 // @Produce  json
 // @Param authorization header string true "jwt token"
-// @Success 200 {object} proto.GetAllMaterialShelfResponse
-// @Router /api/mom/material/materialshelf/all [get]
-func GetAllMaterialShelf(c *gin.Context) {
-	resp := &proto.GetAllMaterialShelfResponse{
+// @Success 200 {object} proto.GetAllMaterialChannelProposingRecordResponse
+// @Router /api/mom/material/materialchannelproposingrecord/all [get]
+func GetAllMaterialChannelProposingRecord(c *gin.Context) {
+	resp := &proto.GetAllMaterialChannelProposingRecordResponse{
 		Code: proto.Code_Success,
 	}
-	list, err := logic.GetAllMaterialShelfs()
+	list, err := logic.GetAllMaterialChannelProposingRecords()
 	if err != nil {
 		resp.Code = proto.Code_InternalServerError
 		resp.Message = err.Error()
 		c.JSON(http.StatusOK, resp)
 		return
 	}
-	resp.Data = model.MaterialShelfsToPB(list)
+	resp.Data = model.MaterialChannelProposingRecordsToPB(list)
 	c.JSON(http.StatusOK, resp)
 }
 
-// GetMaterialShelfDetail godoc
+// GetMaterialChannelProposingRecordDetail godoc
 // @Summary 查询明细
 // @Description 查询明细
-// @Tags 物料货架管理
+// @Tags 通道叫料记录管理
 // @Accept  json
 // @Produce  json
 // @Param id query string true "ID"
 // @Param authorization header string true "jwt token"
-// @Success 200 {object} proto.GetMaterialShelfDetailResponse
-// @Router /api/mom/material/materialshelf/detail [get]
-func GetMaterialShelfDetail(c *gin.Context) {
-	resp := &proto.GetMaterialShelfDetailResponse{
+// @Success 200 {object} proto.GetMaterialChannelProposingRecordDetailResponse
+// @Router /api/mom/material/materialchannelproposingrecord/detail [get]
+func GetMaterialChannelProposingRecordDetail(c *gin.Context) {
+	resp := &proto.GetMaterialChannelProposingRecordDetailResponse{
 		Code: proto.Code_Success,
 	}
 	id := c.Query("id")
@@ -170,27 +170,27 @@ func GetMaterialShelfDetail(c *gin.Context) {
 	}
 	var err error
 
-	data, err := logic.GetMaterialShelfByID(id)
+	data, err := logic.GetMaterialChannelProposingRecordByID(id)
 	if err != nil {
 		resp.Code = proto.Code_InternalServerError
 		resp.Message = err.Error()
 	} else {
-		resp.Data = model.MaterialShelfToPB(data)
+		resp.Data = model.MaterialChannelProposingRecordToPB(data)
 	}
 	c.JSON(http.StatusOK, resp)
 }
 
-// DeleteMaterialShelf godoc
+// DeleteMaterialChannelProposingRecord godoc
 // @Summary 删除
 // @Description 删除
-// @Tags 物料货架管理
+// @Tags 通道叫料记录管理
 // @Accept  json
 // @Produce  json
 // @Param authorization header string true "jwt token"
-// @Param data body proto.DelRequest true "Delete MaterialShelf"
+// @Param data body proto.DelRequest true "Delete MaterialChannelProposingRecord"
 // @Success 200 {object} proto.CommonResponse
-// @Router /api/mom/material/materialshelf/delete [delete]
-func DeleteMaterialShelf(c *gin.Context) {
+// @Router /api/mom/material/materialchannelproposingrecord/delete [delete]
+func DeleteMaterialChannelProposingRecord(c *gin.Context) {
 	transID := middleware.GetTransID(c)
 	req := &proto.DelRequest{}
 	resp := &proto.CommonResponse{
@@ -201,7 +201,7 @@ func DeleteMaterialShelf(c *gin.Context) {
 		resp.Code = proto.Code_BadRequest
 		resp.Message = err.Error()
 		c.JSON(http.StatusOK, resp)
-		log.Warnf(context.Background(), "TransID:%s,删除物料货架请求参数无效:%v", transID, err)
+		log.Warnf(context.Background(), "TransID:%s,删除通道叫料记录请求参数无效:%v", transID, err)
 		return
 	}
 	err = middleware.Validate.Struct(req)
@@ -211,7 +211,7 @@ func DeleteMaterialShelf(c *gin.Context) {
 		c.JSON(http.StatusOK, resp)
 		return
 	}
-	err = logic.DeleteMaterialShelf(req.Id)
+	err = logic.DeleteMaterialChannelProposingRecord(req.Id)
 	if err != nil {
 		resp.Code = proto.Code_InternalServerError
 		resp.Message = err.Error()
@@ -219,13 +219,13 @@ func DeleteMaterialShelf(c *gin.Context) {
 	c.JSON(http.StatusOK, resp)
 }
 
-func RegisterMaterialShelfRouter(r *gin.Engine) {
-	g := r.Group("/api/mom/material/materialshelf")
+func RegisterMaterialChannelProposingRecordRouter(r *gin.Engine) {
+	g := r.Group("/api/mom/material/materialchannelproposingrecord")
 
-	g.POST("add", AddMaterialShelf)
-	g.PUT("update", UpdateMaterialShelf)
-	g.GET("query", QueryMaterialShelf)
-	g.DELETE("delete", DeleteMaterialShelf)
-	g.GET("all", GetAllMaterialShelf)
-	g.GET("detail", GetMaterialShelfDetail)
+	g.POST("add", AddMaterialChannelProposingRecord)
+	g.PUT("update", UpdateMaterialChannelProposingRecord)
+	g.GET("query", QueryMaterialChannelProposingRecord)
+	g.DELETE("delete", DeleteMaterialChannelProposingRecord)
+	g.GET("all", GetAllMaterialChannelProposingRecord)
+	g.GET("detail", GetMaterialChannelProposingRecordDetail)
 }

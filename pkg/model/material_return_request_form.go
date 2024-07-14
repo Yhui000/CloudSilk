@@ -8,7 +8,7 @@ import (
 	"github.com/CloudSilk/pkg/utils"
 )
 
-// 材料退货申请表
+// 物料退料记录
 type MaterialReturnRequestForm struct {
 	ModelID
 	FormNo                   string                  `gorm:"size:50;comment:申请单号"`

@@ -15,7 +15,7 @@ import (
 // AddMaterialReturnRequestForm godoc
 // @Summary 新增
 // @Description 新增
-// @Tags 材料退货申请表管理
+// @Tags 物料退料记录管理
 // @Accept  json
 // @Produce  json
 // @Param authorization header string true "jwt token"
@@ -33,7 +33,7 @@ func AddMaterialReturnRequestForm(c *gin.Context) {
 		resp.Code = proto.Code_BadRequest
 		resp.Message = err.Error()
 		c.JSON(http.StatusOK, resp)
-		log.Warnf(context.Background(), "TransID:%s,新建材料退货申请表请求参数无效:%v", transID, err)
+		log.Warnf(context.Background(), "TransID:%s,新建物料退料记录请求参数无效:%v", transID, err)
 		return
 	}
 	err = middleware.Validate.Struct(req)
@@ -57,7 +57,7 @@ func AddMaterialReturnRequestForm(c *gin.Context) {
 // UpdateMaterialReturnRequestForm godoc
 // @Summary 更新
 // @Description 更新
-// @Tags 材料退货申请表管理
+// @Tags 物料退料记录管理
 // @Accept  json
 // @Produce  json
 // @Param authorization header string true "jwt token"
@@ -75,7 +75,7 @@ func UpdateMaterialReturnRequestForm(c *gin.Context) {
 		resp.Code = proto.Code_BadRequest
 		resp.Message = err.Error()
 		c.JSON(http.StatusOK, resp)
-		log.Warnf(context.Background(), "TransID:%s,更新材料退货申请表请求参数无效:%v", transID, err)
+		log.Warnf(context.Background(), "TransID:%s,更新物料退料记录请求参数无效:%v", transID, err)
 		return
 	}
 	err = middleware.Validate.Struct(req)
@@ -96,7 +96,7 @@ func UpdateMaterialReturnRequestForm(c *gin.Context) {
 // QueryMaterialReturnRequestForm godoc
 // @Summary 分页查询
 // @Description 分页查询
-// @Tags 材料退货申请表管理
+// @Tags 物料退料记录管理
 // @Accept  json
 // @Produce  octet-stream
 // @Param authorization header string true "jwt token"
@@ -126,7 +126,7 @@ func QueryMaterialReturnRequestForm(c *gin.Context) {
 // GetAllMaterialReturnRequestForm godoc
 // @Summary 查询所有
 // @Description 查询所有
-// @Tags 材料退货申请表管理
+// @Tags 物料退料记录管理
 // @Accept  json
 // @Produce  json
 // @Param authorization header string true "jwt token"
@@ -150,7 +150,7 @@ func GetAllMaterialReturnRequestForm(c *gin.Context) {
 // GetMaterialReturnRequestFormDetail godoc
 // @Summary 查询明细
 // @Description 查询明细
-// @Tags 材料退货申请表管理
+// @Tags 物料退料记录管理
 // @Accept  json
 // @Produce  json
 // @Param id query string true "ID"
@@ -182,7 +182,7 @@ func GetMaterialReturnRequestFormDetail(c *gin.Context) {
 // DeleteMaterialReturnRequestForm godoc
 // @Summary 删除
 // @Description 删除
-// @Tags 材料退货申请表管理
+// @Tags 物料退料记录管理
 // @Accept  json
 // @Produce  json
 // @Param authorization header string true "jwt token"
@@ -200,7 +200,7 @@ func DeleteMaterialReturnRequestForm(c *gin.Context) {
 		resp.Code = proto.Code_BadRequest
 		resp.Message = err.Error()
 		c.JSON(http.StatusOK, resp)
-		log.Warnf(context.Background(), "TransID:%s,删除材料退货申请表请求参数无效:%v", transID, err)
+		log.Warnf(context.Background(), "TransID:%s,删除物料退料记录请求参数无效:%v", transID, err)
 		return
 	}
 	err = middleware.Validate.Struct(req)

@@ -74,7 +74,7 @@ func AutoMigrate() {
 		&MaterialContainerType{},
 		&MaterialShelf{},
 		&MaterialShelfBin{},
-		&MaterialStore{},
+		// &MaterialStore{},
 		&MaterialStoreAvailableLine{},
 		&MaterialInventory{},
 		&MaterialStoreFeedRule{},
@@ -82,6 +82,7 @@ func AutoMigrate() {
 		&AGVTaskQueue{},
 		&WMSBillQueue{},
 		&AGVParkingSpace{},
+		&MaterialChannelProposingRecord{},
 
 		&ProductInfo{},
 		&ProductOrderAttribute{},

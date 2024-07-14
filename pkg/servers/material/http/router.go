@@ -15,7 +15,7 @@ func RegisterRouter(r *gin.Engine) {
 	RegisterMaterialInventoryRouter(r)
 	RegisterMaterialShelfBinRouter(r)
 	RegisterMaterialShelfRouter(r)
-	RegisterMaterialStoreRouter(r)
+	// RegisterMaterialStoreRouter(r)
 	RegisterMaterialStoreFeedRuleRouter(r)
 	RegisterAGVTaskTypeRouter(r)
 	RegisterAGVTaskQueueRouter(r)
@@ -26,4 +26,5 @@ func RegisterRouter(r *gin.Engine) {
 	RegisterMaterialReturnTypeRouter(r)
 	RegisterMaterialChannelLayerRouter(r)
 	RegisterAGVParkingSpaceRouter(r)
+	RegisterMaterialChannelProposingRecordRouter(r)
 }

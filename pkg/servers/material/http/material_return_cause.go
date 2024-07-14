@@ -44,6 +44,25 @@ func AddMaterialReturnCause(c *gin.Context) {
 		return
 	}
 
+	if len(req.MaterialCategoryIDs) > 0 {
+		var materialCategorys []*proto.MaterialReturnCauseAvailableCategoryInfo
+		for _, materialCategoryID := range req.MaterialCategoryIDs {
+			materialCategorys = append(materialCategorys, &proto.MaterialReturnCauseAvailableCategoryInfo{
+				MaterialCategoryID: materialCategoryID,
+			})
+		}
+		req.MaterialCategories = materialCategorys
+	}
+	if len(req.MaterialReturnTypeIDs) > 0 {
+		var materialReturnTypes []*proto.MaterialReturnCauseAvailableTypeInfo
+		for _, materialReturnTypeID := range req.MaterialReturnTypeIDs {
+			materialReturnTypes = append(materialReturnTypes, &proto.MaterialReturnCauseAvailableTypeInfo{
+				MaterialReturnTypeID: materialReturnTypeID,
+			})
+		}
+		req.MaterialReturnTypes = materialReturnTypes
+	}
+
 	id, err := logic.CreateMaterialReturnCause(model.PBToMaterialReturnCause(req))
 	if err != nil {
 		resp.Code = proto.Code_InternalServerError
@@ -85,6 +104,26 @@ func UpdateMaterialReturnCause(c *gin.Context) {
 		c.JSON(http.StatusOK, resp)
 		return
 	}
+
+	if len(req.MaterialCategoryIDs) > 0 {
+		var materialCategorys []*proto.MaterialReturnCauseAvailableCategoryInfo
+		for _, materialCategoryID := range req.MaterialCategoryIDs {
+			materialCategorys = append(materialCategorys, &proto.MaterialReturnCauseAvailableCategoryInfo{
+				MaterialCategoryID: materialCategoryID,
+			})
+		}
+		req.MaterialCategories = materialCategorys
+	}
+	if len(req.MaterialReturnTypeIDs) > 0 {
+		var materialReturnTypes []*proto.MaterialReturnCauseAvailableTypeInfo
+		for _, materialReturnTypeID := range req.MaterialReturnTypeIDs {
+			materialReturnTypes = append(materialReturnTypes, &proto.MaterialReturnCauseAvailableTypeInfo{
+				MaterialReturnTypeID: materialReturnTypeID,
+			})
+		}
+		req.MaterialReturnTypes = materialReturnTypes
+	}
+
 	err = logic.UpdateMaterialReturnCause(model.PBToMaterialReturnCause(req))
 	if err != nil {
 		resp.Code = proto.Code_InternalServerError

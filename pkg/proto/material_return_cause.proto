@@ -17,8 +17,10 @@ message MaterialReturnCauseInfo{
     string remark=4;
     //物料类别
     repeated MaterialReturnCauseAvailableCategoryInfo materialCategories=5;
+    repeated string materialCategoryIDs=6;
     //归属类型
-    repeated MaterialReturnCauseAvailableTypeInfo materialReturnTypes=6;
+    repeated MaterialReturnCauseAvailableTypeInfo materialReturnTypes=7;
+    repeated string materialReturnTypeIDs=8;
 }
 
 message MaterialReturnCauseAvailableCategoryInfo{

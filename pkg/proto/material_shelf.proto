@@ -4,7 +4,7 @@ package proto;
 option go_package="./;proto";
 
 import "mom_common.proto";
-import "material_store.proto";
+import "production_line.proto";
 
 message MaterialShelfInfo{
     string id=1;
@@ -12,17 +12,31 @@ message MaterialShelfInfo{
     string code=2;
     //描述
     string description=3;
-    //识别码
-    string identifier=4;
     //货架类型
-    int32 shelfType=5;
+    int32 shelfType=4;
     //是否启用
-    bool enable=6;
+    bool enable=5;
+    //当前状态
+    string currentState=6;
+    //状态变更时间
+    string lastUpdateTime=7;
     //备注
-    string remark=7;
-    //隶属仓库ID
-    string materialStoreID=8;
-    MaterialStoreInfo materialStore=9;
+    string remark=8;
+    //隶属产线ID
+    string productionLineID=9;
+    ProductionLineInfo productionLine=10;
+    //当前泊位ID
+    string aGVParkingSpaceID=11;
+    AGVParkingSpaceInfo aGVParkingSpace=12;
+    //可停靠泊位
+    repeated MaterialShelfAvailableSpaceInfo parkableSpaces=13;
+}
+
+message MaterialShelfAvailableSpaceInfo{
+    string id=1;
+    string materialShelfID=2;
+    string aGVParkingSpaceID=3;
+    AGVParkingSpaceInfo aGVParkingSpace=4;
 }
 
 message QueryMaterialShelfRequest{
@@ -32,9 +46,9 @@ message QueryMaterialShelfRequest{
     int64 pageSize=2;
     // @inject_tag: uri:"sortConfig" form:"sortConfig"
     string sortConfig=3;
-    //隶属仓库ID
-    // @inject_tag: uri:"materialStoreID" form:"materialStoreID"
-    string materialStoreID=8;
+    //隶属产线ID
+    // @inject_tag: uri:"productionLineID" form:"productionLineID"
+    string productionLineID=8;
 }
 
 message QueryMaterialShelfResponse{
@@ -56,4 +70,72 @@ message GetMaterialShelfDetailResponse{
     Code code=1;
     string message=2;
     MaterialShelfInfo data=3;
+}
+
+
+message AGVParkingSpaceInfo {
+	//ID 
+ 	string id=1;
+    //代号
+    string code=2;
+    //描述
+    string description=3;
+    //识别码
+    string identifier=4;
+    //泊位类型
+    int32 spaceType=5;
+    //货架类型
+    int32 shelfType=6;
+    //允许停靠
+    bool enablePark=7;
+    //允许签派
+    bool enableDispatch=8;
+    //当前状态
+    string currentState=9;
+    //状态变更时间
+    string lastUpdateTime=10;
+    //备注
+    string remark=11;
+    //隶属产线ID
+    string productionLineID=12;
+    ProductionLineInfo productionLine=13;
+    //当前货架ID
+    string materialShelfID=14;
+    MaterialShelfInfo materialShelf=15;
+}
+
+message QueryAGVParkingSpaceRequest{
+    // @inject_tag: uri:"pageIndex" form:"pageIndex"
+    int64 pageIndex=1;
+    // @inject_tag: uri:"pageSize" form:"pageSize"
+    int64 pageSize=2;
+    // @inject_tag: uri:"sortConfig" form:"sortConfig"
+    string sortConfig=3;
+	// 代号或描述 
+	// @inject_tag: uri:"code" form:"code"
+    string code=6;
+    //隶属产线ID
+    // @inject_tag: uri:"productionLineID" form:"productionLineID"
+    string productionLineID=12;
+}
+
+message QueryAGVParkingSpaceResponse{
+    Code code=1;
+    string message=2;
+    repeated AGVParkingSpaceInfo data=3;
+    int64 pages=4;
+    int64 records=5;
+    int64 total=6;
+}
+
+message GetAllAGVParkingSpaceResponse{
+    Code code=1;
+    string message=2;
+    repeated AGVParkingSpaceInfo data=3;
+}
+
+message GetAGVParkingSpaceDetailResponse{
+    Code code=1;
+    string message=2;
+    AGVParkingSpaceInfo data=3;
 }

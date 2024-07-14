@@ -4,6 +4,7 @@ import (
 	"github.com/CloudSilk/CloudSilk/pkg/model"
 	"github.com/CloudSilk/CloudSilk/pkg/proto"
 	"github.com/CloudSilk/pkg/utils"
+	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
 
@@ -13,13 +14,23 @@ func CreateMaterialShelf(m *model.MaterialShelf) (string, error) {
 }
 
 func UpdateMaterialShelf(m *model.MaterialShelf) error {
-	return model.DB.DB().Omit("created_at").Save(m).Error
+	return model.DB.DB().Transaction(func(tx *gorm.DB) error {
+		if err := tx.Unscoped().Delete(&model.MaterialShelfAvailableSpace{}, "`material_shelf_id` = ?", m.ID).Error; err != nil {
+			return err
+		}
+
+		if err := tx.Omit("created_at").Save(m).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
 }
 
 func QueryMaterialShelf(req *proto.QueryMaterialShelfRequest, resp *proto.QueryMaterialShelfResponse, preload bool) {
-	db := model.DB.DB().Model(&model.MaterialShelf{}).Preload("MaterialStore")
-	if req.MaterialStoreID != "" {
-		db = db.Where("`material_store_id` = ?", req.MaterialStoreID)
+	db := model.DB.DB().Model(&model.MaterialShelf{}).Preload("ProductionLine")
+	if req.ProductionLineID != "" {
+		db = db.Where("`production_line_id` = ?", req.ProductionLineID)
 	}
 
 	orderStr, err := utils.GenerateOrderString(req.SortConfig, "created_at desc")
@@ -47,13 +58,13 @@ func GetAllMaterialShelfs() (list []*model.MaterialShelf, err error) {
 
 func GetMaterialShelfByID(id string) (*model.MaterialShelf, error) {
 	m := &model.MaterialShelf{}
-	err := model.DB.DB().Preload("MaterialStore").Preload(clause.Associations).Where("id = ?", id).First(m).Error
+	err := model.DB.DB().Preload("AGVParkingSpace").Preload("ParkableSpaces").Preload("ParkableSpaces.AGVParkingSpace").Preload(clause.Associations).Where("id = ?", id).First(m).Error
 	return m, err
 }
 
 func GetMaterialShelfByIDs(ids []string) ([]*model.MaterialShelf, error) {
 	var m []*model.MaterialShelf
-	err := model.DB.DB().Preload("MaterialStore").Preload(clause.Associations).Where("id in (?)", ids).Find(&m).Error
+	err := model.DB.DB().Preload("AGVParkingSpace").Preload("ParkableSpaces").Preload("ParkableSpaces.AGVParkingSpace").Preload(clause.Associations).Where("id in (?)", ids).Find(&m).Error
 	return m, err
 }
 

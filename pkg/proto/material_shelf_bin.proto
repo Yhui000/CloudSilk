@@ -4,7 +4,6 @@ package proto;
 option go_package="./;proto";
 
 import "mom_common.proto";
-import "material_container_type.proto";
 import "material_shelf.proto";
 import "material_info.proto";
 
@@ -12,15 +11,10 @@ message MaterialShelfBinInfo{
     string id=1;
     //编号
     string code=2;
-    //行
-    int32 rowIndex=3;
-    //列
-    int32 columnIndex=4;
     //识别码
     string identifier=5;
-    //兼容容器类型ID
-    string materialContainerTypeID=6;
-    MaterialContainerTypeInfo materialContainerType=7;
+    //描述
+    string description=6;
     //缺料调度
     bool enableDispatch=8;
     //状态监控
