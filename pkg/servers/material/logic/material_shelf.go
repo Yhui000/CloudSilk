@@ -28,7 +28,7 @@ func UpdateMaterialShelf(m *model.MaterialShelf) error {
 }
 
 func QueryMaterialShelf(req *proto.QueryMaterialShelfRequest, resp *proto.QueryMaterialShelfResponse, preload bool) {
-	db := model.DB.DB().Model(&model.MaterialShelf{}).Preload("ProductionLine")
+	db := model.DB.DB().Model(&model.MaterialShelf{}).Preload("ProductionLine").Preload("AGVParkingSpace")
 	if req.ProductionLineID != "" {
 		db = db.Where("`production_line_id` = ?", req.ProductionLineID)
 	}
