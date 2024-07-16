@@ -29,6 +29,7 @@ message MaterialShelfInfo{
     string aGVParkingSpaceID=11;
     AGVParkingSpaceInfo aGVParkingSpace=12;
     //可停靠泊位
+    repeated string parkableSpaceIDs=14;
     repeated MaterialShelfAvailableSpaceInfo parkableSpaces=13;
 }
 

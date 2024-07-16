@@ -3349,8 +3349,12 @@ definitions:
         type: string
       id:
         type: string
-      materialReturnCauses:
+      materialReturnCauseIDs:
         description: 退料原因
+        items:
+          type: string
+        type: array
+      materialReturnCauses:
         items:
           $ref: '#/definitions/proto.MaterialReturnSolutionAvailableCauseInfo'
         type: array
@@ -3446,8 +3450,12 @@ definitions:
       lastUpdateTime:
         description: 状态变更时间
         type: string
-      parkableSpaces:
+      parkableSpaceIDs:
         description: 可停靠泊位
+        items:
+          type: string
+        type: array
+      parkableSpaces:
         items:
           $ref: '#/definitions/proto.MaterialShelfAvailableSpaceInfo'
         type: array
@@ -3533,8 +3541,12 @@ definitions:
     type: object
   proto.MaterialSupplierInfo:
     properties:
-      availableMaterials:
+      availableMaterialIDs:
         description: 持有物料信息
+        items:
+          type: string
+        type: array
+      availableMaterials:
         items:
           $ref: '#/definitions/proto.AvailableMaterialInfo'
         type: array

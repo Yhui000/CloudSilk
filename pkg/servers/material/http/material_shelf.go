@@ -44,6 +44,16 @@ func AddMaterialShelf(c *gin.Context) {
 		return
 	}
 
+	if len(req.ParkableSpaceIDs) > 0 {
+		var parkableSpaces []*proto.MaterialShelfAvailableSpaceInfo
+		for _, parkableSpaceID := range req.ParkableSpaceIDs {
+			parkableSpaces = append(parkableSpaces, &proto.MaterialShelfAvailableSpaceInfo{
+				AGVParkingSpaceID: parkableSpaceID,
+			})
+		}
+		req.ParkableSpaces = parkableSpaces
+	}
+
 	id, err := logic.CreateMaterialShelf(model.PBToMaterialShelf(req))
 	if err != nil {
 		resp.Code = proto.Code_InternalServerError
@@ -85,6 +95,17 @@ func UpdateMaterialShelf(c *gin.Context) {
 		c.JSON(http.StatusOK, resp)
 		return
 	}
+
+	if len(req.ParkableSpaceIDs) > 0 {
+		var parkableSpaces []*proto.MaterialShelfAvailableSpaceInfo
+		for _, parkableSpaceID := range req.ParkableSpaceIDs {
+			parkableSpaces = append(parkableSpaces, &proto.MaterialShelfAvailableSpaceInfo{
+				AGVParkingSpaceID: parkableSpaceID,
+			})
+		}
+		req.ParkableSpaces = parkableSpaces
+	}
+
 	err = logic.UpdateMaterialShelf(model.PBToMaterialShelf(req))
 	if err != nil {
 		resp.Code = proto.Code_InternalServerError

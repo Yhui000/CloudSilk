@@ -67,11 +67,11 @@ func MaterialReturnCauseToPB(in *MaterialReturnCause) *proto.MaterialReturnCause
 	}
 
 	var materialCategoryIDs, materialReturnTypeIDs []string
-	for _, materialCategory := range in.MaterialCategories {
-		materialCategoryIDs = append(materialCategoryIDs, materialCategory.MaterialCategoryID)
+	for _, v := range in.MaterialCategories {
+		materialCategoryIDs = append(materialCategoryIDs, v.MaterialCategoryID)
 	}
-	for _, materialReturnType := range in.MaterialReturnTypes {
-		materialReturnTypeIDs = append(materialReturnTypeIDs, materialReturnType.MaterialReturnTypeID)
+	for _, v := range in.MaterialReturnTypes {
+		materialReturnTypeIDs = append(materialReturnTypeIDs, v.MaterialReturnTypeID)
 	}
 
 	m := &proto.MaterialReturnCauseInfo{

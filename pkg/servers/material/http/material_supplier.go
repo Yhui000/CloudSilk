@@ -44,6 +44,16 @@ func AddMaterialSupplier(c *gin.Context) {
 		return
 	}
 
+	if len(req.AvailableMaterialIDs) > 0 {
+		var availableMaterials []*proto.AvailableMaterialInfo
+		for _, materialInfoID := range req.AvailableMaterialIDs {
+			availableMaterials = append(availableMaterials, &proto.AvailableMaterialInfo{
+				MaterialInfoID: materialInfoID,
+			})
+		}
+		req.AvailableMaterials = availableMaterials
+	}
+
 	id, err := logic.CreateMaterialSupplier(model.PBToMaterialSupplier(req))
 	if err != nil {
 		resp.Code = proto.Code_InternalServerError
@@ -85,6 +95,17 @@ func UpdateMaterialSupplier(c *gin.Context) {
 		c.JSON(http.StatusOK, resp)
 		return
 	}
+
+	if len(req.AvailableMaterialIDs) > 0 {
+		var availableMaterials []*proto.AvailableMaterialInfo
+		for _, materialInfoID := range req.AvailableMaterialIDs {
+			availableMaterials = append(availableMaterials, &proto.AvailableMaterialInfo{
+				MaterialInfoID: materialInfoID,
+			})
+		}
+		req.AvailableMaterials = availableMaterials
+	}
+
 	err = logic.UpdateMaterialSupplier(model.PBToMaterialSupplier(req))
 	if err != nil {
 		resp.Code = proto.Code_InternalServerError

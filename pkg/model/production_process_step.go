@@ -72,8 +72,8 @@ func ProductionProcessStepToPB(in *ProductionProcessStep) *proto.ProductionProce
 	}
 
 	var availableProcessIDs []string
-	for _, AvailableProcess := range in.AvailableProcesses {
-		availableProcessIDs = append(availableProcessIDs, AvailableProcess.ProductionProcessID)
+	for _, v := range in.AvailableProcesses {
+		availableProcessIDs = append(availableProcessIDs, v.ProductionProcessID)
 	}
 
 	m := &proto.ProductionProcessStepInfo{

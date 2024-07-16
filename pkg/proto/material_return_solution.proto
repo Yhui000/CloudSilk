@@ -15,7 +15,8 @@ message MaterialReturnSolutionInfo{
     //备注
     string remark=4;
     //退料原因
-    repeated MaterialReturnSolutionAvailableCauseInfo materialReturnCauses=5;
+    repeated string materialReturnCauseIDs=5;
+    repeated MaterialReturnSolutionAvailableCauseInfo materialReturnCauses=6;
 }
 
 message MaterialReturnSolutionAvailableCauseInfo{

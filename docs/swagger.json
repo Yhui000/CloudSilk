@@ -32948,8 +32948,14 @@
                 "id": {
                     "type": "string"
                 },
-                "materialReturnCauses": {
+                "materialReturnCauseIDs": {
                     "description": "退料原因",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "materialReturnCauses": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/proto.MaterialReturnSolutionAvailableCauseInfo"
@@ -33085,8 +33091,14 @@
                     "description": "状态变更时间",
                     "type": "string"
                 },
-                "parkableSpaces": {
+                "parkableSpaceIDs": {
                     "description": "可停靠泊位",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "parkableSpaces": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/proto.MaterialShelfAvailableSpaceInfo"
@@ -33209,8 +33221,14 @@
         "proto.MaterialSupplierInfo": {
             "type": "object",
             "properties": {
-                "availableMaterials": {
+                "availableMaterialIDs": {
                     "description": "持有物料信息",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "availableMaterials": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/proto.AvailableMaterialInfo"

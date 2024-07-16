@@ -73,11 +73,11 @@ func ProductReworkProcessToPB(in *ProductReworkProcess) *proto.ProductReworkProc
 	}
 
 	var availableStationIDs, availableProcessIDs []string
-	for _, availableStation := range in.ProductionStations {
-		availableStationIDs = append(availableStationIDs, availableStation.ProductionStationID)
+	for _, v := range in.ProductionStations {
+		availableStationIDs = append(availableStationIDs, v.ProductionStationID)
 	}
-	for _, availableProcess := range in.ProductionProcesses {
-		availableProcessIDs = append(availableProcessIDs, availableProcess.ProductionProcessID)
+	for _, v := range in.ProductionProcesses {
+		availableProcessIDs = append(availableProcessIDs, v.ProductionProcessID)
 	}
 
 	m := &proto.ProductReworkProcessInfo{

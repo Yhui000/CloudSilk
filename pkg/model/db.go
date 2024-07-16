@@ -77,7 +77,7 @@ func AutoMigrate() {
 		&MaterialShelfBin{},
 		&MaterialShelfAvailableSpace{},
 		// &MaterialStore{},
-		&MaterialStoreAvailableLine{},
+		// &MaterialStoreAvailableLine{},
 		&MaterialInventory{},
 		&MaterialStoreFeedRule{},
 		&AGVTaskType{},

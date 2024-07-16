@@ -81,6 +81,11 @@ func MaterialShelfToPB(in *MaterialShelf) *proto.MaterialShelfInfo {
 		agvParkingSpaceID = *in.AGVParkingSpaceID
 	}
 
+	var agvParkingSpaceIDs []string
+	for _, v := range in.ParkableSpaces {
+		agvParkingSpaceIDs = append(agvParkingSpaceIDs, v.AGVParkingSpaceID)
+	}
+
 	m := &proto.MaterialShelfInfo{
 		Id:                in.ID,
 		Code:              in.Code,
@@ -93,6 +98,7 @@ func MaterialShelfToPB(in *MaterialShelf) *proto.MaterialShelfInfo {
 		ProductionLineID:  in.ProductionLineID,
 		ProductionLine:    ProductionLineToPB(in.ProductionLine),
 		AGVParkingSpaceID: agvParkingSpaceID,
+		ParkableSpaceIDs:  agvParkingSpaceIDs,
 		ParkableSpaces:    MaterialShelfAvailableSpacesToPB(in.ParkableSpaces),
 	}
 

@@ -44,6 +44,16 @@ func AddMaterialReturnSolution(c *gin.Context) {
 		return
 	}
 
+	if len(req.MaterialReturnCauseIDs) > 0 {
+		var materialReturnCauses []*proto.MaterialReturnSolutionAvailableCauseInfo
+		for _, materialReturnCauseID := range req.MaterialReturnCauseIDs {
+			materialReturnCauses = append(materialReturnCauses, &proto.MaterialReturnSolutionAvailableCauseInfo{
+				MaterialReturnCauseID: materialReturnCauseID,
+			})
+		}
+		req.MaterialReturnCauses = materialReturnCauses
+	}
+
 	id, err := logic.CreateMaterialReturnSolution(model.PBToMaterialReturnSolution(req))
 	if err != nil {
 		resp.Code = proto.Code_InternalServerError
@@ -85,6 +95,17 @@ func UpdateMaterialReturnSolution(c *gin.Context) {
 		c.JSON(http.StatusOK, resp)
 		return
 	}
+
+	if len(req.MaterialReturnCauseIDs) > 0 {
+		var materialReturnCauses []*proto.MaterialReturnSolutionAvailableCauseInfo
+		for _, materialReturnCauseID := range req.MaterialReturnCauseIDs {
+			materialReturnCauses = append(materialReturnCauses, &proto.MaterialReturnSolutionAvailableCauseInfo{
+				MaterialReturnCauseID: materialReturnCauseID,
+			})
+		}
+		req.MaterialReturnCauses = materialReturnCauses
+	}
+
 	err = logic.UpdateMaterialReturnSolution(model.PBToMaterialReturnSolution(req))
 	if err != nil {
 		resp.Code = proto.Code_InternalServerError

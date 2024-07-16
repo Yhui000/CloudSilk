@@ -15,6 +15,7 @@ message MaterialSupplierInfo{
     //备注
     string remark=4;
 	//持有物料信息
+    repeated string availableMaterialIDs=6;
 	repeated AvailableMaterialInfo availableMaterials=5;
 }
 

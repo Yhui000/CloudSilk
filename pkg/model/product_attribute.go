@@ -111,8 +111,8 @@ func ProductAttributeIdentifierToPB(in *ProductAttributeIdentifier) *proto.Produ
 		return nil
 	}
 	var AvailableCategoryIDs []string
-	for _, AvailableCategory := range in.ProductAttributeIdentifierAvailableCategorys {
-		AvailableCategoryIDs = append(AvailableCategoryIDs, AvailableCategory.ProductCategoryID)
+	for _, v := range in.ProductAttributeIdentifierAvailableCategorys {
+		AvailableCategoryIDs = append(AvailableCategoryIDs, v.ProductCategoryID)
 	}
 
 	m := &proto.ProductAttributeIdentifierInfo{

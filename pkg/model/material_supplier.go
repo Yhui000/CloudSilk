@@ -54,16 +54,19 @@ func MaterialSupplierToPB(in *MaterialSupplier) *proto.MaterialSupplierInfo {
 	if in == nil {
 		return nil
 	}
-	var AvailableMaterials []*proto.AvailableMaterialInfo
-	if in.AvailableMaterials != nil {
-		AvailableMaterials = AvailableMaterialsToPB(in.AvailableMaterials)
+
+	var availableMaterialIDs []string
+	for _, v := range in.AvailableMaterials {
+		availableMaterialIDs = append(availableMaterialIDs, v.MaterialInfoID)
 	}
+
 	m := &proto.MaterialSupplierInfo{
-		Id:                 in.ID,
-		Code:               in.Code,
-		Description:        in.Description,
-		Remark:             in.Remark,
-		AvailableMaterials: AvailableMaterials,
+		Id:                   in.ID,
+		Code:                 in.Code,
+		Description:          in.Description,
+		Remark:               in.Remark,
+		AvailableMaterialIDs: availableMaterialIDs,
+		AvailableMaterials:   AvailableMaterialsToPB(in.AvailableMaterials),
 	}
 	return m
 }
