@@ -104,6 +104,15 @@ func UpdateMaterialReturnRequestForm(c *gin.Context) {
 // @Param pageSize query int false "默认每页10条"
 // @Param orderField query string false "排序字段"
 // @Param desc query bool false "是否倒序排序"
+// @Param productionLineID query string false "生产产线ID"
+// @Param productionStationID query string false "生产工站ID"
+// @Param currentState query int false "当前状态"
+// @Param materialInfo query string false "物料信息"
+// @Param formNo query string false "申请单号"
+// @Param createUserID query string false "退料人员ID"
+// @Param materialSupplier query string false "物料供应商"
+// @Param createTime0 query string false "创建时间开始"
+// @Param createTime1 query string false "创建时间结束"
 // @Success 200 {object} proto.QueryMaterialReturnRequestFormResponse
 // @Router /api/mom/material/materialreturnrequestform/query [get]
 func QueryMaterialReturnRequestForm(c *gin.Context) {

@@ -15,22 +15,22 @@ type MaterialReturnRequestForm struct {
 	CreateTime               time.Time               `gorm:"autoCreateTime:nano;comment:创建时间"`
 	CreateUserID             string                  `gorm:"size:36;comment:创建人员ID"`
 	MaterialSupplierID       *string                 `gorm:"size:36;comment:物料供应商ID"`
-	MaterialSupplier         *MaterialSupplier       `gorm:"constraint:OnDelete:SET NULL"`
+	MaterialSupplier         *MaterialSupplier       `gorm:"constraint:OnDelete:SET NULL"` //物料供应商
 	MaterialInfoID           string                  `gorm:"size:36;comment:物料信息ID"`
-	MaterialInfo             *MaterialInfo           `gorm:"constraint:OnDelete:CASCADE"`
-	ProductionLineID         string                  `gorm:"size:36;comment:发现产线ID"`
-	ProductionLine           *ProductionLine         `gorm:"constraint:OnDelete:CASCADE"`
+	MaterialInfo             *MaterialInfo           `gorm:"constraint:OnDelete:CASCADE"` //物料信息
+	ProductionStationID      string                  `gorm:"size:36;comment:发现工站ID"`
+	ProductionStation        *ProductionStation      `gorm:"constraint:OnDelete:CASCADE"` //发现工站
 	MaterialTraceNo          string                  `gorm:"size:100;comment:物料追溯号"`
 	Quantity                 float32                 `gorm:"comment:退料数量"`
 	ReturnID                 string                  `gorm:"size:36;comment:退料来源ID"`
 	ReturnSource             string                  `gorm:"size:50;comment:退料来源"`
 	ReturnReason             string                  `gorm:"size:500;comment:退料原因"`
 	MaterialReturnTypeID     *string                 `gorm:"size:36;comment:退料类型ID"`
-	MaterialReturnType       *MaterialReturnType     `gorm:"constraint:OnDelete:SET NULL"`
+	MaterialReturnType       *MaterialReturnType     `gorm:"constraint:OnDelete:SET NULL"` //退料类型
 	MaterialReturnCauseID    *string                 `gorm:"size:36;comment:退料原因ID"`
-	MaterialReturnCause      *MaterialReturnCause    `gorm:"constraint:OnDelete:SET NULL"`
+	MaterialReturnCause      *MaterialReturnCause    `gorm:"constraint:OnDelete:SET NULL"` //退料原因
 	MaterialReturnSolutionID *string                 `gorm:"size:36;comment:处理方案ID"`
-	MaterialReturnSolution   *MaterialReturnSolution `gorm:"constraint:OnDelete:SET NULL"`
+	MaterialReturnSolution   *MaterialReturnSolution `gorm:"constraint:OnDelete:SET NULL"` //处理方案
 	ReturnBrief              string                  `gorm:"size:500;comment:退料简述"`
 	CheckTime                sql.NullTime            `gorm:"comment:复核时间"`
 	CheckUserID              *string                 `gorm:"size:36;comment:复核人员ID"`
@@ -75,7 +75,7 @@ func PBToMaterialReturnRequestForm(in *proto.MaterialReturnRequestFormInfo) *Mat
 		CreateUserID:             in.CreateUserID,
 		MaterialSupplierID:       materialSupplierID,
 		MaterialInfoID:           in.MaterialInfoID,
-		ProductionLineID:         in.ProductionLineID,
+		ProductionStationID:      in.ProductionStationID,
 		MaterialTraceNo:          in.MaterialTraceNo,
 		Quantity:                 in.Quantity,
 		ReturnID:                 in.ReturnID,
@@ -131,8 +131,8 @@ func MaterialReturnRequestFormToPB(in *MaterialReturnRequestForm) *proto.Materia
 		MaterialSupplier:         MaterialSupplierToPB(in.MaterialSupplier),
 		MaterialInfoID:           in.MaterialInfoID,
 		MaterialInfo:             MaterialInfoToPB(in.MaterialInfo),
-		ProductionLineID:         in.ProductionLineID,
-		ProductionLine:           ProductionLineToPB(in.ProductionLine),
+		ProductionStationID:      in.ProductionStationID,
+		ProductionStation:        ProductionStationToPB(in.ProductionStation),
 		MaterialTraceNo:          in.MaterialTraceNo,
 		Quantity:                 in.Quantity,
 		ReturnID:                 in.ReturnID,

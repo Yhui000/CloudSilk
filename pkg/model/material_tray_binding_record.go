@@ -7,6 +7,7 @@ import (
 	"github.com/CloudSilk/pkg/utils"
 )
 
+// 载具绑定记录
 type MaterialTrayBindingRecord struct {
 	ModelID
 	CreateTime     time.Time     `gorm:"autoCreateTime:nano;comment:发料时间"`

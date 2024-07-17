@@ -26,8 +26,8 @@ message MaterialReturnRequestFormInfo{
     string materialInfoID=7;
     MaterialInfoInfo materialInfo=8;
     //发现工站ID
-    string productionLineID=9;
-    ProductionLineInfo productionLine=10;
+    string productionStationID=9;
+    ProductionStationInfo productionStation=10;
     //物料追溯号
     string materialTraceNo=11;
     //退料数量
@@ -69,6 +69,33 @@ message QueryMaterialReturnRequestFormRequest{
     int64 pageSize=2;
     // @inject_tag: uri:"sortConfig" form:"sortConfig"
     string sortConfig=3;
+    //生产产线ID
+    // @inject_tag: uri:"productionLineID" form:"productionLineID"
+    string productionLineID=4;
+    //生产工站ID
+    // @inject_tag: uri:"productionStationID" form:"productionStationID"
+    string productionStationID=5;
+    //当前状态
+    // @inject_tag: uri:"currentState" form:"currentState"
+    int32 currentState=6;
+    //物料信息
+    // @inject_tag: uri:"materialInfo" form:"materialInfo"
+    string materialInfo=7;
+    //申请单号
+    // @inject_tag: uri:"formNo" form:"formNo"
+    string formNo=8;
+    //退料人员ID
+    // @inject_tag: uri:"createUserID" form:"createUserID"
+    string createUserID=9;
+    //物料供应商
+    // @inject_tag: uri:"materialSupplier" form:"materialSupplier"
+    string materialSupplier=10;
+    //创建时间开始
+    // @inject_tag: uri:"createTime0" form:"createTime0"
+    string createTime0=11;
+    //创建时间结束
+    // @inject_tag: uri:"createTime1" form:"createTime1"
+    string createTime1=12;
 }
 
 message QueryMaterialReturnRequestFormResponse{

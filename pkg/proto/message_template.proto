@@ -1,0 +1,63 @@
+syntax="proto3";
+
+package proto;
+option go_package="./;proto";
+
+import "mom_common.proto";
+import "message_type.proto";
+
+message MessageTemplateInfo{
+    string id=1;
+	//代号
+	string code=2;
+	//描述
+	string description=3;
+	//标题
+	string title=4;
+	//内容
+	string content=5;
+	//备注
+	string remark=6;
+	//消息类型ID
+	string messageTypeID=7;
+	MessageTypeInfo messageType=8;
+	//消息参数
+	repeated MessageParameterInfo messageParameters=9;
+}
+
+message MessageParameterInfo{
+	string id=1;
+	string messageTemplateID=2;
+	string name=3;
+	string defaultValue=4;
+}
+
+message QueryMessageTemplateRequest{
+    // @inject_tag: uri:"pageIndex" form:"pageIndex"
+    int64 pageIndex=1;
+    // @inject_tag: uri:"pageSize" form:"pageSize"
+    int64 pageSize=2;
+    // @inject_tag: uri:"sortConfig" form:"sortConfig"
+    string sortConfig=3;
+}
+
+message QueryMessageTemplateResponse{
+    Code code=1;
+    string message=2;
+    repeated MessageTemplateInfo data=3;
+    int64 pages=4;
+    int64 records=5;
+    int64 total=6;
+}
+
+message GetAllMessageTemplateResponse{
+    Code code=1;
+    string message=2;
+    repeated MessageTemplateInfo data=3;
+}
+
+message GetMessageTemplateDetailResponse{
+    Code code=1;
+    string message=2;
+    MessageTemplateInfo data=3;
+}

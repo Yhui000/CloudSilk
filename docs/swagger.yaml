@@ -3304,9 +3304,9 @@ definitions:
       materialTraceNo:
         description: 物料追溯号
         type: string
-      productionLine:
-        $ref: '#/definitions/proto.ProductionLineInfo'
-      productionLineID:
+      productionStation:
+        $ref: '#/definitions/proto.ProductionStationInfo'
+      productionStationID:
         description: 发现工站ID
         type: string
       quantity:
@@ -12412,6 +12412,42 @@ paths:
         in: query
         name: desc
         type: boolean
+      - description: 生产产线ID
+        in: query
+        name: productionLineID
+        type: string
+      - description: 生产工站ID
+        in: query
+        name: productionStationID
+        type: string
+      - description: 当前状态
+        in: query
+        name: currentState
+        type: integer
+      - description: 物料信息
+        in: query
+        name: materialInfo
+        type: string
+      - description: 申请单号
+        in: query
+        name: formNo
+        type: string
+      - description: 退料人员ID
+        in: query
+        name: createUserID
+        type: string
+      - description: 物料供应商
+        in: query
+        name: materialSupplier
+        type: string
+      - description: 创建时间开始
+        in: query
+        name: createTime0
+        type: string
+      - description: 创建时间结束
+        in: query
+        name: createTime1
+        type: string
       produces:
       - application/octet-stream
       responses:

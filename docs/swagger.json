@@ -5661,6 +5661,60 @@
                         "description": "是否倒序排序",
                         "name": "desc",
                         "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "生产产线ID",
+                        "name": "productionLineID",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "生产工站ID",
+                        "name": "productionStationID",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "当前状态",
+                        "name": "currentState",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "物料信息",
+                        "name": "materialInfo",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "申请单号",
+                        "name": "formNo",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "退料人员ID",
+                        "name": "createUserID",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "物料供应商",
+                        "name": "materialSupplier",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "创建时间开始",
+                        "name": "createTime0",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "创建时间结束",
+                        "name": "createTime1",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -32884,10 +32938,10 @@
                     "description": "物料追溯号",
                     "type": "string"
                 },
-                "productionLine": {
-                    "$ref": "#/definitions/proto.ProductionLineInfo"
+                "productionStation": {
+                    "$ref": "#/definitions/proto.ProductionStationInfo"
                 },
-                "productionLineID": {
+                "productionStationID": {
                     "description": "发现工站ID",
                     "type": "string"
                 },
