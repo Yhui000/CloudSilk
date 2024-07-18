@@ -17,7 +17,7 @@ func UpdateProductionStationEfficiency(m *model.ProductionStationEfficiency) err
 }
 
 func QueryProductionStationEfficiency(req *proto.QueryProductionStationEfficiencyRequest, resp *proto.QueryProductionStationEfficiencyResponse, preload bool) {
-	db := model.DB.DB().Model(&model.ProductionStationEfficiency{}).Preload("ProductionStation").Preload(clause.Associations)
+	db := model.DB.DB().Model(&model.ProductionStationEfficiency{}).Preload("ProductionStation")
 	if req.ProductionLineID != "" {
 		db = db.Joins("JOIN production_stations ON production_station_efficiencys.production_station_id=production_stations.id").
 			Where("production_stations.production_line_id = ?", req.ProductionLineID)

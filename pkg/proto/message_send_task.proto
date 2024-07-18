@@ -1,0 +1,75 @@
+syntax="proto3";
+
+package proto;
+option go_package="./;proto";
+
+import "mom_common.proto";
+import "production_line.proto";
+import "message_template.proto";
+import "remote_service_task.proto";
+
+message MessageSendTaskInfo{
+    string id=1;
+	//代号
+	string code=2;
+	//描述
+	string description=3;
+	//是否启用
+	bool enable=4;
+	//工厂产线ID
+	string productionLineID=5;
+	ProductionLineInfo productionLine=6;
+	//消息模板ID
+	string messageTemplateID=7;
+	MessageTemplateInfo messageTemplate=8;
+	//收件地址
+	string To=9;
+	//抄送地址
+	string Cc=10;
+	//远程服务ID
+	string remoteServiceTaskID=11;
+	RemoteServiceTaskInfo remoteServiceTask=12;
+	//备注
+	string Remark=13;
+}
+
+message QueryMessageSendTaskRequest{
+    // @inject_tag: uri:"pageIndex" form:"pageIndex"
+    int64 pageIndex=1;
+    // @inject_tag: uri:"pageSize" form:"pageSize"
+    int64 pageSize=2;
+    // @inject_tag: uri:"sortConfig" form:"sortConfig"
+    string sortConfig=3;
+    // @inject_tag: uri:"identifier" form:"identifier"
+    string identifier=4;
+    // 代号或描述
+    // @inject_tag: uri:"code" form:"code"
+    string code=5;
+	// 工厂产线ID
+    // @inject_tag: uri:"productionLineID" form:"productionLineID"
+    string productionLineID=6;
+	// 消息类型ID
+    // @inject_tag: uri:"messageTypeID" form:"messageTypeID"
+    string messageTypeID=7;
+}
+
+message QueryMessageSendTaskResponse{
+    Code code=1;
+    string message=2;
+    repeated MessageSendTaskInfo data=3;
+    int64 pages=4;
+    int64 records=5;
+    int64 total=6;
+}
+
+message GetAllMessageSendTaskResponse{
+    Code code=1;
+    string message=2;
+    repeated MessageSendTaskInfo data=3;
+}
+
+message GetMessageSendTaskDetailResponse{
+    Code code=1;
+    string message=2;
+    MessageSendTaskInfo data=3;
+}

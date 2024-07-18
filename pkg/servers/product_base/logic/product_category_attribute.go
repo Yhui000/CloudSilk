@@ -37,7 +37,7 @@ func UpdateProductCategoryAttribute(m *model.ProductCategoryAttribute) error {
 }
 
 func QueryProductCategoryAttribute(req *proto.QueryProductCategoryAttributeRequest, resp *proto.QueryProductCategoryAttributeResponse, preload bool) {
-	db := model.DB.DB().Model(&model.ProductCategoryAttribute{}).Preload("ProductCategoryAttributeValue").Preload("ProductAttribute").Preload(clause.Associations)
+	db := model.DB.DB().Model(&model.ProductCategoryAttribute{}).Preload("ProductCategoryAttributeValue").Preload("ProductAttribute")
 	if req.ProductCategoryID != "" {
 		db = db.Where("`product_category_id` = ?", req.ProductCategoryID)
 	}

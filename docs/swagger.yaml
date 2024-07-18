@@ -947,6 +947,50 @@ definitions:
       message:
         type: string
     type: object
+  proto.GetAllMessageSendQueueResponse:
+    properties:
+      code:
+        $ref: '#/definitions/proto.Code'
+      data:
+        items:
+          $ref: '#/definitions/proto.MessageSendQueueInfo'
+        type: array
+      message:
+        type: string
+    type: object
+  proto.GetAllMessageSendTaskResponse:
+    properties:
+      code:
+        $ref: '#/definitions/proto.Code'
+      data:
+        items:
+          $ref: '#/definitions/proto.MessageSendTaskInfo'
+        type: array
+      message:
+        type: string
+    type: object
+  proto.GetAllMessageTemplateResponse:
+    properties:
+      code:
+        $ref: '#/definitions/proto.Code'
+      data:
+        items:
+          $ref: '#/definitions/proto.MessageTemplateInfo'
+        type: array
+      message:
+        type: string
+    type: object
+  proto.GetAllMessageTypeResponse:
+    properties:
+      code:
+        $ref: '#/definitions/proto.Code'
+      data:
+        items:
+          $ref: '#/definitions/proto.MessageTypeInfo'
+        type: array
+      message:
+        type: string
+    type: object
   proto.GetAllOperationTraceResponse:
     properties:
       code:
@@ -1991,6 +2035,42 @@ definitions:
         $ref: '#/definitions/proto.Code'
       data:
         $ref: '#/definitions/proto.MaterialTrayInfo'
+      message:
+        type: string
+    type: object
+  proto.GetMessageSendQueueDetailResponse:
+    properties:
+      code:
+        $ref: '#/definitions/proto.Code'
+      data:
+        $ref: '#/definitions/proto.MessageSendQueueInfo'
+      message:
+        type: string
+    type: object
+  proto.GetMessageSendTaskDetailResponse:
+    properties:
+      code:
+        $ref: '#/definitions/proto.Code'
+      data:
+        $ref: '#/definitions/proto.MessageSendTaskInfo'
+      message:
+        type: string
+    type: object
+  proto.GetMessageTemplateDetailResponse:
+    properties:
+      code:
+        $ref: '#/definitions/proto.Code'
+      data:
+        $ref: '#/definitions/proto.MessageTemplateInfo'
+      message:
+        type: string
+    type: object
+  proto.GetMessageTypeDetailResponse:
+    properties:
+      code:
+        $ref: '#/definitions/proto.Code'
+      data:
+        $ref: '#/definitions/proto.MessageTypeInfo'
       message:
         type: string
     type: object
@@ -3637,6 +3717,193 @@ definitions:
         type: string
       trayType:
         description: 载具类型
+        type: string
+    type: object
+  proto.MessageParameterInfo:
+    properties:
+      defaultValue:
+        type: string
+      id:
+        type: string
+      messageTemplateID:
+        type: string
+      name:
+        type: string
+    type: object
+  proto.MessageSendQueueExecutionInfo:
+    properties:
+      CreateTime:
+        description: 创建时间
+        type: string
+      FailureReason:
+        description: 失败原因
+        type: string
+      MessageSendQueueID:
+        description: 消息发送队列ID
+        type: string
+      Success:
+        description: 是否成功
+        type: boolean
+      id:
+        type: string
+    type: object
+  proto.MessageSendQueueInfo:
+    properties:
+      cc:
+        description: 抄送地址
+        type: string
+      content:
+        description: 内容
+        type: string
+      createTime:
+        description: 创建时间
+        type: string
+      createUserID:
+        description: 创建人员
+        type: string
+      createUserName:
+        type: string
+      currentState:
+        description: 当前状态
+        type: string
+      id:
+        type: string
+      lastUpdateTime:
+        description: 状态变更时间
+        type: string
+      messageParameters:
+        description: 消息发送队列参数
+        items:
+          $ref: '#/definitions/proto.MessageSendQueueParameterInfo'
+        type: array
+      messageType:
+        $ref: '#/definitions/proto.MessageTypeInfo'
+      messageTypeID:
+        description: 消息类型ID
+        type: string
+      remark:
+        description: 备注
+        type: string
+      remoteServiceTask:
+        $ref: '#/definitions/proto.RemoteServiceTaskInfo'
+      remoteServiceTaskID:
+        description: 远程任务ID
+        type: string
+      sendExecutions:
+        description: 消息发送队列执行
+        items:
+          $ref: '#/definitions/proto.MessageSendQueueExecutionInfo'
+        type: array
+      sendTimes:
+        description: 发送次数
+        type: integer
+      taskNo:
+        description: 任务编号
+        type: string
+      title:
+        description: 标题
+        type: string
+      to:
+        description: 收件地址
+        type: string
+    type: object
+  proto.MessageSendQueueParameterInfo:
+    properties:
+      FixedValue:
+        description: 设定值
+        type: string
+      MessageSendQueueID:
+        description: 消息发送队列ID
+        type: string
+      Name:
+        description: 名称
+        type: string
+      Remark:
+        description: 备注
+        type: string
+      id:
+        type: string
+    type: object
+  proto.MessageSendTaskInfo:
+    properties:
+      Cc:
+        description: 抄送地址
+        type: string
+      Remark:
+        description: 备注
+        type: string
+      To:
+        description: 收件地址
+        type: string
+      code:
+        description: 代号
+        type: string
+      description:
+        description: 描述
+        type: string
+      enable:
+        description: 是否启用
+        type: boolean
+      id:
+        type: string
+      messageTemplate:
+        $ref: '#/definitions/proto.MessageTemplateInfo'
+      messageTemplateID:
+        description: 消息模板ID
+        type: string
+      productionLine:
+        $ref: '#/definitions/proto.ProductionLineInfo'
+      productionLineID:
+        description: 工厂产线ID
+        type: string
+      remoteServiceTask:
+        $ref: '#/definitions/proto.RemoteServiceTaskInfo'
+      remoteServiceTaskID:
+        description: 远程服务ID
+        type: string
+    type: object
+  proto.MessageTemplateInfo:
+    properties:
+      code:
+        description: 代号
+        type: string
+      content:
+        description: 内容
+        type: string
+      description:
+        description: 描述
+        type: string
+      id:
+        type: string
+      messageParameters:
+        description: 消息参数
+        items:
+          $ref: '#/definitions/proto.MessageParameterInfo'
+        type: array
+      messageType:
+        $ref: '#/definitions/proto.MessageTypeInfo'
+      messageTypeID:
+        description: 消息类型ID
+        type: string
+      remark:
+        description: 备注
+        type: string
+      title:
+        description: 标题
+        type: string
+    type: object
+  proto.MessageTypeInfo:
+    properties:
+      code:
+        description: 代号
+        type: string
+      description:
+        description: 描述
+        type: string
+      id:
+        type: string
+      remark:
+        description: 备注
         type: string
     type: object
   proto.OnlineProductInfoRequest:
@@ -6933,6 +7200,74 @@ definitions:
       data:
         items:
           $ref: '#/definitions/proto.MaterialTrayInfo'
+        type: array
+      message:
+        type: string
+      pages:
+        type: integer
+      records:
+        type: integer
+      total:
+        type: integer
+    type: object
+  proto.QueryMessageSendQueueResponse:
+    properties:
+      code:
+        $ref: '#/definitions/proto.Code'
+      data:
+        items:
+          $ref: '#/definitions/proto.MessageSendQueueInfo'
+        type: array
+      message:
+        type: string
+      pages:
+        type: integer
+      records:
+        type: integer
+      total:
+        type: integer
+    type: object
+  proto.QueryMessageSendTaskResponse:
+    properties:
+      code:
+        $ref: '#/definitions/proto.Code'
+      data:
+        items:
+          $ref: '#/definitions/proto.MessageSendTaskInfo'
+        type: array
+      message:
+        type: string
+      pages:
+        type: integer
+      records:
+        type: integer
+      total:
+        type: integer
+    type: object
+  proto.QueryMessageTemplateResponse:
+    properties:
+      code:
+        $ref: '#/definitions/proto.Code'
+      data:
+        items:
+          $ref: '#/definitions/proto.MessageTemplateInfo'
+        type: array
+      message:
+        type: string
+      pages:
+        type: integer
+      records:
+        type: integer
+      total:
+        type: integer
+    type: object
+  proto.QueryMessageTypeResponse:
+    properties:
+      code:
+        $ref: '#/definitions/proto.Code'
+      data:
+        items:
+          $ref: '#/definitions/proto.MessageTypeInfo'
         type: array
       message:
         type: string
@@ -10708,6 +11043,27 @@ paths:
       summary: 分页查询
       tags:
       - AGV任务队列管理
+  /api/mom/material/agvtaskqueue/submit:
+    get:
+      consumes:
+      - application/json
+      description: 提交
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.CommonResponse'
+      summary: 提交
+      tags:
+      - AGV任务队列管理
   /api/mom/material/agvtaskqueue/update:
     put:
       consumes:
@@ -14195,6 +14551,733 @@ paths:
       summary: 更新
       tags:
       - WMS过帐队列管理
+  /api/mom/message/messagesendqueue/add:
+    post:
+      consumes:
+      - application/json
+      description: 新增
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      - description: Add MessageSendQueue
+        in: body
+        name: account
+        required: true
+        schema:
+          $ref: '#/definitions/proto.MessageSendQueueInfo'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.CommonResponse'
+      summary: 新增
+      tags:
+      - 消息发送队列管理
+  /api/mom/message/messagesendqueue/all:
+    get:
+      consumes:
+      - application/json
+      description: 查询所有
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.GetAllMessageSendQueueResponse'
+      summary: 查询所有
+      tags:
+      - 消息发送队列管理
+  /api/mom/message/messagesendqueue/delete:
+    delete:
+      consumes:
+      - application/json
+      description: 删除
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      - description: Delete MessageSendQueue
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/proto.DelRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.CommonResponse'
+      summary: 删除
+      tags:
+      - 消息发送队列管理
+  /api/mom/message/messagesendqueue/detail:
+    get:
+      consumes:
+      - application/json
+      description: 查询明细
+      parameters:
+      - description: ID
+        in: query
+        name: id
+        required: true
+        type: string
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.GetMessageSendQueueDetailResponse'
+      summary: 查询明细
+      tags:
+      - 消息发送队列管理
+  /api/mom/message/messagesendqueue/query:
+    get:
+      consumes:
+      - application/json
+      description: 分页查询
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      - description: 从1开始
+        in: query
+        name: pageIndex
+        type: integer
+      - description: 默认每页10条
+        in: query
+        name: pageSize
+        type: integer
+      - description: 排序字段
+        in: query
+        name: orderField
+        type: string
+      - description: 是否倒序排序
+        in: query
+        name: desc
+        type: boolean
+      - description: 任务编号
+        in: query
+        name: taskNo
+        type: string
+      - description: 消息类型ID
+        in: query
+        name: messageTypeID
+        type: string
+      - description: 创建时间开始
+        in: query
+        name: createTime0
+        type: string
+      - description: 创建时间结束
+        in: query
+        name: createTime1
+        type: string
+      produces:
+      - application/octet-stream
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.QueryMessageSendQueueResponse'
+      summary: 分页查询
+      tags:
+      - 消息发送队列管理
+  /api/mom/message/messagesendqueue/send:
+    get:
+      consumes:
+      - application/json
+      description: 发送
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      - description: Send MessageSendQueue
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/proto.GetByIDsRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.CommonResponse'
+      summary: 发送
+      tags:
+      - 消息发送队列管理
+  /api/mom/message/messagesendqueue/update:
+    put:
+      consumes:
+      - application/json
+      description: 更新
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      - description: Update MessageSendQueue
+        in: body
+        name: account
+        required: true
+        schema:
+          $ref: '#/definitions/proto.MessageSendQueueInfo'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.CommonResponse'
+      summary: 更新
+      tags:
+      - 消息发送队列管理
+  /api/mom/message/messagesendtask/add:
+    post:
+      consumes:
+      - application/json
+      description: 新增
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      - description: Add MessageSendTask
+        in: body
+        name: account
+        required: true
+        schema:
+          $ref: '#/definitions/proto.MessageSendTaskInfo'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.CommonResponse'
+      summary: 新增
+      tags:
+      - 消息发送任务管理
+  /api/mom/message/messagesendtask/all:
+    get:
+      consumes:
+      - application/json
+      description: 查询所有
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.GetAllMessageSendTaskResponse'
+      summary: 查询所有
+      tags:
+      - 消息发送任务管理
+  /api/mom/message/messagesendtask/delete:
+    delete:
+      consumes:
+      - application/json
+      description: 删除
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      - description: Delete MessageSendTask
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/proto.DelRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.CommonResponse'
+      summary: 删除
+      tags:
+      - 消息发送任务管理
+  /api/mom/message/messagesendtask/detail:
+    get:
+      consumes:
+      - application/json
+      description: 查询明细
+      parameters:
+      - description: ID
+        in: query
+        name: id
+        required: true
+        type: string
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.GetMessageSendTaskDetailResponse'
+      summary: 查询明细
+      tags:
+      - 消息发送任务管理
+  /api/mom/message/messagesendtask/query:
+    get:
+      consumes:
+      - application/json
+      description: 分页查询
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      - description: 从1开始
+        in: query
+        name: pageIndex
+        type: integer
+      - description: 默认每页10条
+        in: query
+        name: pageSize
+        type: integer
+      - description: 排序字段
+        in: query
+        name: orderField
+        type: string
+      - description: 是否倒序排序
+        in: query
+        name: desc
+        type: boolean
+      - description: 代号或描述
+        in: query
+        name: code
+        type: string
+      - description: 消息类型ID
+        in: query
+        name: messageTypeID
+        type: string
+      - description: 隶属产线ID
+        in: query
+        name: productionLineID
+        type: string
+      produces:
+      - application/octet-stream
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.QueryMessageSendTaskResponse'
+      summary: 分页查询
+      tags:
+      - 消息发送任务管理
+  /api/mom/message/messagesendtask/update:
+    put:
+      consumes:
+      - application/json
+      description: 更新
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      - description: Update MessageSendTask
+        in: body
+        name: account
+        required: true
+        schema:
+          $ref: '#/definitions/proto.MessageSendTaskInfo'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.CommonResponse'
+      summary: 更新
+      tags:
+      - 消息发送任务管理
+  /api/mom/message/messagetemplate/add:
+    post:
+      consumes:
+      - application/json
+      description: 新增
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      - description: Add MessageTemplate
+        in: body
+        name: account
+        required: true
+        schema:
+          $ref: '#/definitions/proto.MessageTemplateInfo'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.CommonResponse'
+      summary: 新增
+      tags:
+      - 消息模版管理
+  /api/mom/message/messagetemplate/all:
+    get:
+      consumes:
+      - application/json
+      description: 查询所有
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.GetAllMessageTemplateResponse'
+      summary: 查询所有
+      tags:
+      - 消息模版管理
+  /api/mom/message/messagetemplate/delete:
+    delete:
+      consumes:
+      - application/json
+      description: 删除
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      - description: Delete MessageTemplate
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/proto.DelRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.CommonResponse'
+      summary: 删除
+      tags:
+      - 消息模版管理
+  /api/mom/message/messagetemplate/detail:
+    get:
+      consumes:
+      - application/json
+      description: 查询明细
+      parameters:
+      - description: ID
+        in: query
+        name: id
+        required: true
+        type: string
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.GetMessageTemplateDetailResponse'
+      summary: 查询明细
+      tags:
+      - 消息模版管理
+  /api/mom/message/messagetemplate/query:
+    get:
+      consumes:
+      - application/json
+      description: 分页查询
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      - description: 从1开始
+        in: query
+        name: pageIndex
+        type: integer
+      - description: 默认每页10条
+        in: query
+        name: pageSize
+        type: integer
+      - description: 排序字段
+        in: query
+        name: orderField
+        type: string
+      - description: 是否倒序排序
+        in: query
+        name: desc
+        type: boolean
+      - description: 代号或描述
+        in: query
+        name: code
+        type: string
+      - description: 消息类型ID
+        in: query
+        name: messageTypeID
+        type: string
+      produces:
+      - application/octet-stream
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.QueryMessageTemplateResponse'
+      summary: 分页查询
+      tags:
+      - 消息模版管理
+  /api/mom/message/messagetemplate/update:
+    put:
+      consumes:
+      - application/json
+      description: 更新
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      - description: Update MessageTemplate
+        in: body
+        name: account
+        required: true
+        schema:
+          $ref: '#/definitions/proto.MessageTemplateInfo'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.CommonResponse'
+      summary: 更新
+      tags:
+      - 消息模版管理
+  /api/mom/message/messagetype/add:
+    post:
+      consumes:
+      - application/json
+      description: 新增
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      - description: Add MessageType
+        in: body
+        name: account
+        required: true
+        schema:
+          $ref: '#/definitions/proto.MessageTypeInfo'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.CommonResponse'
+      summary: 新增
+      tags:
+      - 消息类型管理
+  /api/mom/message/messagetype/all:
+    get:
+      consumes:
+      - application/json
+      description: 查询所有
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.GetAllMessageTypeResponse'
+      summary: 查询所有
+      tags:
+      - 消息类型管理
+  /api/mom/message/messagetype/delete:
+    delete:
+      consumes:
+      - application/json
+      description: 删除
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      - description: Delete MessageType
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/proto.DelRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.CommonResponse'
+      summary: 删除
+      tags:
+      - 消息类型管理
+  /api/mom/message/messagetype/detail:
+    get:
+      consumes:
+      - application/json
+      description: 查询明细
+      parameters:
+      - description: ID
+        in: query
+        name: id
+        required: true
+        type: string
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.GetMessageTypeDetailResponse'
+      summary: 查询明细
+      tags:
+      - 消息类型管理
+  /api/mom/message/messagetype/query:
+    get:
+      consumes:
+      - application/json
+      description: 分页查询
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      - description: 从1开始
+        in: query
+        name: pageIndex
+        type: integer
+      - description: 默认每页10条
+        in: query
+        name: pageSize
+        type: integer
+      - description: 排序字段
+        in: query
+        name: orderField
+        type: string
+      - description: 是否倒序排序
+        in: query
+        name: desc
+        type: boolean
+      - description: 代号或描述
+        in: query
+        name: code
+        type: string
+      produces:
+      - application/octet-stream
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.QueryMessageTypeResponse'
+      summary: 分页查询
+      tags:
+      - 消息类型管理
+  /api/mom/message/messagetype/update:
+    put:
+      consumes:
+      - application/json
+      description: 更新
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      - description: Update MessageType
+        in: body
+        name: account
+        required: true
+        schema:
+          $ref: '#/definitions/proto.MessageTypeInfo'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.CommonResponse'
+      summary: 更新
+      tags:
+      - 消息类型管理
   /api/mom/printserver/add:
     post:
       consumes:
@@ -24904,6 +25987,27 @@ paths:
       summary: 分页查询
       tags:
       - 远程任务管理
+  /api/mom/system/remoteservicetask/run:
+    get:
+      consumes:
+      - application/json
+      description: 运行
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.CommonResponse'
+      summary: 运行
+      tags:
+      - 远程任务管理
   /api/mom/system/remoteservicetask/update:
     put:
       consumes:
@@ -25541,6 +26645,33 @@ paths:
           schema:
             $ref: '#/definitions/proto.GetSystemEventTriggerDetailResponse'
       summary: 查询明细
+      tags:
+      - 系统事件触发管理
+  /api/mom/system/systemeventtrigger/execute:
+    get:
+      consumes:
+      - application/json
+      description: 执行
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      - description: Execute SystemEventTrigger
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/proto.GetByIDsRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.CommonResponse'
+      summary: 执行
       tags:
       - 系统事件触发管理
   /api/mom/system/systemeventtrigger/query:

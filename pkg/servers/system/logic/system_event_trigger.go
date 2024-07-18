@@ -1,9 +1,15 @@
 package logic
 
 import (
+	"fmt"
+	"runtime/debug"
+
 	"github.com/CloudSilk/CloudSilk/pkg/model"
 	"github.com/CloudSilk/CloudSilk/pkg/proto"
+	"github.com/CloudSilk/CloudSilk/pkg/types"
 	"github.com/CloudSilk/pkg/utils"
+	"github.com/google/uuid"
+	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
 
@@ -17,7 +23,7 @@ func UpdateSystemEventTrigger(m *model.SystemEventTrigger) error {
 }
 
 func QuerySystemEventTrigger(req *proto.QuerySystemEventTriggerRequest, resp *proto.QuerySystemEventTriggerResponse, preload bool) {
-	db := model.DB.DB().Model(&model.SystemEventTrigger{}).Preload("SystemEvent").Preload(clause.Associations)
+	db := model.DB.DB().Model(&model.SystemEventTrigger{}).Preload("SystemEvent")
 	if req.EventNo != "" {
 		db = db.Where("`event_no` = ?", req.EventNo)
 	}
@@ -66,4 +72,76 @@ func GetSystemEventTriggerByIDs(ids []string) ([]*model.SystemEventTrigger, erro
 
 func DeleteSystemEventTrigger(id string) (err error) {
 	return model.DB.DB().Delete(&model.SystemEventTrigger{}, "`id` = ?", id).Error
+}
+
+func ExecuteSystemEventTrigger(userID string, ids []string) (err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			if err = model.DB.DB().Create(&model.ExceptionTrace{
+				Host:         "/api/mom/system/systemeventtrigger/execute",
+				Level:        types.EventTypeError,
+				Source:       "系统事件触发执行",
+				Message:      fmt.Sprintf("%v", r),
+				StackTrace:   string(debug.Stack()),
+				ReportUserID: userID,
+			}).Error; err != nil {
+				return
+			}
+		}
+	}()
+
+	return model.DB.DB().Transaction(func(tx *gorm.DB) (err error) {
+		if err = tx.Model(model.SystemEventTrigger{}).Where("`id` IN ?", ids).Update("current_state", types.SystemEventTriggerStateWaitExecute).Error; err != nil {
+			return
+		}
+		if err = OnSystemEventTriggerExecute(tx, ids); err != nil {
+			return
+		}
+		//TODO TaskQueueExecution
+
+		return
+	})
+}
+
+func OnSystemEventTriggerExecute(tx *gorm.DB, ids []string) (err error) {
+	systemEventTriggers := []*model.SystemEventTrigger{}
+	if err = tx.Preload("SystemEvent.SystemEventSubscriptions").Where("`id` IN ?", ids).Find(&systemEventTriggers).Error; err != nil {
+		return
+	}
+
+	for _, systemEventTrigger := range systemEventTriggers {
+		for _, systemEventSubscription := range systemEventTrigger.SystemEvent.SystemEventSubscriptions {
+			remoteServiceTaskQueueParameters := make([]*model.RemoteServiceTaskQueueParameter, len(systemEventTrigger.SystemEventTriggerParameters))
+			for i, systemEventTriggerParameter := range systemEventTrigger.SystemEventTriggerParameters {
+				remoteServiceTaskQueueParameters[i] = &model.RemoteServiceTaskQueueParameter{
+					DataType:    systemEventTriggerParameter.DataType,
+					Name:        systemEventTriggerParameter.Name,
+					Description: systemEventTriggerParameter.Description,
+					Value:       systemEventTriggerParameter.Value,
+				}
+			}
+			remoteServiceTaskQueue := &model.RemoteServiceTaskQueue{
+				TaskNo:                           uuid.NewString(),
+				CurrentState:                     types.RemoteServiceTaskQueueStateWaitExecute,
+				RemoteServiceTaskID:              systemEventSubscription.RemoteServiceTaskID,
+				RemoteServiceTaskQueueParameters: remoteServiceTaskQueueParameters,
+			}
+			if err = tx.Create(remoteServiceTaskQueue).Error; err != nil {
+				return
+			}
+
+			if err = tx.Create(&model.SystemEventTriggerExecution{
+				RemoteServiceTaskQueueID: remoteServiceTaskQueue.ID,
+				SystemEventTriggerID:     systemEventTrigger.ID,
+			}).Error; err != nil {
+				return
+			}
+		}
+
+		if err = tx.Model(systemEventTrigger).Update("current_state", types.SystemEventTriggerStateExecuted).Error; err != nil {
+			return
+		}
+	}
+
+	return nil
 }

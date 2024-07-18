@@ -31,7 +31,7 @@ func UpdateProductReworkProcess(m *model.ProductReworkProcess) error {
 }
 
 func QueryProductReworkProcess(req *proto.QueryProductReworkProcessRequest, resp *proto.QueryProductReworkProcessResponse, preload bool) {
-	db := model.DB.DB().Model(&model.ProductReworkProcess{}).Preload("ProductionLine").Preload(clause.Associations)
+	db := model.DB.DB().Model(&model.ProductReworkProcess{}).Preload("ProductionLine")
 	if req.ProductionLineID != "" {
 		db = db.Where("`production_line_id` = ?", req.ProductionLineID)
 	}

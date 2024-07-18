@@ -32,7 +32,7 @@ func UpdateProductOrderProcessStep(m *model.ProductOrderProcessStep) error {
 }
 
 func QueryProductOrderProcessStep(req *proto.QueryProductOrderProcessStepRequest, resp *proto.QueryProductOrderProcessStepResponse, preload bool) {
-	db := model.DB.DB().Model(&model.ProductOrderProcessStep{}).Preload("ProcessStepType").Preload("ProductOrderProcessStepTypeParameters").Preload(clause.Associations)
+	db := model.DB.DB().Model(&model.ProductOrderProcessStep{}).Preload("ProcessStepType").Preload("ProductOrderProcessStepTypeParameters")
 	if req.ProductOrderProcessID != "" {
 		db = db.Where("`product_order_process_id` = ?", req.ProductOrderProcessID)
 	}

@@ -17,7 +17,7 @@ func UpdateProductReleaseRecord(m *model.ProductReleaseRecord) error {
 }
 
 func QueryProductReleaseRecord(req *proto.QueryProductReleaseRecordRequest, resp *proto.QueryProductReleaseRecordResponse, preload bool) {
-	db := model.DB.DB().Model(&model.ProductReleaseRecord{}).Preload("ProductInfo").Preload("RemanufacturedProductInfo").Preload("RemanufacturedProductInfo.ProductOrder").Preload(clause.Associations)
+	db := model.DB.DB().Model(&model.ProductReleaseRecord{}).Preload("ProductInfo").Preload("RemanufacturedProductInfo").Preload("RemanufacturedProductInfo.ProductOrder")
 	if req.ProductSerialNo != "" || req.ProductOrderNo != "" || req.SecurityCode != "" {
 		db = db.Joins("JOIN product_infos ON product_release_records.remanufactured_product_info_id = product_infos.id")
 

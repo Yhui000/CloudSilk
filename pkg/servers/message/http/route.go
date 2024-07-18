@@ -6,4 +6,5 @@ import (
 
 func RegisterRouter(r *gin.Engine) {
 	RegisterMessageTypeRouter(r)
+	RegisterMessageTemplateRouter(r)
 }

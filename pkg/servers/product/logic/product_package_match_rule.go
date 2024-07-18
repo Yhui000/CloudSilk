@@ -28,7 +28,7 @@ func UpdateProductPackageMatchRule(m *model.ProductPackageMatchRule) error {
 }
 
 func QueryProductPackageMatchRule(req *proto.QueryProductPackageMatchRuleRequest, resp *proto.QueryProductPackageMatchRuleResponse, preload bool) {
-	db := model.DB.DB().Model(&model.ProductPackageMatchRule{}).Preload("ProductPackage").Preload(clause.Associations)
+	db := model.DB.DB().Model(&model.ProductPackageMatchRule{}).Preload("ProductPackage")
 
 	orderStr, err := utils.GenerateOrderString(req.SortConfig, "created_at desc")
 	if err != nil {

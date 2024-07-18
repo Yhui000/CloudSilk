@@ -29,7 +29,7 @@ func UpdateLabelTemplate(m *model.LabelTemplate) error {
 }
 
 func QueryLabelTemplate(req *proto.QueryLabelTemplateRequest, resp *proto.QueryLabelTemplateResponse, preload bool) {
-	db := model.DB.DB().Model(&model.LabelTemplate{}).Preload("LabelType").Preload(clause.Associations)
+	db := model.DB.DB().Model(&model.LabelTemplate{}).Preload("LabelType")
 	if req.Code != "" {
 		db.Where("code LIKE ? OR description LIKE ?", "%"+req.Code+"%", "%"+req.Code+"%")
 	}

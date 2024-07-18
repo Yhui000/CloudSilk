@@ -17,7 +17,7 @@ func UpdateProductOrderLabel(m *model.ProductOrderLabel) error {
 }
 
 func QueryProductOrderLabel(req *proto.QueryProductOrderLabelRequest, resp *proto.QueryProductOrderLabelResponse, preload bool) {
-	db := model.DB.DB().Model(&model.ProductOrderLabel{}).Preload("ProductOrder").Preload("LabelType").Preload(clause.Associations)
+	db := model.DB.DB().Model(&model.ProductOrderLabel{}).Preload("ProductOrder").Preload("LabelType")
 	if req.ProductOrderNo != "" {
 		db = db.Joins("JOIN product_orders ON model.product_order_labels.product_order_id = product_orders.id").
 			Where("product_orders.product_order_no LIKE ?", "%"+req.ProductOrderNo+"%")

@@ -17,7 +17,7 @@ func UpdateProductionStationAlarm(m *model.ProductionStationAlarm) error {
 }
 
 func QueryProductionStationAlarm(req *proto.QueryProductionStationAlarmRequest, resp *proto.QueryProductionStationAlarmResponse, preload bool) {
-	db := model.DB.DB().Model(&model.ProductionStationAlarm{}).Preload("ProductionStation").Preload("ProductionStation.ProductionLine").Preload("ProductionProcess").Preload("ProductInfo").Preload("ProductInfo.ProductOrder").Preload(clause.Associations)
+	db := model.DB.DB().Model(&model.ProductionStationAlarm{}).Preload("ProductionStation").Preload("ProductionStation.ProductionLine").Preload("ProductionProcess").Preload("ProductInfo").Preload("ProductInfo.ProductOrder")
 	if req.CreateTime0 != "" && req.CreateTime1 != "" {
 		db = db.Where("production_station_alarms.create_time BETWEEN ? AND ?", req.CreateTime0, req.CreateTime1)
 	}

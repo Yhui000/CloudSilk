@@ -33,7 +33,7 @@ func UpdateProductOrderProcess(m *model.ProductOrderProcess) error {
 }
 
 func QueryProductOrderProcess(req *proto.QueryProductOrderProcessRequest, resp *proto.QueryProductOrderProcessResponse, preload bool) {
-	db := model.DB.DB().Model(&model.ProductOrderProcess{}).Preload("ProductionProcess").Preload("ProductOrder").Preload(clause.Associations)
+	db := model.DB.DB().Model(&model.ProductOrderProcess{}).Preload("ProductionProcess").Preload("ProductOrder")
 	if req.ProductOrderNo != "" {
 		db.Joins("JOIN product_orders ON product_order_processes.product_order_id=product_orders.id").
 			Where("product_orders.product_order_no LIKE ?", "%"+req.ProductOrderNo+"%")

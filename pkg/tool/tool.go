@@ -3,10 +3,27 @@ package tool
 import (
 	"database/sql"
 	"fmt"
+	"net/smtp"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/jordan-wright/email"
 )
+
+// 发送邮件
+func SendEmail(config map[string]string, from, to, title, content string) error {
+	em := email.NewEmail()
+	// 设置发送方邮箱
+	em.From = from
+	// 设置接收方邮箱
+	em.To = strings.Split(to, ";")
+	em.Subject = title
+	// em.Text = []byte(content)
+	em.HTML = []byte(content)
+
+	return em.Send(config["host"]+":"+config["port"], smtp.PlainAuth(config["identity"], config["username"], config["password"], config["host"]))
+}
 
 func MathOperator(value, method, attributeExpressionValue string) (bool, error) {
 	switch method {

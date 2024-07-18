@@ -15,7 +15,7 @@ import (
 // AddMessageType godoc
 // @Summary 新增
 // @Description 新增
-// @Tags AGV停靠泊位管理
+// @Tags 消息类型管理
 // @Accept  json
 // @Produce  json
 // @Param authorization header string true "jwt token"
@@ -33,7 +33,7 @@ func AddMessageType(c *gin.Context) {
 		resp.Code = proto.Code_BadRequest
 		resp.Message = err.Error()
 		c.JSON(http.StatusOK, resp)
-		log.Warnf(context.Background(), "TransID:%s,新建AGV停靠泊位请求参数无效:%v", transID, err)
+		log.Warnf(context.Background(), "TransID:%s,新建消息类型请求参数无效:%v", transID, err)
 		return
 	}
 	err = middleware.Validate.Struct(req)
@@ -57,7 +57,7 @@ func AddMessageType(c *gin.Context) {
 // UpdateMessageType godoc
 // @Summary 更新
 // @Description 更新
-// @Tags AGV停靠泊位管理
+// @Tags 消息类型管理
 // @Accept  json
 // @Produce  json
 // @Param authorization header string true "jwt token"
@@ -75,7 +75,7 @@ func UpdateMessageType(c *gin.Context) {
 		resp.Code = proto.Code_BadRequest
 		resp.Message = err.Error()
 		c.JSON(http.StatusOK, resp)
-		log.Warnf(context.Background(), "TransID:%s,更新AGV停靠泊位请求参数无效:%v", transID, err)
+		log.Warnf(context.Background(), "TransID:%s,更新消息类型请求参数无效:%v", transID, err)
 		return
 	}
 	err = middleware.Validate.Struct(req)
@@ -96,7 +96,7 @@ func UpdateMessageType(c *gin.Context) {
 // QueryMessageType godoc
 // @Summary 分页查询
 // @Description 分页查询
-// @Tags AGV停靠泊位管理
+// @Tags 消息类型管理
 // @Accept  json
 // @Produce  octet-stream
 // @Param authorization header string true "jwt token"
@@ -105,7 +105,6 @@ func UpdateMessageType(c *gin.Context) {
 // @Param orderField query string false "排序字段"
 // @Param desc query bool false "是否倒序排序"
 // @Param code query string false "代号或描述"
-// @Param productionLineID query string false "隶属产线ID"
 // @Success 200 {object} proto.QueryMessageTypeResponse
 // @Router /api/mom/message/messagetype/query [get]
 func QueryMessageType(c *gin.Context) {
@@ -128,7 +127,7 @@ func QueryMessageType(c *gin.Context) {
 // GetAllMessageType godoc
 // @Summary 查询所有
 // @Description 查询所有
-// @Tags AGV停靠泊位管理
+// @Tags 消息类型管理
 // @Accept  json
 // @Produce  json
 // @Param authorization header string true "jwt token"
@@ -152,7 +151,7 @@ func GetAllMessageType(c *gin.Context) {
 // GetMessageTypeDetail godoc
 // @Summary 查询明细
 // @Description 查询明细
-// @Tags AGV停靠泊位管理
+// @Tags 消息类型管理
 // @Accept  json
 // @Produce  json
 // @Param id query string true "ID"
@@ -184,7 +183,7 @@ func GetMessageTypeDetail(c *gin.Context) {
 // DeleteMessageType godoc
 // @Summary 删除
 // @Description 删除
-// @Tags AGV停靠泊位管理
+// @Tags 消息类型管理
 // @Accept  json
 // @Produce  json
 // @Param authorization header string true "jwt token"
@@ -202,7 +201,7 @@ func DeleteMessageType(c *gin.Context) {
 		resp.Code = proto.Code_BadRequest
 		resp.Message = err.Error()
 		c.JSON(http.StatusOK, resp)
-		log.Warnf(context.Background(), "TransID:%s,删除AGV停靠泊位请求参数无效:%v", transID, err)
+		log.Warnf(context.Background(), "TransID:%s,删除消息类型请求参数无效:%v", transID, err)
 		return
 	}
 	err = middleware.Validate.Struct(req)

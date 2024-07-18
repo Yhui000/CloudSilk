@@ -39,6 +39,12 @@ message QueryMessageTemplateRequest{
     int64 pageSize=2;
     // @inject_tag: uri:"sortConfig" form:"sortConfig"
     string sortConfig=3;
+    //代号
+    // @inject_tag: uri:"code" form:"code"
+	string code=4;
+    //消息类型ID
+    // @inject_tag: uri:"messageTypeID" form:"messageTypeID"
+    string messageTypeID=5;
 }
 
 message QueryMessageTemplateResponse{

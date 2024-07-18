@@ -28,7 +28,7 @@ func UpdateLabelAdaptationRule(m *model.LabelAdaptationRule) error {
 }
 
 func QueryLabelAdaptationRule(req *proto.QueryLabelAdaptationRuleRequest, resp *proto.QueryLabelAdaptationRuleResponse, preload bool) {
-	db := model.DB.DB().Model(&model.LabelAdaptationRule{}).Preload("LabelTemplate").Preload(clause.Associations)
+	db := model.DB.DB().Model(&model.LabelAdaptationRule{}).Preload("LabelTemplate")
 
 	orderStr, err := utils.GenerateOrderString(req.SortConfig, "created_at desc")
 	if err != nil {

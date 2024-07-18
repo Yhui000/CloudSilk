@@ -17,7 +17,7 @@ func UpdateProductionStationSignup(m *model.ProductionStationSignup) error {
 }
 
 func QueryProductionStationSignup(req *proto.QueryProductionStationSignupRequest, resp *proto.QueryProductionStationSignupResponse, preload bool) {
-	db := model.DB.DB().Model(&model.ProductionStationSignup{}).Preload("ProductionStation").Preload("ProductionStation.ProductionLine").Preload(clause.Associations)
+	db := model.DB.DB().Model(&model.ProductionStationSignup{}).Preload("ProductionStation").Preload("ProductionStation.ProductionLine")
 	if req.ProductionLineID != "" {
 		db = db.Joins("JOIN production_stations ON production_station_signups.production_station_id=production_stations.id").
 			Where("production_stations.production_line_id = ?", req.ProductionLineID)

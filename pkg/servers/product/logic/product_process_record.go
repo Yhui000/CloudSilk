@@ -17,7 +17,7 @@ func UpdateProductProcessRecord(m *model.ProductProcessRecord) error {
 }
 
 func QueryProductProcessRecord(req *proto.QueryProductProcessRecordRequest, resp *proto.QueryProductProcessRecordResponse, preload bool) {
-	db := model.DB.DB().Model(&model.ProductProcessRecord{}).Preload("ProductionStation").Preload("ProductInfo").Preload("ProductInfo.ProductOrder").Preload(clause.Associations)
+	db := model.DB.DB().Model(&model.ProductProcessRecord{}).Preload("ProductionStation").Preload("ProductInfo").Preload("ProductInfo.ProductOrder")
 	if req.ProductSerialNo != "" || req.ProductOrderNo != "" {
 		db = db.Joins("JOIN product_infos ON product_process_records.product_info_id = product_infos.id")
 

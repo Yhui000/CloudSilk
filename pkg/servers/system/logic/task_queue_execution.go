@@ -17,7 +17,7 @@ func UpdateTaskQueueExecution(m *model.TaskQueueExecution) error {
 }
 
 func QueryTaskQueueExecution(req *proto.QueryTaskQueueExecutionRequest, resp *proto.QueryTaskQueueExecutionResponse, preload bool) {
-	db := model.DB.DB().Model(&model.TaskQueueExecution{}).Preload("TaskQueue").Preload(clause.Associations)
+	db := model.DB.DB().Model(&model.TaskQueueExecution{}).Preload("TaskQueue")
 	if req.TaskQueueID != "" {
 		db = db.Where("`task_queue_id` = ?", req.TaskQueueID)
 	}

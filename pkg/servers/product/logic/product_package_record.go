@@ -17,7 +17,7 @@ func UpdateProductPackageRecord(m *model.ProductPackageRecord) error {
 }
 
 func QueryProductPackageRecord(req *proto.QueryProductPackageRecordRequest, resp *proto.QueryProductPackageRecordResponse, preload bool) {
-	db := model.DB.DB().Model(&model.ProductPackageRecord{}).Preload("ProductInfo").Preload("ProductInfo.ProductOrder").Preload("ProductInfo.ProductOrder.ProductModel").Preload("ProductOrderPackage").Preload("ProductOrderPackage.ProductPackage").Preload(clause.Associations)
+	db := model.DB.DB().Model(&model.ProductPackageRecord{}).Preload("ProductInfo").Preload("ProductInfo.ProductOrder").Preload("ProductInfo.ProductOrder.ProductModel").Preload("ProductOrderPackage").Preload("ProductOrderPackage.ProductPackage")
 	if req.ProductionLineID != "" {
 		db = db.Joins("JOIN product_infos ON product_package_records.product_info_id = product_infos.id").
 			Joins("JOIN product_orders ON product_infos.product_order_id = product_orders.id").

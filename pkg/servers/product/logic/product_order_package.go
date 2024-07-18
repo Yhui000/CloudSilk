@@ -17,7 +17,7 @@ func UpdateProductOrderPackage(m *model.ProductOrderPackage) error {
 }
 
 func QueryProductOrderPackage(req *proto.QueryProductOrderPackageRequest, resp *proto.QueryProductOrderPackageResponse, preload bool) {
-	db := model.DB.DB().Model(&model.ProductOrderPackage{}).Preload("ProductOrder").Preload("ProductPackage").Preload(clause.Associations)
+	db := model.DB.DB().Model(&model.ProductOrderPackage{}).Preload("ProductOrder").Preload("ProductPackage")
 	if req.PackageNo != "" {
 		db = db.Where("`package_no` LIKE ?", "%"+req.PackageNo+"%")
 	}

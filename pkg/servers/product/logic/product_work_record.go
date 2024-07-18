@@ -17,7 +17,7 @@ func UpdateProductWorkRecord(m *model.ProductWorkRecord) error {
 }
 
 func QueryProductWorkRecord(req *proto.QueryProductWorkRecordRequest, resp *proto.QueryProductWorkRecordResponse, preload bool) {
-	db := model.DB.DB().Model(&model.ProductWorkRecord{}).Preload("ProductionStation").Preload("ProductionStation.ProductionLine").Preload("ProductionProcessStep").Preload("ProductionProcessStep.ProcessStepType").Preload("ProductInfo").Preload("ProductInfo.ProductOrder").Preload(clause.Associations)
+	db := model.DB.DB().Model(&model.ProductWorkRecord{}).Preload("ProductionStation").Preload("ProductionStation.ProductionLine").Preload("ProductionProcessStep").Preload("ProductionProcessStep.ProcessStepType").Preload("ProductInfo").Preload("ProductInfo.ProductOrder")
 	if req.ProductOrderNo != "" || req.ProductSerialNo != "" {
 		db.Joins("JOIN product_infos ON product_work_records.product_info_id=product_infos.id")
 

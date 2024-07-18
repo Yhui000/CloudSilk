@@ -17,7 +17,7 @@ func UpdateProductionProcessSop(m *model.ProductionProcessSop) error {
 }
 
 func QueryProductionProcessSop(req *proto.QueryProductionProcessSopRequest, resp *proto.QueryProductionProcessSopResponse, preload bool) {
-	db := model.DB.DB().Model(&model.ProductionProcessSop{}).Preload("ProductModel").Preload(clause.Associations)
+	db := model.DB.DB().Model(&model.ProductionProcessSop{}).Preload("ProductModel")
 	if req.ProductionLineID != "" {
 		db = db.Joins("JOIN production_processes ON production_process_sops.production_process_id=production_processes.id").
 			Where("production_processes.production_line_id = ?", req.ProductionLineID)

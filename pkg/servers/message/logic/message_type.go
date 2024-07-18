@@ -13,7 +13,7 @@ func CreateMessageType(m *model.MessageType) (string, error) {
 }
 
 func UpdateMessageType(m *model.MessageType) error {
-	return model.DB.DB().Omit("created_at", "create_time").Save(m).Error
+	return model.DB.DB().Omit("created_at").Save(m).Error
 }
 
 func QueryMessageType(req *proto.QueryMessageTypeRequest, resp *proto.QueryMessageTypeResponse, preload bool) {

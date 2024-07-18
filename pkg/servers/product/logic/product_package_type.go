@@ -41,7 +41,7 @@ func UpdateProductPackageType(m *model.ProductPackageType) error {
 }
 
 func QueryProductPackageType(req *proto.QueryProductPackageTypeRequest, resp *proto.QueryProductPackageTypeResponse, preload bool) {
-	db := model.DB.DB().Model(&model.ProductPackageType{}).Preload("SystemEvent").Preload("LabelType").Preload(clause.Associations)
+	db := model.DB.DB().Model(&model.ProductPackageType{}).Preload("SystemEvent").Preload("LabelType")
 	if req.Code != "" {
 		db = db.Where("`code` LIKE ? OR `description` LIKE ?", "%"+req.Code+"%", "%"+req.Code+"%")
 	}

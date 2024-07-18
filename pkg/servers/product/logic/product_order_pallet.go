@@ -17,7 +17,7 @@ func UpdateProductOrderPallet(m *model.ProductOrderPallet) error {
 }
 
 func QueryProductOrderPallet(req *proto.QueryProductOrderPalletRequest, resp *proto.QueryProductOrderPalletResponse, preload bool) {
-	db := model.DB.DB().Model(&model.ProductOrderPallet{}).Preload("ProductPackageStackRule").Preload("ProductOrder").Preload(clause.Associations)
+	db := model.DB.DB().Model(&model.ProductOrderPallet{}).Preload("ProductPackageStackRule").Preload("ProductOrder")
 	if req.PalletNo != "" {
 		db = db.Where("product_order_pallets.pallet_no LIKE ?", "%"+req.PalletNo+"%")
 	}

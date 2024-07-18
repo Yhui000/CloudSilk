@@ -19,6 +19,8 @@ type SystemEventTrigger struct {
 	SystemEventTriggerParameters []*SystemEventTriggerParameter `gorm:"constraint:OnDelete:CASCADE;"`
 	SystemEventTriggerExecutions []*SystemEventTriggerExecution `gorm:"constraint:OnDelete:CASCADE;"`
 }
+
+//系统事件执行
 type SystemEventTriggerExecution struct {
 	ModelID
 	SystemEventTriggerID     string                  `gorm:"index;size:36;comment:系统事件触发ID"`

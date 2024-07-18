@@ -17,7 +17,7 @@ func UpdateRemoteServiceTaskQueue(m *model.RemoteServiceTaskQueue) error {
 }
 
 func QueryRemoteServiceTaskQueue(req *proto.QueryRemoteServiceTaskQueueRequest, resp *proto.QueryRemoteServiceTaskQueueResponse, preload bool) {
-	db := model.DB.DB().Model(&model.RemoteServiceTaskQueue{}).Preload("RemoteServiceTask").Preload("RemoteServiceTask.RemoteService").Preload(clause.Associations)
+	db := model.DB.DB().Model(&model.RemoteServiceTaskQueue{}).Preload("RemoteServiceTask").Preload("RemoteServiceTask.RemoteService")
 	if req.TaskNo != "" {
 		db.Where("`task_no` LIKE ? OR `request_text` LIKE ? OR `response_text` LIKE ?", "%"+req.TaskNo+"%", "%"+req.TaskNo+"%", "%"+req.TaskNo+"%")
 	}

@@ -17,7 +17,7 @@ func UpdateProductOrderBom(m *model.ProductOrderBom) error {
 }
 
 func QueryProductOrderBom(req *proto.QueryProductOrderBomRequest, resp *proto.QueryProductOrderBomResponse, preload bool) {
-	db := model.DB.DB().Model(&model.ProductOrderBom{}).Preload("ProductOrder").Preload(clause.Associations)
+	db := model.DB.DB().Model(&model.ProductOrderBom{}).Preload("ProductOrder")
 	if req.ProductOrderNo != "" {
 		db = db.Joins("JOIN product_orders ON product_order_boms.product_order_id = product_orders.id").
 			Where("product_orders.product_order_no LIKE ?", "%"+req.ProductOrderNo+"%")

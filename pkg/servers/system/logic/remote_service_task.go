@@ -2,10 +2,15 @@ package logic
 
 import (
 	"errors"
+	"fmt"
+	"runtime/debug"
+	"time"
 
 	"github.com/CloudSilk/CloudSilk/pkg/model"
 	"github.com/CloudSilk/CloudSilk/pkg/proto"
+	"github.com/CloudSilk/CloudSilk/pkg/types"
 	"github.com/CloudSilk/pkg/utils"
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
@@ -40,7 +45,7 @@ func UpdateRemoteServiceTask(m *model.RemoteServiceTask) error {
 }
 
 func QueryRemoteServiceTask(req *proto.QueryRemoteServiceTaskRequest, resp *proto.QueryRemoteServiceTaskResponse, preload bool) {
-	db := model.DB.DB().Model(&model.RemoteServiceTask{}).Preload("RemoteService").Preload(clause.Associations)
+	db := model.DB.DB().Model(&model.RemoteServiceTask{}).Preload("RemoteService")
 
 	orderStr, err := utils.GenerateOrderString(req.SortConfig, "created_at desc")
 	if err != nil {
@@ -79,4 +84,55 @@ func GetRemoteServiceTaskByIDs(ids []string) ([]*model.RemoteServiceTask, error)
 
 func DeleteRemoteServiceTask(id string) (err error) {
 	return model.DB.DB().Delete(&model.RemoteServiceTask{}, "`id` = ?", id).Error
+}
+
+func RunRemoteServiceTask(userID string) (err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			if err = model.DB.DB().Create(&model.ExceptionTrace{
+				Host:         "/api/mom/system/remoteservicetask/run",
+				Level:        types.EventTypeError,
+				Source:       "远程服务任务运行",
+				Message:      fmt.Sprintf("%v", r),
+				StackTrace:   string(debug.Stack()),
+				ReportUserID: userID,
+			}).Error; err != nil {
+				return
+			}
+		}
+	}()
+
+	remoteServiceTasks := []*model.RemoteServiceTask{}
+	if err = model.DB.DB().Where("`regular_invoke` = ? AND `start_time` IS NOT NULL AND `start_time` <= ? AND `finish_time` IS NOT NULL AND `finish_time` > ?", true, time.Now(), time.Now()).Find(&remoteServiceTasks).Error; err != nil {
+		return
+	}
+	for _, v := range remoteServiceTasks {
+		if err = OnRemoteServiceTaskRun(v); err != nil {
+			return
+		}
+		//TODO TaskQueueExecution
+	}
+	return
+}
+
+func OnRemoteServiceTaskRun(remoteServiceTask *model.RemoteServiceTask) (err error) {
+	t := remoteServiceTask.LastInvokeTime.Time.Add(time.Duration(remoteServiceTask.Interval) * time.Millisecond)
+	if !remoteServiceTask.LastInvokeTime.Valid || t.Before(time.Now()) || t.Equal(time.Now()) {
+		err = model.DB.DB().Transaction(func(tx *gorm.DB) (err error) {
+			if err = tx.Model(remoteServiceTask).Update("last_invoke_time", time.Now()).Error; err != nil {
+				return
+			}
+
+			if err = tx.Create(&model.RemoteServiceTaskQueue{
+				TaskNo:              uuid.NewString(),
+				CurrentState:        types.RemoteServiceTaskQueueStateWaitExecute,
+				RemoteServiceTaskID: remoteServiceTask.ID,
+			}).Error; err != nil {
+				return
+			}
+
+			return
+		})
+	}
+	return
 }

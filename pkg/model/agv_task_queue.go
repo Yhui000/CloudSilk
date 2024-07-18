@@ -19,6 +19,8 @@ type AGVTaskQueue struct {
 	Remark           string            `gorm:"size:500;comment:备注"`
 	AGVTaskTypeID    *string           `gorm:"size:36;comment:任务类型ID"`
 	AGVTaskType      *AGVTaskType      `gorm:"constraint:OnDelete:SET NULL"` //任务类型
+	MaterialShelfID  *string           `gorm:"size:36;comment:物料货架ID"`
+	MaterialShelf    *MaterialShelf    `gorm:"constraint:OnDelete:SET NULL"` //物料货架
 	DepartureID      string            `gorm:"size:36;comment:起点库位ID"`
 	Departure        *MaterialShelfBin `gorm:"constraint:OnDelete:CASCADE"` //起点库位
 	DestinationID    string            `gorm:"size:36;comment:终点库位ID"`

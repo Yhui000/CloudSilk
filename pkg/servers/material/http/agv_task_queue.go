@@ -221,6 +221,27 @@ func DeleteAGVTaskQueue(c *gin.Context) {
 	c.JSON(http.StatusOK, resp)
 }
 
+// SubmitAGVTaskQueue godoc
+// @Summary 提交
+// @Description 提交
+// @Tags AGV任务队列管理
+// @Accept  json
+// @Produce  json
+// @Param authorization header string true "jwt token"
+// @Success 200 {object} proto.CommonResponse
+// @Router /api/mom/material/agvtaskqueue/submit [get]
+func SubmitAGVTaskQueue(c *gin.Context) {
+	resp := &proto.CommonResponse{
+		Code: proto.Code_Success,
+	}
+
+	if err := logic.SubmitAGVTaskQueue(middleware.GetUserID(c)); err != nil {
+		resp.Code = proto.Code_InternalServerError
+		resp.Message = err.Error()
+	}
+	c.JSON(http.StatusOK, resp)
+}
+
 func RegisterAGVTaskQueueRouter(r *gin.Engine) {
 	g := r.Group("/api/mom/material/agvtaskqueue")
 
@@ -230,4 +251,5 @@ func RegisterAGVTaskQueueRouter(r *gin.Engine) {
 	g.DELETE("delete", DeleteAGVTaskQueue)
 	g.GET("all", GetAllAGVTaskQueue)
 	g.GET("detail", GetAGVTaskQueueDetail)
+	g.GET("submit", SubmitAGVTaskQueue)
 }

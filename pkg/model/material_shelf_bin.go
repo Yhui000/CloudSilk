@@ -16,7 +16,7 @@ type MaterialShelfBin struct {
 	CurrentState    string         `gorm:"size:50;comment:当前状态"`
 	LastUpdateTime  time.Time      `gorm:"autoUpdateTime:nano;comment:状态变更时间"`
 	Remark          string         `gorm:"size:500;comment:备注"`
-	MaterialShelfID string         `gorm:"size:36;comment:隶属料架ID"`
+	MaterialShelfID *string        `gorm:"size:36;comment:隶属料架ID"`
 	MaterialShelf   *MaterialShelf `gorm:"constraint:OnDelete:CASCADE"` //隶属料架
 	MaterialInfoID  *string        `gorm:"size:36;comment:当前物料ID"`
 	MaterialInfo    *MaterialInfo  `gorm:"constraint:OnDelete:SET NULL"` //当前物料
@@ -35,7 +35,10 @@ func PBToMaterialShelfBin(in *proto.MaterialShelfBinInfo) *MaterialShelfBin {
 		return nil
 	}
 
-	var materialInfoID *string
+	var materialShelfID, materialInfoID *string
+	if in.MaterialShelfID != "" {
+		materialShelfID = &in.MaterialShelfID
+	}
 	if in.MaterialInfoID != "" {
 		materialInfoID = &in.MaterialInfoID
 	}
@@ -47,7 +50,7 @@ func PBToMaterialShelfBin(in *proto.MaterialShelfBinInfo) *MaterialShelfBin {
 		Identifier:      in.Identifier,
 		CurrentState:    in.CurrentState,
 		Remark:          in.Remark,
-		MaterialShelfID: in.MaterialShelfID,
+		MaterialShelfID: materialShelfID,
 		MaterialInfoID:  materialInfoID,
 	}
 }
@@ -65,7 +68,10 @@ func MaterialShelfBinToPB(in *MaterialShelfBin) *proto.MaterialShelfBinInfo {
 		return nil
 	}
 
-	var materialInfoID string
+	var materialShelfID, materialInfoID string
+	if in.MaterialShelfID != nil {
+		materialShelfID = *in.MaterialShelfID
+	}
 	if in.MaterialInfoID != nil {
 		materialInfoID = *in.MaterialInfoID
 	}
@@ -78,7 +84,7 @@ func MaterialShelfBinToPB(in *MaterialShelfBin) *proto.MaterialShelfBinInfo {
 		CurrentState:    in.CurrentState,
 		LastUpdateTime:  utils.FormatTime(in.LastUpdateTime),
 		Remark:          in.Remark,
-		MaterialShelfID: in.MaterialShelfID,
+		MaterialShelfID: materialShelfID,
 		MaterialShelf:   MaterialShelfToPB(in.MaterialShelf),
 		MaterialInfoID:  materialInfoID,
 		MaterialInfo:    MaterialInfoToPB(in.MaterialInfo),

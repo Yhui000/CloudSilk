@@ -17,7 +17,7 @@ func UpdateProductOrderAttribute(m *model.ProductOrderAttribute) error {
 }
 
 func QueryProductOrderAttribute(req *proto.QueryProductOrderAttributeRequest, resp *proto.QueryProductOrderAttributeResponse, preload bool) {
-	db := model.DB.DB().Model(&model.ProductOrderAttribute{}).Preload("ProductAttribute").Preload("ProductOrder").Preload(clause.Associations)
+	db := model.DB.DB().Model(&model.ProductOrderAttribute{}).Preload("ProductAttribute").Preload("ProductOrder")
 	if req.ProductOrderNo != "" {
 		db = db.Joins("JOIN product_orders ON product_order_attributes.product_order_id=product_orders.id").
 			Where("product_orders.product_order_no LIKE ?", "%"+req.ProductOrderNo+"%")

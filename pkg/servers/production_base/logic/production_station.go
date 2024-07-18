@@ -17,7 +17,7 @@ func UpdateProductionStation(m *model.ProductionStation) error {
 }
 
 func QueryProductionStation(req *proto.QueryProductionStationRequest, resp *proto.QueryProductionStationResponse, preload bool) {
-	db := model.DB.DB().Model(&model.ProductionStation{}).Preload("ProductionLine").Preload(clause.Associations)
+	db := model.DB.DB().Model(&model.ProductionStation{}).Preload("ProductionLine")
 	if req.ProductionLineID != "" {
 		db = db.Where("`production_line_id` = ?", req.ProductionLineID)
 	}

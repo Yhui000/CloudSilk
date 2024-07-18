@@ -17,7 +17,7 @@ func UpdateProductProcessRoute(m *model.ProductProcessRoute) error {
 }
 
 func QueryProductProcessRoute(req *proto.QueryProductProcessRouteRequest, resp *proto.QueryProductProcessRouteResponse, preload bool) {
-	db := model.DB.DB().Model(&model.ProductProcessRoute{}).Preload("ProductionStation").Preload("ProductInfo").Preload("ProductInfo.ProductOrder").Preload("CurrentProcess").Preload(clause.Associations)
+	db := model.DB.DB().Model(&model.ProductProcessRoute{}).Preload("ProductionStation").Preload("ProductInfo").Preload("ProductInfo.ProductOrder").Preload("CurrentProcess")
 	if req.CurrentProcessID != "" {
 		db = db.Where("`current_process_id` = ?", req.CurrentProcessID)
 	}

@@ -28,7 +28,7 @@ func UpdateProductOrderReleaseRule(m *model.ProductOrderReleaseRule) error {
 }
 
 func QueryProductOrderReleaseRule(req *proto.QueryProductOrderReleaseRuleRequest, resp *proto.QueryProductOrderReleaseRuleResponse, preload bool) {
-	db := model.DB.DB().Model(&model.ProductOrderReleaseRule{}).Preload("ProductionLine").Preload(clause.Associations)
+	db := model.DB.DB().Model(&model.ProductOrderReleaseRule{}).Preload("ProductionLine")
 
 	orderStr, err := utils.GenerateOrderString(req.SortConfig, "created_at desc")
 	if err != nil {

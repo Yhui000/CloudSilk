@@ -44,7 +44,7 @@ func UpdateProductionProcessStep(m *model.ProductionProcessStep) error {
 }
 
 func QueryProductionProcessStep(req *proto.QueryProductionProcessStepRequest, resp *proto.QueryProductionProcessStepResponse, preload bool) {
-	db := model.DB.DB().Model(&model.ProductionProcessStep{}).Preload("ProcessStepType").Preload("AttributeExpressions").Preload(clause.Associations)
+	db := model.DB.DB().Model(&model.ProductionProcessStep{}).Preload("ProcessStepType").Preload("AttributeExpressions")
 	if req.ProductionProcessID != "" {
 		db = db.Joins("JOIN available_processes ON production_process_steps.id=available_processes.production_process_step_id").
 			Where("available_processes.production_process_id = ?", req.ProductionProcessID)

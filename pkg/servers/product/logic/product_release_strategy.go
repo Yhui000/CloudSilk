@@ -24,7 +24,7 @@ func UpdateProductReleaseStrategy(m *model.ProductReleaseStrategy) error {
 }
 
 func QueryProductReleaseStrategy(req *proto.QueryProductReleaseStrategyRequest, resp *proto.QueryProductReleaseStrategyResponse, preload bool) {
-	db := model.DB.DB().Model(&model.ProductReleaseStrategy{}).Preload("ProductCategory").Preload(clause.Associations)
+	db := model.DB.DB().Model(&model.ProductReleaseStrategy{}).Preload("ProductCategory")
 	if req.Code != "" {
 		db = db.Where("`code` LIKE ? OR `description` LIKE ?", "%"+req.Code+"%", "%"+req.Code+"%")
 	}

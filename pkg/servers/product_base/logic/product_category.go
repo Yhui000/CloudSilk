@@ -31,7 +31,7 @@ func UpdateProductCategory(m *model.ProductCategory) error {
 }
 
 func QueryProductCategory(req *proto.QueryProductCategoryRequest, resp *proto.QueryProductCategoryResponse, preload bool) {
-	db := model.DB.DB().Model(&model.ProductCategory{}).Preload("ProductBrand").Preload(clause.Associations)
+	db := model.DB.DB().Model(&model.ProductCategory{}).Preload("ProductBrand")
 	if req.Code != "" {
 		db = db.Where("`code` LIKE ? OR `description` LIKE ?", "%"+req.Code+"%", "%"+req.Code+"%")
 	}

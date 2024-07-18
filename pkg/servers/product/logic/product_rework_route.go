@@ -17,7 +17,7 @@ func UpdateProductReworkRoute(m *model.ProductReworkRoute) error {
 }
 
 func QueryProductReworkRoute(req *proto.QueryProductReworkRouteRequest, resp *proto.QueryProductReworkRouteResponse, preload bool) {
-	db := model.DB.DB().Model(&model.ProductReworkRoute{}).Preload("ProductionLine").Preload("MaterialCategory").Preload("FollowProcess").Preload(clause.Associations)
+	db := model.DB.DB().Model(&model.ProductReworkRoute{}).Preload("ProductionLine").Preload("MaterialCategory").Preload("FollowProcess")
 	if req.ProductionLineID != "" {
 		db = db.Where("`production_line_id` = ?", req.ProductionLineID)
 	}

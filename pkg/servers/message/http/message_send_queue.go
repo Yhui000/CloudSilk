@@ -4,27 +4,29 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/CloudSilk/CloudSilk/pkg/clients"
 	"github.com/CloudSilk/CloudSilk/pkg/model"
 	"github.com/CloudSilk/CloudSilk/pkg/proto"
-	"github.com/CloudSilk/CloudSilk/pkg/servers/system/logic"
+	"github.com/CloudSilk/CloudSilk/pkg/servers/message/logic"
 	"github.com/CloudSilk/pkg/utils/log"
+	usercenter "github.com/CloudSilk/usercenter/proto"
 	"github.com/CloudSilk/usercenter/utils/middleware"
 	"github.com/gin-gonic/gin"
 )
 
-// AddSystemEventTrigger godoc
+// AddMessageSendQueue godoc
 // @Summary 新增
 // @Description 新增
-// @Tags 系统事件触发管理
+// @Tags 消息发送队列管理
 // @Accept  json
 // @Produce  json
 // @Param authorization header string true "jwt token"
-// @Param account body proto.SystemEventTriggerInfo true "Add SystemEventTrigger"
+// @Param account body proto.MessageSendQueueInfo true "Add MessageSendQueue"
 // @Success 200 {object} proto.CommonResponse
-// @Router /api/mom/system/systemeventtrigger/add [post]
-func AddSystemEventTrigger(c *gin.Context) {
+// @Router /api/mom/message/messagesendqueue/add [post]
+func AddMessageSendQueue(c *gin.Context) {
 	transID := middleware.GetTransID(c)
-	req := &proto.SystemEventTriggerInfo{}
+	req := &proto.MessageSendQueueInfo{CreateUserID: middleware.GetUserID(c)}
 	resp := &proto.CommonResponse{
 		Code: proto.Code_Success,
 	}
@@ -33,7 +35,7 @@ func AddSystemEventTrigger(c *gin.Context) {
 		resp.Code = proto.Code_BadRequest
 		resp.Message = err.Error()
 		c.JSON(http.StatusOK, resp)
-		log.Warnf(context.Background(), "TransID:%s,新建系统事件触发请求参数无效:%v", transID, err)
+		log.Warnf(context.Background(), "TransID:%s,新建消息发送队列请求参数无效:%v", transID, err)
 		return
 	}
 	err = middleware.Validate.Struct(req)
@@ -44,7 +46,7 @@ func AddSystemEventTrigger(c *gin.Context) {
 		return
 	}
 
-	id, err := logic.CreateSystemEventTrigger(model.PBToSystemEventTrigger(req))
+	id, err := logic.CreateMessageSendQueue(model.PBToMessageSendQueue(req))
 	if err != nil {
 		resp.Code = proto.Code_InternalServerError
 		resp.Message = err.Error()
@@ -54,19 +56,19 @@ func AddSystemEventTrigger(c *gin.Context) {
 	c.JSON(http.StatusOK, resp)
 }
 
-// UpdateSystemEventTrigger godoc
+// UpdateMessageSendQueue godoc
 // @Summary 更新
 // @Description 更新
-// @Tags 系统事件触发管理
+// @Tags 消息发送队列管理
 // @Accept  json
 // @Produce  json
 // @Param authorization header string true "jwt token"
-// @Param account body proto.SystemEventTriggerInfo true "Update SystemEventTrigger"
+// @Param account body proto.MessageSendQueueInfo true "Update MessageSendQueue"
 // @Success 200 {object} proto.CommonResponse
-// @Router /api/mom/system/systemeventtrigger/update [put]
-func UpdateSystemEventTrigger(c *gin.Context) {
+// @Router /api/mom/message/messagesendqueue/update [put]
+func UpdateMessageSendQueue(c *gin.Context) {
 	transID := middleware.GetTransID(c)
-	req := &proto.SystemEventTriggerInfo{}
+	req := &proto.MessageSendQueueInfo{}
 	resp := &proto.CommonResponse{
 		Code: proto.Code_Success,
 	}
@@ -75,7 +77,7 @@ func UpdateSystemEventTrigger(c *gin.Context) {
 		resp.Code = proto.Code_BadRequest
 		resp.Message = err.Error()
 		c.JSON(http.StatusOK, resp)
-		log.Warnf(context.Background(), "TransID:%s,更新系统事件触发请求参数无效:%v", transID, err)
+		log.Warnf(context.Background(), "TransID:%s,更新消息发送队列请求参数无效:%v", transID, err)
 		return
 	}
 	err = middleware.Validate.Struct(req)
@@ -85,7 +87,7 @@ func UpdateSystemEventTrigger(c *gin.Context) {
 		c.JSON(http.StatusOK, resp)
 		return
 	}
-	err = logic.UpdateSystemEventTrigger(model.PBToSystemEventTrigger(req))
+	err = logic.UpdateMessageSendQueue(model.PBToMessageSendQueue(req))
 	if err != nil {
 		resp.Code = proto.Code_InternalServerError
 		resp.Message = err.Error()
@@ -93,10 +95,10 @@ func UpdateSystemEventTrigger(c *gin.Context) {
 	c.JSON(http.StatusOK, resp)
 }
 
-// QuerySystemEventTrigger godoc
+// QueryMessageSendQueue godoc
 // @Summary 分页查询
 // @Description 分页查询
-// @Tags 系统事件触发管理
+// @Tags 消息发送队列管理
 // @Accept  json
 // @Produce  octet-stream
 // @Param authorization header string true "jwt token"
@@ -104,15 +106,15 @@ func UpdateSystemEventTrigger(c *gin.Context) {
 // @Param pageSize query int false "默认每页10条"
 // @Param orderField query string false "排序字段"
 // @Param desc query bool false "是否倒序排序"
-// @Param eventNo query string false "事件编号"
-// @Param createTime0 query string false "触发时间开始"
-// @Param createTime1 query string false "触发时间结束"
-// @Param systemEvent query string false "系统事件"
-// @Success 200 {object} proto.QuerySystemEventTriggerResponse
-// @Router /api/mom/system/systemeventtrigger/query [get]
-func QuerySystemEventTrigger(c *gin.Context) {
-	req := &proto.QuerySystemEventTriggerRequest{}
-	resp := &proto.QuerySystemEventTriggerResponse{
+// @Param taskNo query string false "任务编号"
+// @Param messageTypeID query string false "消息类型ID"
+// @Param createTime0 query string false "创建时间开始"
+// @Param createTime1 query string false "创建时间结束"
+// @Success 200 {object} proto.QueryMessageSendQueueResponse
+// @Router /api/mom/message/messagesendqueue/query [get]
+func QueryMessageSendQueue(c *gin.Context) {
+	req := &proto.QueryMessageSendQueueRequest{}
+	resp := &proto.QueryMessageSendQueueResponse{
 		Code: proto.Code_Success,
 	}
 	err := c.BindQuery(req)
@@ -122,47 +124,64 @@ func QuerySystemEventTrigger(c *gin.Context) {
 		c.JSON(http.StatusOK, resp)
 		return
 	}
-	logic.QuerySystemEventTrigger(req, resp, false)
+	logic.QueryMessageSendQueue(req, resp, false)
+	if resp.Code == proto.Code_Success {
+		r := &usercenter.QueryUserRequest{}
+		for _, u := range resp.Data {
+			r.Ids = append(r.Ids, u.CreateUserID)
+		}
+		r.PageSize = int64(len(r.Ids))
+		users, err := clients.UserClient.Query(context.Background(), r)
+		if err == nil && users.Code == usercenter.Code_Success {
+			for _, u := range resp.Data {
+				for _, u2 := range users.Data {
+					if u.CreateUserID == u2.Id {
+						u.CreateUserName = u2.Nickname
+					}
+				}
+			}
+		}
+	}
 
 	c.JSON(http.StatusOK, resp)
 }
 
-// GetAllSystemEventTrigger godoc
+// GetAllMessageSendQueue godoc
 // @Summary 查询所有
 // @Description 查询所有
-// @Tags 系统事件触发管理
+// @Tags 消息发送队列管理
 // @Accept  json
 // @Produce  json
 // @Param authorization header string true "jwt token"
-// @Success 200 {object} proto.GetAllSystemEventTriggerResponse
-// @Router /api/mom/system/systemeventtrigger/all [get]
-func GetAllSystemEventTrigger(c *gin.Context) {
-	resp := &proto.GetAllSystemEventTriggerResponse{
+// @Success 200 {object} proto.GetAllMessageSendQueueResponse
+// @Router /api/mom/message/messagesendqueue/all [get]
+func GetAllMessageSendQueue(c *gin.Context) {
+	resp := &proto.GetAllMessageSendQueueResponse{
 		Code: proto.Code_Success,
 	}
-	list, err := logic.GetAllSystemEventTriggers()
+	list, err := logic.GetAllMessageSendQueues()
 	if err != nil {
 		resp.Code = proto.Code_InternalServerError
 		resp.Message = err.Error()
 		c.JSON(http.StatusOK, resp)
 		return
 	}
-	resp.Data = model.SystemEventTriggersToPB(list)
+	resp.Data = model.MessageSendQueuesToPB(list)
 	c.JSON(http.StatusOK, resp)
 }
 
-// GetSystemEventTriggerDetail godoc
+// GetMessageSendQueueDetail godoc
 // @Summary 查询明细
 // @Description 查询明细
-// @Tags 系统事件触发管理
+// @Tags 消息发送队列管理
 // @Accept  json
 // @Produce  json
 // @Param id query string true "ID"
 // @Param authorization header string true "jwt token"
-// @Success 200 {object} proto.GetSystemEventTriggerDetailResponse
-// @Router /api/mom/system/systemeventtrigger/detail [get]
-func GetSystemEventTriggerDetail(c *gin.Context) {
-	resp := &proto.GetSystemEventTriggerDetailResponse{
+// @Success 200 {object} proto.GetMessageSendQueueDetailResponse
+// @Router /api/mom/message/messagesendqueue/detail [get]
+func GetMessageSendQueueDetail(c *gin.Context) {
+	resp := &proto.GetMessageSendQueueDetailResponse{
 		Code: proto.Code_Success,
 	}
 	id := c.Query("id")
@@ -173,27 +192,27 @@ func GetSystemEventTriggerDetail(c *gin.Context) {
 	}
 	var err error
 
-	data, err := logic.GetSystemEventTriggerByID(id)
+	data, err := logic.GetMessageSendQueueByID(id)
 	if err != nil {
 		resp.Code = proto.Code_InternalServerError
 		resp.Message = err.Error()
 	} else {
-		resp.Data = model.SystemEventTriggerToPB(data)
+		resp.Data = model.MessageSendQueueToPB(data)
 	}
 	c.JSON(http.StatusOK, resp)
 }
 
-// DeleteSystemEventTrigger godoc
+// DeleteMessageSendQueue godoc
 // @Summary 删除
 // @Description 删除
-// @Tags 系统事件触发管理
+// @Tags 消息发送队列管理
 // @Accept  json
 // @Produce  json
 // @Param authorization header string true "jwt token"
-// @Param data body proto.DelRequest true "Delete SystemEventTrigger"
+// @Param data body proto.DelRequest true "Delete MessageSendQueue"
 // @Success 200 {object} proto.CommonResponse
-// @Router /api/mom/system/systemeventtrigger/delete [delete]
-func DeleteSystemEventTrigger(c *gin.Context) {
+// @Router /api/mom/message/messagesendqueue/delete [delete]
+func DeleteMessageSendQueue(c *gin.Context) {
 	transID := middleware.GetTransID(c)
 	req := &proto.DelRequest{}
 	resp := &proto.CommonResponse{
@@ -204,7 +223,7 @@ func DeleteSystemEventTrigger(c *gin.Context) {
 		resp.Code = proto.Code_BadRequest
 		resp.Message = err.Error()
 		c.JSON(http.StatusOK, resp)
-		log.Warnf(context.Background(), "TransID:%s,删除系统事件触发请求参数无效:%v", transID, err)
+		log.Warnf(context.Background(), "TransID:%s,删除消息发送队列请求参数无效:%v", transID, err)
 		return
 	}
 	err = middleware.Validate.Struct(req)
@@ -214,7 +233,7 @@ func DeleteSystemEventTrigger(c *gin.Context) {
 		c.JSON(http.StatusOK, resp)
 		return
 	}
-	err = logic.DeleteSystemEventTrigger(req.Id)
+	err = logic.DeleteMessageSendQueue(req.Id)
 	if err != nil {
 		resp.Code = proto.Code_InternalServerError
 		resp.Message = err.Error()
@@ -222,17 +241,17 @@ func DeleteSystemEventTrigger(c *gin.Context) {
 	c.JSON(http.StatusOK, resp)
 }
 
-// ExecuteSystemEventTrigger godoc
-// @Summary 执行
-// @Description 执行
-// @Tags 系统事件触发管理
+// SendMessageSendQueue godoc
+// @Summary 发送
+// @Description 发送
+// @Tags 消息发送队列管理
 // @Accept  json
 // @Produce  json
 // @Param authorization header string true "jwt token"
-// @Param data body proto.GetByIDsRequest true "Execute SystemEventTrigger"
+// @Param data body proto.GetByIDsRequest true "Send MessageSendQueue"
 // @Success 200 {object} proto.CommonResponse
-// @Router /api/mom/system/systemeventtrigger/execute [get]
-func ExecuteSystemEventTrigger(c *gin.Context) {
+// @Router /api/mom/message/messagesendqueue/send [get]
+func SendMessageSendQueue(c *gin.Context) {
 	transID := middleware.GetTransID(c)
 	req := &proto.GetByIDsRequest{}
 	resp := &proto.CommonResponse{
@@ -243,7 +262,7 @@ func ExecuteSystemEventTrigger(c *gin.Context) {
 		resp.Code = proto.Code_BadRequest
 		resp.Message = err.Error()
 		c.JSON(http.StatusOK, resp)
-		log.Warnf(context.Background(), "TransID:%s,执行系统事件触发请求参数无效:%v", transID, err)
+		log.Warnf(context.Background(), "TransID:%s,发送消息发送队列请求参数无效:%v", transID, err)
 		return
 	}
 	err = middleware.Validate.Struct(req)
@@ -253,7 +272,7 @@ func ExecuteSystemEventTrigger(c *gin.Context) {
 		c.JSON(http.StatusOK, resp)
 		return
 	}
-	err = logic.ExecuteSystemEventTrigger(middleware.GetUserID(c), req.Ids)
+	err = logic.SendMessageSendQueue(middleware.GetUserID(c), req.Ids)
 	if err != nil {
 		resp.Code = proto.Code_InternalServerError
 		resp.Message = err.Error()
@@ -261,14 +280,14 @@ func ExecuteSystemEventTrigger(c *gin.Context) {
 	c.JSON(http.StatusOK, resp)
 }
 
-func RegisterSystemEventTriggerRouter(r *gin.Engine) {
-	g := r.Group("/api/mom/system/systemeventtrigger")
+func RegisterMessageSendQueueRouter(r *gin.Engine) {
+	g := r.Group("/api/mom/message/messagesendqueue")
 
-	g.POST("add", AddSystemEventTrigger)
-	g.PUT("update", UpdateSystemEventTrigger)
-	g.GET("query", QuerySystemEventTrigger)
-	g.DELETE("delete", DeleteSystemEventTrigger)
-	g.GET("all", GetAllSystemEventTrigger)
-	g.GET("detail", GetSystemEventTriggerDetail)
-	g.GET("excute", ExecuteSystemEventTrigger)
+	g.POST("add", AddMessageSendQueue)
+	g.PUT("update", UpdateMessageSendQueue)
+	g.GET("query", QueryMessageSendQueue)
+	g.DELETE("delete", DeleteMessageSendQueue)
+	g.GET("all", GetAllMessageSendQueue)
+	g.GET("detail", GetMessageSendQueueDetail)
+	g.GET("send", SendMessageSendQueue)
 }

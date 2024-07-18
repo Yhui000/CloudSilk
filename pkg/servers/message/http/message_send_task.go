@@ -6,25 +6,25 @@ import (
 
 	"github.com/CloudSilk/CloudSilk/pkg/model"
 	"github.com/CloudSilk/CloudSilk/pkg/proto"
-	"github.com/CloudSilk/CloudSilk/pkg/servers/system/logic"
+	"github.com/CloudSilk/CloudSilk/pkg/servers/message/logic"
 	"github.com/CloudSilk/pkg/utils/log"
 	"github.com/CloudSilk/usercenter/utils/middleware"
 	"github.com/gin-gonic/gin"
 )
 
-// AddRemoteServiceTask godoc
+// AddMessageSendTask godoc
 // @Summary 新增
 // @Description 新增
-// @Tags 远程任务管理
+// @Tags 消息发送任务管理
 // @Accept  json
 // @Produce  json
 // @Param authorization header string true "jwt token"
-// @Param account body proto.RemoteServiceTaskInfo true "Add RemoteServiceTask"
+// @Param account body proto.MessageSendTaskInfo true "Add MessageSendTask"
 // @Success 200 {object} proto.CommonResponse
-// @Router /api/mom/system/remoteservicetask/add [post]
-func AddRemoteServiceTask(c *gin.Context) {
+// @Router /api/mom/message/messagesendtask/add [post]
+func AddMessageSendTask(c *gin.Context) {
 	transID := middleware.GetTransID(c)
-	req := &proto.RemoteServiceTaskInfo{}
+	req := &proto.MessageSendTaskInfo{}
 	resp := &proto.CommonResponse{
 		Code: proto.Code_Success,
 	}
@@ -33,7 +33,7 @@ func AddRemoteServiceTask(c *gin.Context) {
 		resp.Code = proto.Code_BadRequest
 		resp.Message = err.Error()
 		c.JSON(http.StatusOK, resp)
-		log.Warnf(context.Background(), "TransID:%s,新建远程任务管理请求参数无效:%v", transID, err)
+		log.Warnf(context.Background(), "TransID:%s,新建消息发送任务请求参数无效:%v", transID, err)
 		return
 	}
 	err = middleware.Validate.Struct(req)
@@ -44,7 +44,7 @@ func AddRemoteServiceTask(c *gin.Context) {
 		return
 	}
 
-	id, err := logic.CreateRemoteServiceTask(model.PBToRemoteServiceTask(req))
+	id, err := logic.CreateMessageSendTask(model.PBToMessageSendTask(req))
 	if err != nil {
 		resp.Code = proto.Code_InternalServerError
 		resp.Message = err.Error()
@@ -54,19 +54,19 @@ func AddRemoteServiceTask(c *gin.Context) {
 	c.JSON(http.StatusOK, resp)
 }
 
-// UpdateRemoteServiceTask godoc
+// UpdateMessageSendTask godoc
 // @Summary 更新
 // @Description 更新
-// @Tags 远程任务管理
+// @Tags 消息发送任务管理
 // @Accept  json
 // @Produce  json
 // @Param authorization header string true "jwt token"
-// @Param account body proto.RemoteServiceTaskInfo true "Update RemoteServiceTask"
+// @Param account body proto.MessageSendTaskInfo true "Update MessageSendTask"
 // @Success 200 {object} proto.CommonResponse
-// @Router /api/mom/system/remoteservicetask/update [put]
-func UpdateRemoteServiceTask(c *gin.Context) {
+// @Router /api/mom/message/messagesendtask/update [put]
+func UpdateMessageSendTask(c *gin.Context) {
 	transID := middleware.GetTransID(c)
-	req := &proto.RemoteServiceTaskInfo{}
+	req := &proto.MessageSendTaskInfo{}
 	resp := &proto.CommonResponse{
 		Code: proto.Code_Success,
 	}
@@ -75,7 +75,7 @@ func UpdateRemoteServiceTask(c *gin.Context) {
 		resp.Code = proto.Code_BadRequest
 		resp.Message = err.Error()
 		c.JSON(http.StatusOK, resp)
-		log.Warnf(context.Background(), "TransID:%s,更新远程任务管理请求参数无效:%v", transID, err)
+		log.Warnf(context.Background(), "TransID:%s,更新消息发送任务请求参数无效:%v", transID, err)
 		return
 	}
 	err = middleware.Validate.Struct(req)
@@ -85,7 +85,7 @@ func UpdateRemoteServiceTask(c *gin.Context) {
 		c.JSON(http.StatusOK, resp)
 		return
 	}
-	err = logic.UpdateRemoteServiceTask(model.PBToRemoteServiceTask(req))
+	err = logic.UpdateMessageSendTask(model.PBToMessageSendTask(req))
 	if err != nil {
 		resp.Code = proto.Code_InternalServerError
 		resp.Message = err.Error()
@@ -93,10 +93,10 @@ func UpdateRemoteServiceTask(c *gin.Context) {
 	c.JSON(http.StatusOK, resp)
 }
 
-// QueryRemoteServiceTask godoc
+// QueryMessageSendTask godoc
 // @Summary 分页查询
 // @Description 分页查询
-// @Tags 远程任务管理
+// @Tags 消息发送任务管理
 // @Accept  json
 // @Produce  octet-stream
 // @Param authorization header string true "jwt token"
@@ -104,11 +104,14 @@ func UpdateRemoteServiceTask(c *gin.Context) {
 // @Param pageSize query int false "默认每页10条"
 // @Param orderField query string false "排序字段"
 // @Param desc query bool false "是否倒序排序"
-// @Success 200 {object} proto.QueryRemoteServiceTaskResponse
-// @Router /api/mom/system/remoteservicetask/query [get]
-func QueryRemoteServiceTask(c *gin.Context) {
-	req := &proto.QueryRemoteServiceTaskRequest{}
-	resp := &proto.QueryRemoteServiceTaskResponse{
+// @Param code query string false "代号或描述"
+// @Param messageTypeID query string false "消息类型ID"
+// @Param productionLineID query string false "隶属产线ID"
+// @Success 200 {object} proto.QueryMessageSendTaskResponse
+// @Router /api/mom/message/messagesendtask/query [get]
+func QueryMessageSendTask(c *gin.Context) {
+	req := &proto.QueryMessageSendTaskRequest{}
+	resp := &proto.QueryMessageSendTaskResponse{
 		Code: proto.Code_Success,
 	}
 	err := c.BindQuery(req)
@@ -118,47 +121,47 @@ func QueryRemoteServiceTask(c *gin.Context) {
 		c.JSON(http.StatusOK, resp)
 		return
 	}
-	logic.QueryRemoteServiceTask(req, resp, false)
+	logic.QueryMessageSendTask(req, resp, false)
 
 	c.JSON(http.StatusOK, resp)
 }
 
-// GetAllRemoteServiceTask godoc
+// GetAllMessageSendTask godoc
 // @Summary 查询所有
 // @Description 查询所有
-// @Tags 远程任务管理
+// @Tags 消息发送任务管理
 // @Accept  json
 // @Produce  json
 // @Param authorization header string true "jwt token"
-// @Success 200 {object} proto.GetAllRemoteServiceTaskResponse
-// @Router /api/mom/system/remoteservicetask/all [get]
-func GetAllRemoteServiceTask(c *gin.Context) {
-	resp := &proto.GetAllRemoteServiceTaskResponse{
+// @Success 200 {object} proto.GetAllMessageSendTaskResponse
+// @Router /api/mom/message/messagesendtask/all [get]
+func GetAllMessageSendTask(c *gin.Context) {
+	resp := &proto.GetAllMessageSendTaskResponse{
 		Code: proto.Code_Success,
 	}
-	list, err := logic.GetAllRemoteServiceTasks()
+	list, err := logic.GetAllMessageSendTasks()
 	if err != nil {
 		resp.Code = proto.Code_InternalServerError
 		resp.Message = err.Error()
 		c.JSON(http.StatusOK, resp)
 		return
 	}
-	resp.Data = model.RemoteServiceTasksToPB(list)
+	resp.Data = model.MessageSendTasksToPB(list)
 	c.JSON(http.StatusOK, resp)
 }
 
-// GetRemoteServiceTaskDetail godoc
+// GetMessageSendTaskDetail godoc
 // @Summary 查询明细
 // @Description 查询明细
-// @Tags 远程任务管理
+// @Tags 消息发送任务管理
 // @Accept  json
 // @Produce  json
 // @Param id query string true "ID"
 // @Param authorization header string true "jwt token"
-// @Success 200 {object} proto.GetRemoteServiceTaskDetailResponse
-// @Router /api/mom/system/remoteservicetask/detail [get]
-func GetRemoteServiceTaskDetail(c *gin.Context) {
-	resp := &proto.GetRemoteServiceTaskDetailResponse{
+// @Success 200 {object} proto.GetMessageSendTaskDetailResponse
+// @Router /api/mom/message/messagesendtask/detail [get]
+func GetMessageSendTaskDetail(c *gin.Context) {
+	resp := &proto.GetMessageSendTaskDetailResponse{
 		Code: proto.Code_Success,
 	}
 	id := c.Query("id")
@@ -169,27 +172,27 @@ func GetRemoteServiceTaskDetail(c *gin.Context) {
 	}
 	var err error
 
-	data, err := logic.GetRemoteServiceTaskByID(id)
+	data, err := logic.GetMessageSendTaskByID(id)
 	if err != nil {
 		resp.Code = proto.Code_InternalServerError
 		resp.Message = err.Error()
 	} else {
-		resp.Data = model.RemoteServiceTaskToPB(data)
+		resp.Data = model.MessageSendTaskToPB(data)
 	}
 	c.JSON(http.StatusOK, resp)
 }
 
-// DeleteRemoteServiceTask godoc
+// DeleteMessageSendTask godoc
 // @Summary 删除
 // @Description 删除
-// @Tags 远程任务管理
+// @Tags 消息发送任务管理
 // @Accept  json
 // @Produce  json
 // @Param authorization header string true "jwt token"
-// @Param data body proto.DelRequest true "Delete RemoteServiceTask"
+// @Param data body proto.DelRequest true "Delete MessageSendTask"
 // @Success 200 {object} proto.CommonResponse
-// @Router /api/mom/system/remoteservicetask/delete [delete]
-func DeleteRemoteServiceTask(c *gin.Context) {
+// @Router /api/mom/message/messagesendtask/delete [delete]
+func DeleteMessageSendTask(c *gin.Context) {
 	transID := middleware.GetTransID(c)
 	req := &proto.DelRequest{}
 	resp := &proto.CommonResponse{
@@ -200,7 +203,7 @@ func DeleteRemoteServiceTask(c *gin.Context) {
 		resp.Code = proto.Code_BadRequest
 		resp.Message = err.Error()
 		c.JSON(http.StatusOK, resp)
-		log.Warnf(context.Background(), "TransID:%s,删除远程任务管理请求参数无效:%v", transID, err)
+		log.Warnf(context.Background(), "TransID:%s,删除消息发送任务请求参数无效:%v", transID, err)
 		return
 	}
 	err = middleware.Validate.Struct(req)
@@ -210,7 +213,7 @@ func DeleteRemoteServiceTask(c *gin.Context) {
 		c.JSON(http.StatusOK, resp)
 		return
 	}
-	err = logic.DeleteRemoteServiceTask(req.Id)
+	err = logic.DeleteMessageSendTask(req.Id)
 	if err != nil {
 		resp.Code = proto.Code_InternalServerError
 		resp.Message = err.Error()
@@ -218,35 +221,13 @@ func DeleteRemoteServiceTask(c *gin.Context) {
 	c.JSON(http.StatusOK, resp)
 }
 
-// RunRemoteServiceTask godoc
-// @Summary 运行
-// @Description 运行
-// @Tags 远程任务管理
-// @Accept  json
-// @Produce  json
-// @Param authorization header string true "jwt token"
-// @Success 200 {object} proto.CommonResponse
-// @Router /api/mom/system/remoteservicetask/run [get]
-func RunRemoteServiceTask(c *gin.Context) {
-	resp := &proto.CommonResponse{
-		Code: proto.Code_Success,
-	}
+func RegisterMessageSendTaskRouter(r *gin.Engine) {
+	g := r.Group("/api/mom/message/messagesendtask")
 
-	if err := logic.DeleteRemoteServiceTask(middleware.GetUserID(c)); err != nil {
-		resp.Code = proto.Code_InternalServerError
-		resp.Message = err.Error()
-	}
-	c.JSON(http.StatusOK, resp)
-}
-
-func RegisterRemoteServiceTaskRouter(r *gin.Engine) {
-	g := r.Group("/api/mom/system/remoteservicetask")
-
-	g.POST("add", AddRemoteServiceTask)
-	g.PUT("update", UpdateRemoteServiceTask)
-	g.GET("query", QueryRemoteServiceTask)
-	g.DELETE("delete", DeleteRemoteServiceTask)
-	g.GET("all", GetAllRemoteServiceTask)
-	g.GET("detail", GetRemoteServiceTaskDetail)
-	g.GET("run", RunRemoteServiceTask)
+	g.POST("add", AddMessageSendTask)
+	g.PUT("update", UpdateMessageSendTask)
+	g.GET("query", QueryMessageSendTask)
+	g.DELETE("delete", DeleteMessageSendTask)
+	g.GET("all", GetAllMessageSendTask)
+	g.GET("detail", GetMessageSendTaskDetail)
 }

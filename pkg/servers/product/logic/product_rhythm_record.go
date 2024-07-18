@@ -17,7 +17,7 @@ func UpdateProductRhythmRecord(m *model.ProductRhythmRecord) error {
 }
 
 func QueryProductRhythmRecord(req *proto.QueryProductRhythmRecordRequest, resp *proto.QueryProductRhythmRecordResponse, preload bool) {
-	db := model.DB.DB().Model(&model.ProductRhythmRecord{}).Preload("ProductionStation").Preload("ProductionProcess").Preload("ProductInfo").Preload("ProductInfo.ProductOrder").Preload(clause.Associations)
+	db := model.DB.DB().Model(&model.ProductRhythmRecord{}).Preload("ProductionStation").Preload("ProductionProcess").Preload("ProductInfo").Preload("ProductInfo.ProductOrder")
 	if req.ProductOrderNo != "" || req.ProductSerialNo != "" {
 		db.Joins("JOIN product_infos ON product_rhythm_records.product_info_id=product_infos.id")
 
