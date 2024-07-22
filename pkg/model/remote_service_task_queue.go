@@ -1,6 +1,7 @@
 package model
 
 import (
+	"database/sql"
 	"time"
 
 	"github.com/CloudSilk/CloudSilk/pkg/proto"
@@ -15,7 +16,7 @@ type RemoteServiceTaskQueue struct {
 	RequestURL                       string                             `json:"requestURL" gorm:"size:-1;comment:请求路径"`
 	RequestText                      string                             `json:"requestText" gorm:"size:-1;comment:请求内容"`
 	ResponseText                     string                             `json:"responseText" gorm:"size:-1;comment:响应内容"`
-	FinishTime                       time.Time                          `json:"finishTime" gorm:"comment:完成时间"`
+	FinishTime                       sql.NullTime                       `json:"finishTime" gorm:"comment:完成时间"`
 	InvokeCount                      int32                              `json:"invokeCount" gorm:"comment:调用计数"`
 	CurrentState                     string                             `json:"currentState" gorm:"size:-1;comment:当前状态"`
 	TransactionState                 string                             `json:"transactionState" gorm:"size:-1;comment:事务状态"`
@@ -50,10 +51,10 @@ func PBToRemoteServiceTaskQueue(in *proto.RemoteServiceTaskQueueInfo) *RemoteSer
 		ModelID: ModelID{ID: in.Id},
 		TaskNo:  in.TaskNo,
 		// CreateTime:                       utils.ParseTime(in.CreateTime),
-		RequestURL:   in.RequestURL,
-		RequestText:  in.RequestText,
-		ResponseText: in.ResponseText,
-		// FinishTime:                       utils.ParseTime(in.FinishTime),
+		RequestURL:                       in.RequestURL,
+		RequestText:                      in.RequestText,
+		ResponseText:                     in.ResponseText,
+		FinishTime:                       utils.ParseSqlNullTime(in.FinishTime),
 		InvokeCount:                      in.InvokeCount,
 		CurrentState:                     in.CurrentState,
 		TransactionState:                 in.TransactionState,
@@ -89,7 +90,7 @@ func RemoteServiceTaskQueueToPB(in *RemoteServiceTaskQueue) *proto.RemoteService
 		RequestURL:                       in.RequestURL,
 		RequestText:                      in.RequestText,
 		ResponseText:                     in.ResponseText,
-		FinishTime:                       utils.FormatTime(in.FinishTime),
+		FinishTime:                       utils.FormatSqlNullTime(in.FinishTime),
 		InvokeCount:                      in.InvokeCount,
 		CurrentState:                     in.CurrentState,
 		TransactionState:                 in.TransactionState,

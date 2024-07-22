@@ -11,7 +11,7 @@ type RemoteService struct {
 	Enable        bool   `json:"enable" gorm:"comment:是否启用"`
 	Address       string `json:"address" gorm:"size:1000;comment:服务地址"`
 	Headers       string `json:"headers" gorm:"size:-1;comment:请求头"`
-	Timeout       int32  `json:"timeout" gorm:"comment:超时时间"`
+	Timeout       int64  `json:"timeout" gorm:"comment:超时时间"`
 	UseCredential bool   `json:"useCredential" gorm:"comment:使用凭证"`
 	UserName      string `json:"userName" gorm:"size:100;comment:用户名"`
 	Password      string `json:"password" gorm:"size:100;comment:密码"`
@@ -35,7 +35,7 @@ func PBToRemoteService(in *proto.RemoteServiceInfo) *RemoteService {
 		Enable:        in.Enable,
 		Address:       in.Address,
 		Headers:       in.Headers,
-		Timeout:       in.Timeout,
+		Timeout:       int64(in.Timeout),
 		UseCredential: in.UseCredential,
 		UserName:      in.UserName,
 		Password:      in.Password,
@@ -60,7 +60,7 @@ func RemoteServiceToPB(in *RemoteService) *proto.RemoteServiceInfo {
 		Enable:        in.Enable,
 		Address:       in.Address,
 		Headers:       in.Headers,
-		Timeout:       in.Timeout,
+		Timeout:       int32(in.Timeout),
 		UseCredential: in.UseCredential,
 		UserName:      in.UserName,
 		Password:      in.Password,
