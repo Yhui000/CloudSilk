@@ -13,8 +13,50 @@ import (
 )
 
 func CreateAGVTaskQueue(m *model.AGVTaskQueue) (string, error) {
+	departure := &model.AGVParkingSpace{}
+	if err := model.DB.DB().First(departure, "`id` = ?", m.DepartureID).Error; err != nil {
+		return "", err
+	}
+	if departure.MaterialShelfID == nil {
+		return "", fmt.Errorf("创建失败！当前选择的起点泊位的货架已被移走，请重新选择其他泊位。")
+	}
+
+	destination := &model.AGVParkingSpace{}
+	if err := model.DB.DB().First(destination, "`id` = ?", m.DestinationID).Error; err != nil {
+		return "", err
+	}
+	if destination.MaterialShelfID != nil {
+		return "", fmt.Errorf("创建失败！当前选择的终点泊位已被其他货架占用，请重新选择其他泊位。")
+	}
+	if destination.ShelfType != departure.ShelfType {
+		return "", fmt.Errorf("创建失败！当前选择的起点和终点的货架类型不一致，请重新选择其他泊位。")
+	}
+
+	agvTaskType := &model.AGVTaskType{}
+	if err := model.DB.DB().First(agvTaskType, "`shelf_type` = ? AND `shelf_type` = ?", destination.ShelfType, destination.SpaceType).Error; err == gorm.ErrRecordNotFound {
+		return "", fmt.Errorf("创建失败！当前选择的终点泊位缺少对应的AGV任务类型，请先创建AGV任务类型或者选择其他泊位。")
+	} else if err != nil {
+		return "", err
+	}
+	m.MaterialShelfID = departure.MaterialShelfID
+	m.AGVTaskTypeID = &agvTaskType.ID
 	m.CurrentState = types.AGVTaskQueueStateWaitDispatch
-	err := model.DB.DB().Create(m).Error
+
+	err := model.DB.DB().Transaction(func(tx *gorm.DB) error {
+		if err := tx.Model(departure).Update("current_state", types.AGVParkingSpaceStateEmpting).Error; err != nil {
+			return err
+		}
+		if err := tx.Model(destination).Update("current_state", types.AGVParkingSpaceStateParking).Error; err != nil {
+			return err
+		}
+
+		if err := tx.Create(m).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
+
 	return m.ID, err
 }
 

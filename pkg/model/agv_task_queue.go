@@ -9,22 +9,22 @@ import (
 
 type AGVTaskQueue struct {
 	ModelID
-	TaskNo           string            `gorm:"size:50;comment:任务编号"`
-	CreateTime       time.Time         `gorm:"autoCreateTime:nano;comment:创建时间"`
-	CreateUserID     string            `gorm:"size:36;comment:配料人员"`
-	ContinueTask     bool              `gorm:"comment:后续任务"`
-	CurrentState     string            `gorm:"size:50;comment:当前状态"`
-	TransactionState string            `gorm:"size:50;comment:事务状态"`
-	LastUpdateTime   time.Time         `gorm:"autoUpdateTime:nano;comment:状态变更时间"`
-	Remark           string            `gorm:"size:500;comment:备注"`
-	AGVTaskTypeID    *string           `gorm:"size:36;comment:任务类型ID"`
-	AGVTaskType      *AGVTaskType      `gorm:"constraint:OnDelete:SET NULL"` //任务类型
-	MaterialShelfID  *string           `gorm:"size:36;comment:物料货架ID"`
-	MaterialShelf    *MaterialShelf    `gorm:"constraint:OnDelete:SET NULL"` //物料货架
-	DepartureID      string            `gorm:"size:36;comment:起点库位ID"`
-	Departure        *MaterialShelfBin `gorm:"constraint:OnDelete:CASCADE"` //起点库位
-	DestinationID    string            `gorm:"size:36;comment:终点库位ID"`
-	Destination      *MaterialShelfBin `gorm:"constraint:OnDelete:CASCADE"` //终点库位
+	TaskNo           string           `gorm:"size:50;comment:任务编号"`
+	CreateTime       time.Time        `gorm:"autoCreateTime:nano;comment:创建时间"`
+	CreateUserID     string           `gorm:"size:36;comment:配料人员"`
+	ContinueTask     bool             `gorm:"comment:后续任务"`
+	CurrentState     string           `gorm:"size:50;comment:当前状态"`
+	TransactionState string           `gorm:"size:50;comment:事务状态"`
+	LastUpdateTime   time.Time        `gorm:"autoUpdateTime:nano;comment:状态变更时间"`
+	Remark           string           `gorm:"size:500;comment:备注"`
+	AGVTaskTypeID    *string          `gorm:"size:36;comment:任务类型ID"`
+	AGVTaskType      *AGVTaskType     `gorm:"constraint:OnDelete:SET NULL"` //任务类型
+	MaterialShelfID  *string          `gorm:"size:36;comment:物料货架ID"`
+	MaterialShelf    *MaterialShelf   `gorm:"constraint:OnDelete:SET NULL"` //物料货架
+	DepartureID      string           `gorm:"size:36;comment:起点库位ID"`
+	Departure        *AGVParkingSpace `gorm:"constraint:OnDelete:CASCADE"` //起点库位
+	DestinationID    string           `gorm:"size:36;comment:终点库位ID"`
+	Destination      *AGVParkingSpace `gorm:"constraint:OnDelete:CASCADE"` //终点库位
 }
 
 func PBToAGVTaskQueues(in []*proto.AGVTaskQueueInfo) []*AGVTaskQueue {
@@ -90,9 +90,9 @@ func AGVTaskQueueToPB(in *AGVTaskQueue) *proto.AGVTaskQueueInfo {
 		AGVTaskTypeID:    aGVTaskTypeID,
 		AGVTaskType:      AGVTaskTypeToPB(in.AGVTaskType),
 		DepartureID:      in.DepartureID,
-		Departure:        MaterialShelfBinToPB(in.Departure),
+		Departure:        AGVParkingSpaceToPB(in.Departure),
 		DestinationID:    in.DestinationID,
-		Destination:      MaterialShelfBinToPB(in.Destination),
+		Destination:      AGVParkingSpaceToPB(in.Destination),
 	}
 	return m
 }

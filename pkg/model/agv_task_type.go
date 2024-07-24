@@ -7,7 +7,7 @@ type AGVTaskType struct {
 	Code                    string                 `gorm:"size:50;comment:代号"`
 	Description             string                 `gorm:"size:500;comment:描述"`
 	ShelfType               int32                  `gorm:"comment:货架类型"`
-	SceneType               int32                  `gorm:"comment:场景类型"`
+	SpaceType               int32                  `gorm:"comment:泊位类型"`
 	PositionCode            string                 `gorm:"size:50;comment:任务点位"`
 	Remark                  string                 `gorm:"size:500;comment:备注"`
 	MaterialContainerTypeID *string                `gorm:"size:36;comment:容器类型ID"`
@@ -37,7 +37,7 @@ func PBToAGVTaskType(in *proto.AGVTaskTypeInfo) *AGVTaskType {
 		Code:                    in.Code,
 		Description:             in.Description,
 		ShelfType:               in.ShelfType,
-		SceneType:               in.SceneType,
+		SpaceType:               in.SpaceType,
 		PositionCode:            in.PositionCode,
 		Remark:                  in.Remark,
 		MaterialContainerTypeID: materialContainerTypeID,
@@ -67,7 +67,7 @@ func AGVTaskTypeToPB(in *AGVTaskType) *proto.AGVTaskTypeInfo {
 		Code:                    in.Code,
 		Description:             in.Description,
 		ShelfType:               in.ShelfType,
-		SceneType:               in.SceneType,
+		SpaceType:               in.SpaceType,
 		PositionCode:            in.PositionCode,
 		Remark:                  in.Remark,
 		MaterialContainerTypeID: materialContainerTypeID,

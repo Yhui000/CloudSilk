@@ -5,7 +5,7 @@ option go_package = "./;proto";
 
 import "mom_common.proto";
 import "agv_task_type.proto";
-import "material_shelf_bin.proto";
+import "agv_parking_space.proto";
 
 message AGVTaskQueueInfo {
 	//ID 
@@ -31,10 +31,10 @@ message AGVTaskQueueInfo {
     AGVTaskTypeInfo aGVTaskType=11;
 	//起点库位ID 
     string departureID=12;
- 	MaterialShelfBinInfo departure=13;
+    AGVParkingSpaceInfo departure=13;
 	//终点库位ID 
     string destinationID=14;
-    MaterialShelfBinInfo destination=15;
+    AGVParkingSpaceInfo destination=15;
 }
 
 message QueryAGVTaskQueueRequest{

@@ -2,7 +2,6 @@ package logic
 
 import (
 	"bytes"
-	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -79,7 +78,7 @@ func DeleteRemoteServiceTaskQueue(id string) (err error) {
 	return model.DB.DB().Delete(&model.RemoteServiceTaskQueue{}, "`id` = ?", id).Error
 }
 
-func RemoteServiceTaskQueueCallback(userID string) (err error) {
+func CallbackRemoteServiceTaskQueue(userID string) (err error) {
 	defer func() {
 		if r := recover(); r != nil {
 			if err = model.DB.DB().Create(&model.ExceptionTrace{
@@ -100,7 +99,7 @@ func RemoteServiceTaskQueueCallback(userID string) (err error) {
 		return
 	}
 	for _, v := range remoteServiceTaskQueues {
-		if err = OnRemoteServiceTaskQueueCallback(v); err != nil {
+		if err = OnCallbackRemoteServiceTaskQueue(v); err != nil {
 			return
 		}
 		//TODO TaskQueueExecution
@@ -108,7 +107,7 @@ func RemoteServiceTaskQueueCallback(userID string) (err error) {
 	return
 }
 
-func OnRemoteServiceTaskQueueCallback(remoteServiceTaskQueue *model.RemoteServiceTaskQueue) error {
+func OnCallbackRemoteServiceTaskQueue(remoteServiceTaskQueue *model.RemoteServiceTaskQueue) error {
 	return model.DB.DB().Transaction(func(tx *gorm.DB) error {
 		remoteServiceTaskQueue.TransactionState = types.TransactionStateSubmitted
 		remoteServiceTaskQueue.InvokeCount += 1
@@ -165,7 +164,7 @@ func OnRemoteServiceTaskQueueCallback(remoteServiceTaskQueue *model.RemoteServic
 	})
 }
 
-func RemoteServiceTaskQueueExecute(userID string) (err error) {
+func ExecuteRemoteServiceTaskQueue(userID string) (err error) {
 	defer func() {
 		if r := recover(); r != nil {
 			if err = model.DB.DB().Create(&model.ExceptionTrace{
@@ -192,7 +191,7 @@ func RemoteServiceTaskQueueExecute(userID string) (err error) {
 
 	for _, remoteServiceTaskQueues := range remoteServiceTasks {
 		for _, v := range remoteServiceTaskQueues {
-			if err = OnRemoteServiceTaskQueueCallback(v); err != nil {
+			if err = OnExecuteRemoteServiceTaskQueue(v); err != nil {
 				return
 			}
 		}
@@ -201,7 +200,7 @@ func RemoteServiceTaskQueueExecute(userID string) (err error) {
 	return
 }
 
-func OnRemoteServiceTaskQueueExecute(remoteServiceTaskQueue *model.RemoteServiceTaskQueue) error {
+func OnExecuteRemoteServiceTaskQueue(remoteServiceTaskQueue *model.RemoteServiceTaskQueue) error {
 	return model.DB.DB().Transaction(func(tx *gorm.DB) error {
 		serviceURI, err := url.Parse(remoteServiceTaskQueue.RemoteServiceTask.RemoteService.Address)
 		if err != nil {
@@ -297,7 +296,7 @@ func OnRemoteServiceTaskQueueExecute(remoteServiceTaskQueue *model.RemoteService
 		userName := remoteServiceTaskQueue.RemoteServiceTask.RemoteService.UserName
 		password := remoteServiceTaskQueue.RemoteServiceTask.RemoteService.Password
 		timeout := remoteServiceTaskQueue.RemoteServiceTask.RemoteService.Timeout
-		responseText, err := GetResponse(requestURL, string(requestByte), headers, useCredential, userName, password, timeout)
+		responseText, err := tool.GetResponse(requestURL, string(requestByte), headers, useCredential, userName, password, timeout)
 		if err != nil {
 			return err
 		}
@@ -309,57 +308,4 @@ func OnRemoteServiceTaskQueueExecute(remoteServiceTaskQueue *model.RemoteService
 
 		return tx.Save(remoteServiceTaskQueue).Error
 	})
-}
-
-func GetResponse(url string, jsonData string, headers map[string]string, useCredential bool, userName, password string, timeout int64) (string, error) {
-	// 创建一个HTTP客户端，并设置超时
-	client := &http.Client{
-		Timeout: time.Duration(timeout),
-	}
-
-	// 创建请求体
-	requestBody := bytes.NewBuffer([]byte(jsonData))
-
-	// 创建请求
-	req, err := http.NewRequest("POST", url, requestBody)
-	if err != nil {
-		return "", err
-	}
-
-	// 设置请求头
-	req.Header.Set("Accept", "application/json")
-	req.Header.Set("Content-Type", "application/json")
-
-	// 添加自定义头部
-	for key, value := range headers {
-		req.Header.Set(key, value)
-	}
-
-	// 如果需要认证，则添加认证头部
-	if useCredential {
-		if userName == "" || password == "" {
-			return "", fmt.Errorf("")
-		}
-
-		// 创建Base64编码的认证字符串
-		auth := userName + ":" + password
-		encodedAuth := base64.StdEncoding.EncodeToString([]byte(auth))
-		req.Header.Set("Authorization", "Basic "+encodedAuth)
-	}
-
-	// 发送请求并获取响应
-	resp, err := client.Do(req)
-	if err != nil {
-		return "", err
-	}
-	defer resp.Body.Close()
-
-	// 读取响应体
-	responseBody, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return "", err
-	}
-
-	// 返回响应体作为字符串
-	return string(responseBody), nil
 }

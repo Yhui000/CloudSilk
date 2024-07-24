@@ -12,19 +12,19 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// AddMaterialChannelLayer godoc
+// AddMaterialChannel godoc
 // @Summary 新增
 // @Description 新增
-// @Tags 料架通道层管理
+// @Tags 料架通道管理
 // @Accept  json
 // @Produce  json
 // @Param authorization header string true "jwt token"
-// @Param account body proto.MaterialChannelLayerInfo true "Add MaterialChannelLayer"
+// @Param account body proto.MaterialChannelInfo true "Add MaterialChannel"
 // @Success 200 {object} proto.CommonResponse
-// @Router /api/mom/material/materialchannellayer/add [post]
-func AddMaterialChannelLayer(c *gin.Context) {
+// @Router /api/mom/material/materialchannel/add [post]
+func AddMaterialChannel(c *gin.Context) {
 	transID := middleware.GetTransID(c)
-	req := &proto.MaterialChannelLayerInfo{}
+	req := &proto.MaterialChannelInfo{}
 	resp := &proto.CommonResponse{
 		Code: proto.Code_Success,
 	}
@@ -33,7 +33,7 @@ func AddMaterialChannelLayer(c *gin.Context) {
 		resp.Code = proto.Code_BadRequest
 		resp.Message = err.Error()
 		c.JSON(http.StatusOK, resp)
-		log.Warnf(context.Background(), "TransID:%s,新建料架通道层请求参数无效:%v", transID, err)
+		log.Warnf(context.Background(), "TransID:%s,新建料架通道请求参数无效:%v", transID, err)
 		return
 	}
 	err = middleware.Validate.Struct(req)
@@ -44,7 +44,7 @@ func AddMaterialChannelLayer(c *gin.Context) {
 		return
 	}
 
-	id, err := logic.CreateMaterialChannelLayer(model.PBToMaterialChannelLayer(req))
+	id, err := logic.CreateMaterialChannel(model.PBToMaterialChannel(req))
 	if err != nil {
 		resp.Code = proto.Code_InternalServerError
 		resp.Message = err.Error()
@@ -54,19 +54,19 @@ func AddMaterialChannelLayer(c *gin.Context) {
 	c.JSON(http.StatusOK, resp)
 }
 
-// UpdateMaterialChannelLayer godoc
+// UpdateMaterialChannel godoc
 // @Summary 更新
 // @Description 更新
-// @Tags 料架通道层管理
+// @Tags 料架通道管理
 // @Accept  json
 // @Produce  json
 // @Param authorization header string true "jwt token"
-// @Param account body proto.MaterialChannelLayerInfo true "Update MaterialChannelLayer"
+// @Param account body proto.MaterialChannelInfo true "Update MaterialChannel"
 // @Success 200 {object} proto.CommonResponse
-// @Router /api/mom/material/materialchannellayer/update [put]
-func UpdateMaterialChannelLayer(c *gin.Context) {
+// @Router /api/mom/material/materialchannel/update [put]
+func UpdateMaterialChannel(c *gin.Context) {
 	transID := middleware.GetTransID(c)
-	req := &proto.MaterialChannelLayerInfo{}
+	req := &proto.MaterialChannelInfo{}
 	resp := &proto.CommonResponse{
 		Code: proto.Code_Success,
 	}
@@ -75,7 +75,7 @@ func UpdateMaterialChannelLayer(c *gin.Context) {
 		resp.Code = proto.Code_BadRequest
 		resp.Message = err.Error()
 		c.JSON(http.StatusOK, resp)
-		log.Warnf(context.Background(), "TransID:%s,更新料架通道层请求参数无效:%v", transID, err)
+		log.Warnf(context.Background(), "TransID:%s,更新料架通道请求参数无效:%v", transID, err)
 		return
 	}
 	err = middleware.Validate.Struct(req)
@@ -85,7 +85,7 @@ func UpdateMaterialChannelLayer(c *gin.Context) {
 		c.JSON(http.StatusOK, resp)
 		return
 	}
-	err = logic.UpdateMaterialChannelLayer(model.PBToMaterialChannelLayer(req))
+	err = logic.UpdateMaterialChannel(model.PBToMaterialChannel(req))
 	if err != nil {
 		resp.Code = proto.Code_InternalServerError
 		resp.Message = err.Error()
@@ -93,10 +93,10 @@ func UpdateMaterialChannelLayer(c *gin.Context) {
 	c.JSON(http.StatusOK, resp)
 }
 
-// QueryMaterialChannelLayer godoc
+// QueryMaterialChannel godoc
 // @Summary 分页查询
 // @Description 分页查询
-// @Tags 料架通道层管理
+// @Tags 料架通道管理
 // @Accept  json
 // @Produce  octet-stream
 // @Param authorization header string true "jwt token"
@@ -105,11 +105,11 @@ func UpdateMaterialChannelLayer(c *gin.Context) {
 // @Param orderField query string false "排序字段"
 // @Param desc query bool false "是否倒序排序"
 // @Param code query string false "代号或描述"
-// @Success 200 {object} proto.QueryMaterialChannelLayerResponse
-// @Router /api/mom/material/materialchannellayer/query [get]
-func QueryMaterialChannelLayer(c *gin.Context) {
-	req := &proto.QueryMaterialChannelLayerRequest{}
-	resp := &proto.QueryMaterialChannelLayerResponse{
+// @Success 200 {object} proto.QueryMaterialChannelResponse
+// @Router /api/mom/material/materialchannel/query [get]
+func QueryMaterialChannel(c *gin.Context) {
+	req := &proto.QueryMaterialChannelRequest{}
+	resp := &proto.QueryMaterialChannelResponse{
 		Code: proto.Code_Success,
 	}
 	err := c.BindQuery(req)
@@ -119,47 +119,47 @@ func QueryMaterialChannelLayer(c *gin.Context) {
 		c.JSON(http.StatusOK, resp)
 		return
 	}
-	logic.QueryMaterialChannelLayer(req, resp, false)
+	logic.QueryMaterialChannel(req, resp, false)
 
 	c.JSON(http.StatusOK, resp)
 }
 
-// GetAllMaterialChannelLayer godoc
+// GetAllMaterialChannel godoc
 // @Summary 查询所有
 // @Description 查询所有
-// @Tags 料架通道层管理
+// @Tags 料架通道管理
 // @Accept  json
 // @Produce  json
 // @Param authorization header string true "jwt token"
-// @Success 200 {object} proto.GetAllMaterialChannelLayerResponse
-// @Router /api/mom/material/materialchannellayer/all [get]
-func GetAllMaterialChannelLayer(c *gin.Context) {
-	resp := &proto.GetAllMaterialChannelLayerResponse{
+// @Success 200 {object} proto.GetAllMaterialChannelResponse
+// @Router /api/mom/material/materialchannel/all [get]
+func GetAllMaterialChannel(c *gin.Context) {
+	resp := &proto.GetAllMaterialChannelResponse{
 		Code: proto.Code_Success,
 	}
-	list, err := logic.GetAllMaterialChannelLayers()
+	list, err := logic.GetAllMaterialChannels()
 	if err != nil {
 		resp.Code = proto.Code_InternalServerError
 		resp.Message = err.Error()
 		c.JSON(http.StatusOK, resp)
 		return
 	}
-	resp.Data = model.MaterialChannelLayersToPB(list)
+	resp.Data = model.MaterialChannelsToPB(list)
 	c.JSON(http.StatusOK, resp)
 }
 
-// GetMaterialChannelLayerDetail godoc
+// GetMaterialChannelDetail godoc
 // @Summary 查询明细
 // @Description 查询明细
-// @Tags 料架通道层管理
+// @Tags 料架通道管理
 // @Accept  json
 // @Produce  json
 // @Param id query string true "ID"
 // @Param authorization header string true "jwt token"
-// @Success 200 {object} proto.GetMaterialChannelLayerDetailResponse
-// @Router /api/mom/material/materialchannellayer/detail [get]
-func GetMaterialChannelLayerDetail(c *gin.Context) {
-	resp := &proto.GetMaterialChannelLayerDetailResponse{
+// @Success 200 {object} proto.GetMaterialChannelDetailResponse
+// @Router /api/mom/material/materialchannel/detail [get]
+func GetMaterialChannelDetail(c *gin.Context) {
+	resp := &proto.GetMaterialChannelDetailResponse{
 		Code: proto.Code_Success,
 	}
 	id := c.Query("id")
@@ -170,27 +170,27 @@ func GetMaterialChannelLayerDetail(c *gin.Context) {
 	}
 	var err error
 
-	data, err := logic.GetMaterialChannelLayerByID(id)
+	data, err := logic.GetMaterialChannelByID(id)
 	if err != nil {
 		resp.Code = proto.Code_InternalServerError
 		resp.Message = err.Error()
 	} else {
-		resp.Data = model.MaterialChannelLayerToPB(data)
+		resp.Data = model.MaterialChannelToPB(data)
 	}
 	c.JSON(http.StatusOK, resp)
 }
 
-// DeleteMaterialChannelLayer godoc
+// DeleteMaterialChannel godoc
 // @Summary 删除
 // @Description 删除
-// @Tags 料架通道层管理
+// @Tags 料架通道管理
 // @Accept  json
 // @Produce  json
 // @Param authorization header string true "jwt token"
-// @Param data body proto.DelRequest true "Delete MaterialChannelLayer"
+// @Param data body proto.DelRequest true "Delete MaterialChannel"
 // @Success 200 {object} proto.CommonResponse
-// @Router /api/mom/material/materialchannellayer/delete [delete]
-func DeleteMaterialChannelLayer(c *gin.Context) {
+// @Router /api/mom/material/materialchannel/delete [delete]
+func DeleteMaterialChannel(c *gin.Context) {
 	transID := middleware.GetTransID(c)
 	req := &proto.DelRequest{}
 	resp := &proto.CommonResponse{
@@ -201,7 +201,7 @@ func DeleteMaterialChannelLayer(c *gin.Context) {
 		resp.Code = proto.Code_BadRequest
 		resp.Message = err.Error()
 		c.JSON(http.StatusOK, resp)
-		log.Warnf(context.Background(), "TransID:%s,删除料架通道层请求参数无效:%v", transID, err)
+		log.Warnf(context.Background(), "TransID:%s,删除料架通道请求参数无效:%v", transID, err)
 		return
 	}
 	err = middleware.Validate.Struct(req)
@@ -211,7 +211,7 @@ func DeleteMaterialChannelLayer(c *gin.Context) {
 		c.JSON(http.StatusOK, resp)
 		return
 	}
-	err = logic.DeleteMaterialChannelLayer(req.Id)
+	err = logic.DeleteMaterialChannel(req.Id)
 	if err != nil {
 		resp.Code = proto.Code_InternalServerError
 		resp.Message = err.Error()
@@ -219,13 +219,13 @@ func DeleteMaterialChannelLayer(c *gin.Context) {
 	c.JSON(http.StatusOK, resp)
 }
 
-func RegisterMaterialChannelLayerRouter(r *gin.Engine) {
-	g := r.Group("/api/mom/material/materialchannellayer")
+func RegisterMaterialChannelRouter(r *gin.Engine) {
+	g := r.Group("/api/mom/material/materialchannel")
 
-	g.POST("add", AddMaterialChannelLayer)
-	g.PUT("update", UpdateMaterialChannelLayer)
-	g.GET("query", QueryMaterialChannelLayer)
-	g.DELETE("delete", DeleteMaterialChannelLayer)
-	g.GET("all", GetAllMaterialChannelLayer)
-	g.GET("detail", GetMaterialChannelLayerDetail)
+	g.POST("add", AddMaterialChannel)
+	g.PUT("update", UpdateMaterialChannel)
+	g.GET("query", QueryMaterialChannel)
+	g.DELETE("delete", DeleteMaterialChannel)
+	g.GET("all", GetAllMaterialChannel)
+	g.GET("detail", GetMaterialChannelDetail)
 }

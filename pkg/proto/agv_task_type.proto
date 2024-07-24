@@ -15,8 +15,8 @@ message AGVTaskTypeInfo {
     string description=3;
 	//货架类型 
     int32 shelfType=4;
-	//场景类型 
-    int32 sceneType=5;
+	//泊位类型 
+    int32 spaceType=5;
 	//任务点位 
  	string positionCode=6;
 	//备注 
@@ -36,9 +36,9 @@ message QueryAGVTaskTypeRequest{
     //货架类型 
 	// @inject_tag: uri:"shelfType" form:"shelfType"
     int32 shelfType=4;
-	//场景类型 
-	// @inject_tag: uri:"sceneType" form:"sceneType"
-    int32 sceneType=5;
+	//泊位类型 
+	// @inject_tag: uri:"spaceType" form:"spaceType"
+    int32 spaceType=5;
 	//容器类型ID 
 	// @inject_tag: uri:"materialContainerTypeID" form:"materialContainerTypeID"
     string materialContainerTypeID=6;

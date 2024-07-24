@@ -24,6 +24,7 @@ func RegisterRouter(r *gin.Engine) {
 	RegisterMaterialReturnRequestFormRouter(r)
 	RegisterMaterialReturnSolutionRouter(r)
 	RegisterMaterialReturnTypeRouter(r)
+	RegisterMaterialChannelRouter(r)
 	RegisterMaterialChannelLayerRouter(r)
 	RegisterAGVParkingSpaceRouter(r)
 	RegisterMaterialChannelProposingRecordRouter(r)

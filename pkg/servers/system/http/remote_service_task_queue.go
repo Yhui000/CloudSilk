@@ -221,6 +221,50 @@ func DeleteRemoteServiceTaskQueue(c *gin.Context) {
 	c.JSON(http.StatusOK, resp)
 }
 
+// CallbackRemoteServiceTaskQueue godoc
+// @Summary 回调
+// @Description 回调
+// @Tags 远程任务队列管理
+// @Accept  json
+// @Produce  json
+// @Param authorization header string true "jwt token"
+// @Success 200 {object} proto.CommonResponse
+// @Router /api/mom/system/remoteservicetaskqueue/callback [get]
+func CallbackRemoteServiceTaskQueue(c *gin.Context) {
+	resp := &proto.CommonResponse{
+		Code: proto.Code_Success,
+	}
+
+	if err := logic.CallbackRemoteServiceTaskQueue(middleware.GetUserID(c)); err != nil {
+		resp.Code = proto.Code_InternalServerError
+		resp.Message = err.Error()
+	}
+
+	c.JSON(http.StatusOK, resp)
+}
+
+// ExecuteRemoteServiceTaskQueue godoc
+// @Summary 执行
+// @Description 执行
+// @Tags 远程任务队列管理
+// @Accept  json
+// @Produce  json
+// @Param authorization header string true "jwt token"
+// @Success 200 {object} proto.CommonResponse
+// @Router /api/mom/system/remoteservicetaskqueue/execute [get]
+func ExecuteRemoteServiceTaskQueue(c *gin.Context) {
+	resp := &proto.CommonResponse{
+		Code: proto.Code_Success,
+	}
+
+	if err := logic.ExecuteRemoteServiceTaskQueue(middleware.GetUserID(c)); err != nil {
+		resp.Code = proto.Code_InternalServerError
+		resp.Message = err.Error()
+	}
+
+	c.JSON(http.StatusOK, resp)
+}
+
 func RegisterRemoteServiceTaskQueueRouter(r *gin.Engine) {
 	g := r.Group("/api/mom/system/remoteservicetaskqueue")
 
@@ -230,4 +274,6 @@ func RegisterRemoteServiceTaskQueueRouter(r *gin.Engine) {
 	g.DELETE("delete", DeleteRemoteServiceTaskQueue)
 	g.GET("all", GetAllRemoteServiceTaskQueue)
 	g.GET("detail", GetRemoteServiceTaskQueueDetail)
+	g.GET("callback", CallbackRemoteServiceTaskQueue)
+	g.GET("execute", ExecuteRemoteServiceTaskQueue)
 }
