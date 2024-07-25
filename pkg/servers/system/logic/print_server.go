@@ -3,11 +3,15 @@ package logic
 import (
 	"github.com/CloudSilk/CloudSilk/pkg/model"
 	apipb "github.com/CloudSilk/CloudSilk/pkg/proto"
+	"github.com/CloudSilk/CloudSilk/pkg/types"
 	"github.com/CloudSilk/pkg/utils"
+	"github.com/google/uuid"
 	"gorm.io/gorm/clause"
 )
 
 func CreatePrintServer(m *model.PrintServer) (string, error) {
+	m.Identity = uuid.NewString()
+	m.RunningState = types.RunningStateOffline
 	err := model.DB.DB().Create(m).Error
 	return m.ID, err
 }

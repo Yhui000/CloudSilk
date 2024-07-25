@@ -3,12 +3,17 @@ package logic
 import (
 	"github.com/CloudSilk/CloudSilk/pkg/model"
 	"github.com/CloudSilk/CloudSilk/pkg/proto"
+	"github.com/CloudSilk/CloudSilk/pkg/types"
 	"github.com/CloudSilk/pkg/utils"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
 
 func CreateMaterialShelf(m *model.MaterialShelf) (string, error) {
+	m.CurrentState = types.MaterialShelfStateWaitFill
+	if !m.Enable {
+		m.CurrentState = types.MaterialShelfStateDisabled
+	}
 	err := model.DB.DB().Create(m).Error
 	return m.ID, err
 }

@@ -1,6 +1,8 @@
 package logic
 
 import (
+	"errors"
+
 	"github.com/CloudSilk/CloudSilk/pkg/model"
 	"github.com/CloudSilk/CloudSilk/pkg/proto"
 	"github.com/CloudSilk/pkg/utils"
@@ -8,8 +10,14 @@ import (
 )
 
 func CreateMaterialReturnType(m *model.MaterialReturnType) (string, error) {
-	err := model.DB.DB().Create(m).Error
-	return m.ID, err
+	duplication, err := model.DB.CreateWithCheckDuplication(m, " code  = ? ", m.Code)
+	if err != nil {
+		return "", err
+	}
+	if duplication {
+		return "", errors.New("存在相同物料退料类型")
+	}
+	return m.ID, nil
 }
 
 func UpdateMaterialReturnType(m *model.MaterialReturnType) error {

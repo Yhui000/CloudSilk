@@ -1,6 +1,8 @@
 package logic
 
 import (
+	"errors"
+
 	"github.com/CloudSilk/CloudSilk/pkg/model"
 	"github.com/CloudSilk/CloudSilk/pkg/proto"
 	"github.com/CloudSilk/pkg/utils"
@@ -8,8 +10,14 @@ import (
 )
 
 func CreateDataMapping(m *model.DataMapping) (string, error) {
-	err := model.DB.DB().Create(m).Error
-	return m.ID, err
+	duplication, err := model.DB.CreateWithCheckDuplication(m, "`group` = ? AND `code` = ?", m.Group, m.Code)
+	if err != nil {
+		return "", err
+	}
+	if duplication {
+		return "", errors.New("存在相同数据词条")
+	}
+	return m.ID, nil
 }
 
 func UpdateDataMapping(m *model.DataMapping) error {

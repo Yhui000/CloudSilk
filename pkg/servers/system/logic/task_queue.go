@@ -11,10 +11,6 @@ import (
 )
 
 func CreateTaskQueue(m *model.TaskQueue) (string, error) {
-	if m.Enable {
-		m.CauseOfState = "处理中"
-		m.RunningState = "队列启用"
-	}
 	duplication, err := model.DB.CreateWithCheckDuplication(m, " `name` = ? ", m.Name)
 	if err != nil {
 		return "", err

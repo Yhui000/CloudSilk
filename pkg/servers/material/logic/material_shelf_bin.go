@@ -1,8 +1,6 @@
 package logic
 
 import (
-	"fmt"
-
 	"github.com/CloudSilk/CloudSilk/pkg/model"
 	"github.com/CloudSilk/CloudSilk/pkg/proto"
 	"github.com/CloudSilk/CloudSilk/pkg/types"
@@ -11,7 +9,7 @@ import (
 )
 
 func CreateMaterialShelfBin(m *model.MaterialShelfBin) (string, error) {
-	m.CurrentState = fmt.Sprintf("%d", types.MaterialShelfStateEmptied)
+	m.CurrentState = types.MaterialShelfStateWaitFill
 	err := model.DB.DB().Create(m).Error
 	return m.ID, err
 }
