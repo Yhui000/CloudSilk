@@ -5,7 +5,7 @@ option go_package = "./;proto";
 
 import "mom_common.proto";
 import "agv_task_type.proto";
-import "agv_parking_space.proto";
+import "material_shelf.proto";
 
 message AGVTaskQueueInfo {
 	//ID 

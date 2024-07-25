@@ -21,8 +21,8 @@ func QueryAGVTaskType(req *proto.QueryAGVTaskTypeRequest, resp *proto.QueryAGVTa
 	if req.ShelfType != 0 {
 		db = db.Where("`shelf_type` = ?", req.ShelfType)
 	}
-	if req.SceneType != 0 {
-		db = db.Where("`scene_type` = ?", req.SceneType)
+	if req.SpaceType != 0 {
+		db = db.Where("`space_type` = ?", req.SpaceType)
 	}
 	if req.MaterialContainerTypeID != "" {
 		db = db.Where("`material_container_type_id` = ?", req.MaterialContainerTypeID)

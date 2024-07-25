@@ -11,6 +11,7 @@ service MaterialChannelLayer{
     rpc GetMaterialChannels(GetMaterialChannelRequest)returns(GetAllMaterialChannelResponse);
 }
 
+
 message MaterialChannelLayerInfo{
     string id=1;
     //顺序
