@@ -3,12 +3,17 @@ package logic
 import (
 	"errors"
 	"fmt"
+	"mime/multipart"
+	"reflect"
 	"regexp"
 	"strings"
 
 	"github.com/CloudSilk/CloudSilk/pkg/model"
 	"github.com/CloudSilk/CloudSilk/pkg/proto"
+	"github.com/CloudSilk/CloudSilk/pkg/types"
 	"github.com/CloudSilk/pkg/utils"
+	"github.com/google/uuid"
+	"github.com/xuri/excelize/v2"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
@@ -130,12 +135,8 @@ func GetAllProductModels() (list []*model.ProductModel, err error) {
 
 func GetProductModelByID(id string) (*model.ProductModel, error) {
 	m := &model.ProductModel{}
-	err := model.DB.DB().
-		Preload("ProductModelAttributeValues").
-		Preload("ProductModelAttributeValues.ProductAttribute").
-		Preload("ProductModelAttributeValues.ProductAttribute.ProductCategoryAttributes").
-		Preload("ProductModelBoms").
-		Preload(clause.Associations).Where("id = ?", id).First(m).Error
+	err := model.DB.DB().Preload("ProductModelAttributeValues.ProductAttribute.ProductCategoryAttributes").
+		Preload("ProductModelBoms").Preload(clause.Associations).Where("id = ?", id).First(m).Error
 
 	for _, productModelAttributeValue := range m.ProductModelAttributeValues {
 		for _, productCategoryAttribute := range productModelAttributeValue.ProductAttribute.ProductCategoryAttributes {
@@ -149,9 +150,7 @@ func GetProductModelByID(id string) (*model.ProductModel, error) {
 
 func GetProductModelByIDs(ids []string) ([]*model.ProductModel, error) {
 	var m []*model.ProductModel
-	err := model.DB.DB().Preload("ProductModelAttributeValues").
-		Preload("ProductModelAttributeValues.ProductAttribute").
-		Preload("ProductModelAttributeValues.ProductAttribute.ProductCategoryAttributes").
+	err := model.DB.DB().Preload("ProductModelAttributeValues.ProductAttribute.ProductCategoryAttributes").
 		Preload("ProductModelBoms").Preload(clause.Associations).Where("id in (?)", ids).Find(&m).Error
 	return m, err
 }
@@ -183,7 +182,7 @@ func ParamProductModelByID(id string) (err error) {
 	pattern := regexp.MustCompile(attributeExpression)
 
 	//正则匹配
-	if flag := pattern.MatchString(materialDescription); !flag {
+	if !pattern.MatchString(materialDescription) {
 		return fmt.Errorf("此产品的型号物料描述不匹配此产品类别的特性表达式的格式，解析失败")
 	}
 
@@ -217,6 +216,257 @@ func ParamProductModelByID(id string) (err error) {
 
 	productModel.ProductModelAttributeValues = productModelAttributeValues
 	if err := UpdateProductModel(&productModel); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+type productModel struct {
+	ProductCategory     string //类别
+	Code                string //型号
+	MaterialNo          string //物料号
+	MaterialDescription string //物料描述
+	Identifier          string //识别码
+	IsAdvanced          bool   //需前置生产
+}
+
+type productModelAttribute struct {
+	MaterialNo    string //产品物料号
+	Code          string //特性代号
+	AssignedValue string //特性值
+}
+
+func UploadProductModel(file multipart.File) error {
+	f, err := excelize.OpenReader(file)
+
+	rows, err := f.GetRows("产品型号")
+	if err != nil {
+		return err
+	}
+
+	var productModelCount int
+	if err := model.DB.DB().Transaction(func(tx *gorm.DB) error {
+		if len(rows) > 0 {
+			for _, row := range rows {
+				m := productModel{
+					ProductCategory:     row[0],
+					Code:                row[1],
+					MaterialNo:          row[2],
+					MaterialDescription: row[3],
+					Identifier:          row[4],
+				}
+
+				productModel := &model.ProductModel{}
+				if err := tx.First(productModel, "`material_no` = ?", m.MaterialNo).Error; err != nil && err != gorm.ErrRecordNotFound {
+					return err
+				}
+
+				if productModel.ID == "" {
+					//查找产品类别
+					productCategory := &model.ProductCategory{}
+					if err := tx.Preload("ProductCategoryAttributes").Where("`code` = ?", m.ProductCategory).First(productCategory).Error; err == gorm.ErrRecordNotFound {
+						productCategorys := []*model.ProductCategory{}
+						if err := tx.Preload("ProductCategoryAttributes").Where("`attribute_expression` IS NOT NULL", m.ProductCategory).Find(&productCategorys).Error; err != nil {
+							return err
+						}
+						for _, v := range productCategorys {
+							if regexp.MustCompile(strings.ReplaceAll(v.AttributeExpression, "(?<", "(?P<")).MatchString(m.MaterialDescription) {
+								productCategory = v
+								break
+							}
+						}
+					} else if err != nil {
+						return err
+					}
+
+					if productCategory.ID == "" {
+						continue
+					}
+
+					//根据当前产品类别特性，创建产品型号特性值
+					productModelAttributeValues := make([]*model.ProductModelAttributeValue, len(productCategory.ProductCategoryAttributes))
+					for i, v := range productCategory.ProductCategoryAttributes {
+						productModelAttributeValues[i] = &model.ProductModelAttributeValue{
+							ProductAttributeID: v.ProductAttributeID,
+							AssignedValue:      v.DefaultValue,
+						}
+					}
+					//创建产品型号
+					if err := tx.Create(&model.ProductModel{
+						ProductCategoryID:           productCategory.ID,
+						MaterialNo:                  m.MaterialNo,
+						Code:                        m.Code,
+						ProductModelAttributeValues: productModelAttributeValues,
+					}).Error; err != nil {
+						return err
+					}
+
+					//根据当前产品类别特性表达式，自动解析
+					attributeExpression := strings.ReplaceAll(productCategory.AttributeExpression, "(?<", "(?P<")
+					if attributeExpression != "" {
+						matches := regexp.MustCompile(productCategory.AttributeExpression).FindStringSubmatch(m.MaterialDescription)
+						groups := regexp.MustCompile(productCategory.AttributeExpression).SubexpNames()
+						for i, code := range groups {
+							productAttribute := &model.ProductAttribute{}
+							if err := model.DB.DB().First(productAttribute, "`code` = ?", code).Error; err == gorm.ErrRecordNotFound {
+								continue
+							} else if err != nil {
+								return err
+							}
+
+							productModelAttributeValue := &model.ProductModelAttributeValue{}
+							if err := model.DB.DB().Where(model.ProductModelAttributeValue{ProductModelID: productModel.ID, ProductAttributeID: productAttribute.ID}).First(productModelAttributeValue).Error; err == gorm.ErrRecordNotFound {
+								if err := tx.Create(&model.ProductModelAttributeValue{
+									ProductAttributeID: productAttribute.ID,
+									ProductModelID:     productModel.ID,
+								}).Error; err != nil {
+									return err
+								}
+							} else if err != nil {
+								return err
+							}
+
+							assigndValue := ""
+							if matches[i] != "" {
+								assigndValue = strings.TrimSpace(matches[i])
+							} else if productModelAttributeValue.AssignedValue != "" {
+								assigndValue = productModelAttributeValue.AssignedValue
+							} else {
+								assigndValue = productAttribute.DefaultValue
+							}
+							productModelAttributeValue.AssignedValue = assigndValue
+
+							rv := reflect.ValueOf(productModel).Elem()
+							for i := 0; i < rv.NumField(); i++ {
+								field := rv.Type().Field(i)
+								if field.Name == code || strings.HasPrefix(field.Tag.Get("binding"), code+":") {
+									if rv.Field(i).CanSet() {
+										value := reflect.ValueOf(assigndValue)
+										if value.Type().AssignableTo(field.Type) {
+											rv.Field(i).Set(value)
+										}
+
+									}
+								}
+							}
+						}
+					}
+				}
+
+				//更新识别码和物料描述
+				productModel.Identifier = m.Identifier
+				productModel.MaterialDescription = m.MaterialDescription
+
+				productModelCount++
+			}
+
+			fmt.Printf("总计%d条记录，成功%d条记录，因无法识别产品类别而忽略%d条记录", len(rows), productModelCount, len(rows)-productModelCount)
+			return nil
+		}
+
+		var productModelAttributeCount int
+		rows, err = f.GetRows("产品型号特性")
+		if err != nil {
+			return err
+		}
+		if len(rows) > 0 {
+			for _, td := range rows {
+				m := productModelAttribute{
+					MaterialNo:    td[0],
+					Code:          td[1],
+					AssignedValue: td[2],
+				}
+
+				productModel := &model.ProductModel{}
+				if err := tx.First(productModel, "`material_no` = ?", m.MaterialNo).Error; err == gorm.ErrRecordNotFound {
+					continue
+				} else if err != nil {
+					return err
+				}
+
+				productAttribute := &model.ProductAttribute{}
+				if err := tx.Joins("JOIN product_attribute_identifiers ON product_attributes.id=product_attribute_identifiers.product_attribute_id").
+					Where("product_attributes.code = ?", m.Code).
+					Or("product_attribute_identifiers.identifier LIKE ?", "%"+m.Code+"%").First(productAttribute).Error; err == gorm.ErrRecordNotFound {
+					continue
+				} else if err != nil {
+					return err
+				}
+
+				productModelAttributeValue := &model.ProductModelAttributeValue{}
+				if err := tx.Where(model.ProductModelAttributeValue{ProductAttributeID: productAttribute.ID, ProductModelID: productModel.ID}).First(productModelAttributeValue).Error; err != nil && err != gorm.ErrRecordNotFound {
+					return err
+				}
+				if productModelAttributeValue.ID == "" {
+					productModelAttributeValue = &model.ProductModelAttributeValue{
+						ProductAttributeID: productAttribute.ID,
+						ProductModelID:     productModel.ID,
+					}
+					if err := tx.Create(productModelAttributeValue).Error; err != nil {
+						return err
+					}
+				}
+
+				if err := tx.Model(productModelAttributeValue).Update("assigned_value", m.AssignedValue).Error; err != nil {
+					return err
+				}
+				productModelAttributeCount++
+			}
+
+			fmt.Printf("总计%d条记录，成功%d条记录，，因无法识别产品物料号或特性代号%d条记录", len(rows), productModelAttributeCount, len(rows)-productModelAttributeCount)
+			return nil
+		}
+
+		return nil
+	}); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func CancelProductModel(ids []string) error {
+	return model.DB.DB().Model(model.ProductModel{}).Where("`id` IN ?", ids).Update("is_authorized", false).Error
+}
+
+func AuthorizeProductModel(ids []string) error {
+	return model.DB.DB().Model(model.ProductModel{}).Where("`id` IN ?", ids).Update("is_authorized", true).Error
+}
+
+func SynchronizeProductModel(productCategoryID string) error {
+	productCategory := &model.ProductCategory{}
+	if err := model.DB.DB().First(productCategory, "`id` = ?", productCategoryID).Error; err == gorm.ErrRecordNotFound {
+		return fmt.Errorf("无效的产品类别ID")
+	} else if err != nil {
+		return err
+	}
+
+	taskCode := "RS205"
+	if err := model.DB.DB().Model(model.SystemParamsConfig{}).Where("`code` = ?", types.SystemConfigKeyProductModelSynchronizeTask).Pluck("value", &taskCode).Error; err != nil {
+		return err
+	}
+
+	remoteServiceTask := &model.RemoteServiceTask{}
+	if err := model.DB.DB().First(remoteServiceTask, "`code` = ?", taskCode).Error; err == gorm.ErrRecordNotFound {
+		return fmt.Errorf("无法找到标签打印的远程任务(%s)", taskCode)
+	} else if err != nil {
+		return err
+	}
+
+	if err := model.DB.DB().Create(&model.RemoteServiceTaskQueue{
+		RemoteServiceTaskID: remoteServiceTask.ID,
+		CurrentState:        types.RemoteServiceTaskQueueStateWaitExecute,
+		TaskNo:              uuid.NewString(),
+		RemoteServiceTaskQueueParameters: []*model.RemoteServiceTaskQueueParameter{
+			{
+				DataType:    types.DataTypeString,
+				Name:        "ProductCategory",
+				Value:       productCategory.Code,
+				Description: "标签代号",
+			},
+		},
+	}).Error; err != nil {
 		return err
 	}
 
