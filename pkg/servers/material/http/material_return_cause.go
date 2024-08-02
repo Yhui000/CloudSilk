@@ -258,6 +258,46 @@ func DeleteMaterialReturnCause(c *gin.Context) {
 	c.JSON(http.StatusOK, resp)
 }
 
+// UploadMaterialReturnCause godoc
+// @Summary 上传
+// @Description 上传
+// @Tags 物料退料原因管理
+// @Accept  json
+// @Produce  json
+// @Param authorization header string true "jwt token"
+// @Param f formData file true "Upload ProductModel"
+// @Success 200 {object} proto.CommonResponse
+// @Router /api/mom/material/materialreturncause/upload [post]
+func UploadMaterialReturnCause(c *gin.Context) {
+	transID := middleware.GetTransID(c)
+	resp := &proto.CommonResponse{
+		Code: proto.Code_Success,
+	}
+	fileHeader, err := c.FormFile("f")
+	if err != nil {
+		resp.Code = proto.Code_BadRequest
+		resp.Message = err.Error()
+		c.JSON(http.StatusOK, resp)
+		log.Warnf(context.Background(), "TransID:%s,上传物料退料原因请求参数无效:%v", transID, err)
+		return
+	}
+
+	f, err := fileHeader.Open()
+	if err != nil {
+		resp.Code = proto.Code_BadRequest
+		resp.Message = err.Error()
+		c.JSON(http.StatusOK, resp)
+		return
+	}
+
+	err = logic.UploadMaterialReturnCause(f)
+	if err != nil {
+		resp.Code = proto.Code_InternalServerError
+		resp.Message = err.Error()
+	}
+	c.JSON(http.StatusOK, resp)
+}
+
 func RegisterMaterialReturnCauseRouter(r *gin.Engine) {
 	g := r.Group("/api/mom/material/materialreturncause")
 
@@ -267,4 +307,5 @@ func RegisterMaterialReturnCauseRouter(r *gin.Engine) {
 	g.DELETE("delete", DeleteMaterialReturnCause)
 	g.GET("all", GetAllMaterialReturnCause)
 	g.GET("detail", GetMaterialReturnCauseDetail)
+	g.POST("upload", UploadMaterialReturnCause)
 }

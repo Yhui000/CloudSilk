@@ -219,6 +219,46 @@ func DeleteMaterialReturnType(c *gin.Context) {
 	c.JSON(http.StatusOK, resp)
 }
 
+// UploadMaterialReturnType godoc
+// @Summary 上传
+// @Description 上传
+// @Tags 物料退料类型管理
+// @Accept  json
+// @Produce  json
+// @Param authorization header string true "jwt token"
+// @Param f formData file true "Upload ProductModel"
+// @Success 200 {object} proto.CommonResponse
+// @Router /api/mom/material/materialreturntype/upload [post]
+func UploadMaterialReturnType(c *gin.Context) {
+	transID := middleware.GetTransID(c)
+	resp := &proto.CommonResponse{
+		Code: proto.Code_Success,
+	}
+	fileHeader, err := c.FormFile("f")
+	if err != nil {
+		resp.Code = proto.Code_BadRequest
+		resp.Message = err.Error()
+		c.JSON(http.StatusOK, resp)
+		log.Warnf(context.Background(), "TransID:%s,上传物料退料类型请求参数无效:%v", transID, err)
+		return
+	}
+
+	f, err := fileHeader.Open()
+	if err != nil {
+		resp.Code = proto.Code_BadRequest
+		resp.Message = err.Error()
+		c.JSON(http.StatusOK, resp)
+		return
+	}
+
+	err = logic.UploadMaterialReturnType(f)
+	if err != nil {
+		resp.Code = proto.Code_InternalServerError
+		resp.Message = err.Error()
+	}
+	c.JSON(http.StatusOK, resp)
+}
+
 func RegisterMaterialReturnTypeRouter(r *gin.Engine) {
 	g := r.Group("/api/mom/material/materialreturntype")
 
@@ -228,4 +268,5 @@ func RegisterMaterialReturnTypeRouter(r *gin.Engine) {
 	g.DELETE("delete", DeleteMaterialReturnType)
 	g.GET("all", GetAllMaterialReturnType)
 	g.GET("detail", GetMaterialReturnTypeDetail)
+	g.POST("upload", UploadMaterialReturnType)
 }

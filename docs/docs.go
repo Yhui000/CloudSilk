@@ -3685,7 +3685,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/mom/material/materialchannellayer/add": {
+        "/api/mom/material/materialchannel/add": {
             "post": {
                 "description": "新增",
                 "consumes": [
@@ -3696,6 +3696,262 @@ const docTemplate = `{
                 ],
                 "tags": [
                     "料架通道管理"
+                ],
+                "summary": "新增",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Add MaterialChannel",
+                        "name": "account",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/proto.MaterialChannelInfo"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/proto.CommonResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/mom/material/materialchannel/all": {
+            "get": {
+                "description": "查询所有",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "料架通道管理"
+                ],
+                "summary": "查询所有",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/proto.GetAllMaterialChannelResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/mom/material/materialchannel/delete": {
+            "delete": {
+                "description": "删除",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "料架通道管理"
+                ],
+                "summary": "删除",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Delete MaterialChannel",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/proto.DelRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/proto.CommonResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/mom/material/materialchannel/detail": {
+            "get": {
+                "description": "查询明细",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "料架通道管理"
+                ],
+                "summary": "查询明细",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/proto.GetMaterialChannelDetailResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/mom/material/materialchannel/query": {
+            "get": {
+                "description": "分页查询",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/octet-stream"
+                ],
+                "tags": [
+                    "料架通道管理"
+                ],
+                "summary": "分页查询",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "从1开始",
+                        "name": "pageIndex",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "默认每页10条",
+                        "name": "pageSize",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "排序字段",
+                        "name": "orderField",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "是否倒序排序",
+                        "name": "desc",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "代号或描述",
+                        "name": "code",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/proto.QueryMaterialChannelResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/mom/material/materialchannel/update": {
+            "put": {
+                "description": "更新",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "料架通道管理"
+                ],
+                "summary": "更新",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Update MaterialChannel",
+                        "name": "account",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/proto.MaterialChannelInfo"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/proto.CommonResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/mom/material/materialchannellayer/add": {
+            "post": {
+                "description": "新增",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "料架通道层管理"
                 ],
                 "summary": "新增",
                 "parameters": [
@@ -3736,7 +3992,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "料架通道管理"
+                    "料架通道层管理"
                 ],
                 "summary": "查询所有",
                 "parameters": [
@@ -3768,7 +4024,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "料架通道管理"
+                    "料架通道层管理"
                 ],
                 "summary": "删除",
                 "parameters": [
@@ -3809,7 +4065,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "料架通道管理"
+                    "料架通道层管理"
                 ],
                 "summary": "查询明细",
                 "parameters": [
@@ -3848,7 +4104,7 @@ const docTemplate = `{
                     "application/octet-stream"
                 ],
                 "tags": [
-                    "料架通道管理"
+                    "料架通道层管理"
                 ],
                 "summary": "分页查询",
                 "parameters": [
@@ -3910,7 +4166,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "料架通道管理"
+                    "料架通道层管理"
                 ],
                 "summary": "更新",
                 "parameters": [
@@ -5507,6 +5763,45 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/mom/material/materialreturncause/upload": {
+            "post": {
+                "description": "上传",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "物料退料原因管理"
+                ],
+                "summary": "上传",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "Upload ProductModel",
+                        "name": "f",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/proto.CommonResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/mom/material/materialreturnrequestform/add": {
             "post": {
                 "description": "新增",
@@ -6067,6 +6362,45 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/mom/material/materialreturnsolution/upload": {
+            "post": {
+                "description": "上传",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "物料退料方案管理"
+                ],
+                "summary": "上传",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "Upload ProductModel",
+                        "name": "f",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/proto.CommonResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/mom/material/materialreturntype/add": {
             "post": {
                 "description": "新增",
@@ -6311,6 +6645,45 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/proto.MaterialReturnTypeInfo"
                         }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/proto.CommonResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/mom/material/materialreturntype/upload": {
+            "post": {
+                "description": "上传",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "物料退料类型管理"
+                ],
+                "summary": "上传",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "Upload ProductModel",
+                        "name": "f",
+                        "in": "formData",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -19909,6 +20282,45 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/mom/productbase/productmodel/synchronize": {
+            "post": {
+                "description": "同步",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "产品型号管理"
+                ],
+                "summary": "同步",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "产品类别ID",
+                        "name": "productCategoryID",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/proto.CommonResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/mom/productbase/productmodel/update": {
             "put": {
                 "description": "更新",
@@ -19938,6 +20350,45 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/proto.ProductModelInfo"
                         }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/proto.CommonResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/mom/productbase/productmodel/upload": {
+            "post": {
+                "description": "上传",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "产品型号管理"
+                ],
+                "summary": "上传",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "Upload ProductModel",
+                        "name": "f",
+                        "in": "formData",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -20051,6 +20502,47 @@ const docTemplate = `{
                         "required": true,
                         "schema": {
                             "$ref": "#/definitions/proto.DelRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/proto.CommonResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/mom/productbase/productmodelbom/deletes": {
+            "delete": {
+                "description": "批量删除",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "产品型号Bom管理"
+                ],
+                "summary": "批量删除",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Delete ProductModelBoms",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/proto.GetByIDsRequest"
                         }
                     }
                 ],
@@ -20200,6 +20692,45 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/proto.ProductModelBomInfo"
                         }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/proto.CommonResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/mom/productbase/productmodelbom/upload": {
+            "post": {
+                "description": "上传",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "产品型号Bom管理"
+                ],
+                "summary": "上传",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "Upload ProductModel",
+                        "name": "f",
+                        "in": "formData",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -25864,6 +26395,38 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/mom/system/remoteservicetaskqueue/callback": {
+            "get": {
+                "description": "回调",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "远程任务队列管理"
+                ],
+                "summary": "回调",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/proto.CommonResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/mom/system/remoteservicetaskqueue/delete": {
             "delete": {
                 "description": "删除",
@@ -25939,6 +26502,38 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/proto.GetRemoteServiceTaskQueueDetailResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/mom/system/remoteservicetaskqueue/execute": {
+            "get": {
+                "description": "执行",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "远程任务队列管理"
+                ],
+                "summary": "执行",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/proto.CommonResponse"
                         }
                     }
                 }
@@ -29295,14 +29890,14 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "departure": {
-                    "$ref": "#/definitions/proto.MaterialShelfBinInfo"
+                    "$ref": "#/definitions/proto.AGVParkingSpaceInfo"
                 },
                 "departureID": {
                     "description": "起点库位ID",
                     "type": "string"
                 },
                 "destination": {
-                    "$ref": "#/definitions/proto.MaterialShelfBinInfo"
+                    "$ref": "#/definitions/proto.AGVParkingSpaceInfo"
                 },
                 "destinationID": {
                     "description": "终点库位ID",
@@ -29360,12 +29955,12 @@ const docTemplate = `{
                     "description": "备注",
                     "type": "string"
                 },
-                "sceneType": {
-                    "description": "场景类型",
-                    "type": "integer"
-                },
                 "shelfType": {
                     "description": "货架类型",
+                    "type": "integer"
+                },
+                "spaceType": {
+                    "description": "泊位类型",
                     "type": "integer"
                 }
             }
@@ -30331,6 +30926,23 @@ const docTemplate = `{
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/proto.MaterialChannelProposingRecordInfo"
+                    }
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "proto.GetAllMaterialChannelResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "$ref": "#/definitions/proto.Code"
+                },
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/proto.MaterialChannelInfo"
                     }
                 },
                 "message": {
@@ -32038,6 +32650,20 @@ const docTemplate = `{
                 },
                 "data": {
                     "$ref": "#/definitions/proto.MaterialCategoryInfo"
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "proto.GetMaterialChannelDetailResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "$ref": "#/definitions/proto.Code"
+                },
+                "data": {
+                    "$ref": "#/definitions/proto.MaterialChannelInfo"
                 },
                 "message": {
                     "type": "string"
@@ -39299,6 +39925,32 @@ const docTemplate = `{
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/proto.MaterialChannelProposingRecordInfo"
+                    }
+                },
+                "message": {
+                    "type": "string"
+                },
+                "pages": {
+                    "type": "integer"
+                },
+                "records": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
+        "proto.QueryMaterialChannelResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "$ref": "#/definitions/proto.Code"
+                },
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/proto.MaterialChannelInfo"
                     }
                 },
                 "message": {

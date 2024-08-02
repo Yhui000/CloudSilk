@@ -65,12 +65,12 @@ definitions:
         description: 当前状态
         type: string
       departure:
-        $ref: '#/definitions/proto.MaterialShelfBinInfo'
+        $ref: '#/definitions/proto.AGVParkingSpaceInfo'
       departureID:
         description: 起点库位ID
         type: string
       destination:
-        $ref: '#/definitions/proto.MaterialShelfBinInfo'
+        $ref: '#/definitions/proto.AGVParkingSpaceInfo'
       destinationID:
         description: 终点库位ID
         type: string
@@ -112,11 +112,11 @@ definitions:
       remark:
         description: 备注
         type: string
-      sceneType:
-        description: 场景类型
-        type: integer
       shelfType:
         description: 货架类型
+        type: integer
+      spaceType:
+        description: 泊位类型
         type: integer
     type: object
   proto.AttributeExpressionInfo:
@@ -778,6 +778,17 @@ definitions:
       data:
         items:
           $ref: '#/definitions/proto.MaterialChannelProposingRecordInfo'
+        type: array
+      message:
+        type: string
+    type: object
+  proto.GetAllMaterialChannelResponse:
+    properties:
+      code:
+        $ref: '#/definitions/proto.Code'
+      data:
+        items:
+          $ref: '#/definitions/proto.MaterialChannelInfo'
         type: array
       message:
         type: string
@@ -1882,6 +1893,15 @@ definitions:
         $ref: '#/definitions/proto.Code'
       data:
         $ref: '#/definitions/proto.MaterialCategoryInfo'
+      message:
+        type: string
+    type: object
+  proto.GetMaterialChannelDetailResponse:
+    properties:
+      code:
+        $ref: '#/definitions/proto.Code'
+      data:
+        $ref: '#/definitions/proto.MaterialChannelInfo'
       message:
         type: string
     type: object
@@ -6955,6 +6975,23 @@ definitions:
       total:
         type: integer
     type: object
+  proto.QueryMaterialChannelResponse:
+    properties:
+      code:
+        $ref: '#/definitions/proto.Code'
+      data:
+        items:
+          $ref: '#/definitions/proto.MaterialChannelInfo'
+        type: array
+      message:
+        type: string
+      pages:
+        type: integer
+      records:
+        type: integer
+      total:
+        type: integer
+    type: object
   proto.QueryMaterialContainerResponse:
     properties:
       code:
@@ -11437,6 +11474,175 @@ paths:
       summary: 更新
       tags:
       - 物料类别管理
+  /api/mom/material/materialchannel/add:
+    post:
+      consumes:
+      - application/json
+      description: 新增
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      - description: Add MaterialChannel
+        in: body
+        name: account
+        required: true
+        schema:
+          $ref: '#/definitions/proto.MaterialChannelInfo'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.CommonResponse'
+      summary: 新增
+      tags:
+      - 料架通道管理
+  /api/mom/material/materialchannel/all:
+    get:
+      consumes:
+      - application/json
+      description: 查询所有
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.GetAllMaterialChannelResponse'
+      summary: 查询所有
+      tags:
+      - 料架通道管理
+  /api/mom/material/materialchannel/delete:
+    delete:
+      consumes:
+      - application/json
+      description: 删除
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      - description: Delete MaterialChannel
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/proto.DelRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.CommonResponse'
+      summary: 删除
+      tags:
+      - 料架通道管理
+  /api/mom/material/materialchannel/detail:
+    get:
+      consumes:
+      - application/json
+      description: 查询明细
+      parameters:
+      - description: ID
+        in: query
+        name: id
+        required: true
+        type: string
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.GetMaterialChannelDetailResponse'
+      summary: 查询明细
+      tags:
+      - 料架通道管理
+  /api/mom/material/materialchannel/query:
+    get:
+      consumes:
+      - application/json
+      description: 分页查询
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      - description: 从1开始
+        in: query
+        name: pageIndex
+        type: integer
+      - description: 默认每页10条
+        in: query
+        name: pageSize
+        type: integer
+      - description: 排序字段
+        in: query
+        name: orderField
+        type: string
+      - description: 是否倒序排序
+        in: query
+        name: desc
+        type: boolean
+      - description: 代号或描述
+        in: query
+        name: code
+        type: string
+      produces:
+      - application/octet-stream
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.QueryMaterialChannelResponse'
+      summary: 分页查询
+      tags:
+      - 料架通道管理
+  /api/mom/material/materialchannel/update:
+    put:
+      consumes:
+      - application/json
+      description: 更新
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      - description: Update MaterialChannel
+        in: body
+        name: account
+        required: true
+        schema:
+          $ref: '#/definitions/proto.MaterialChannelInfo'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.CommonResponse'
+      summary: 更新
+      tags:
+      - 料架通道管理
   /api/mom/material/materialchannellayer/add:
     post:
       consumes:
@@ -11463,7 +11669,7 @@ paths:
             $ref: '#/definitions/proto.CommonResponse'
       summary: 新增
       tags:
-      - 料架通道管理
+      - 料架通道层管理
   /api/mom/material/materialchannellayer/all:
     get:
       consumes:
@@ -11484,7 +11690,7 @@ paths:
             $ref: '#/definitions/proto.GetAllMaterialChannelLayerResponse'
       summary: 查询所有
       tags:
-      - 料架通道管理
+      - 料架通道层管理
   /api/mom/material/materialchannellayer/delete:
     delete:
       consumes:
@@ -11511,7 +11717,7 @@ paths:
             $ref: '#/definitions/proto.CommonResponse'
       summary: 删除
       tags:
-      - 料架通道管理
+      - 料架通道层管理
   /api/mom/material/materialchannellayer/detail:
     get:
       consumes:
@@ -11537,7 +11743,7 @@ paths:
             $ref: '#/definitions/proto.GetMaterialChannelLayerDetailResponse'
       summary: 查询明细
       tags:
-      - 料架通道管理
+      - 料架通道层管理
   /api/mom/material/materialchannellayer/query:
     get:
       consumes:
@@ -11578,7 +11784,7 @@ paths:
             $ref: '#/definitions/proto.QueryMaterialChannelLayerResponse'
       summary: 分页查询
       tags:
-      - 料架通道管理
+      - 料架通道层管理
   /api/mom/material/materialchannellayer/update:
     put:
       consumes:
@@ -11605,7 +11811,7 @@ paths:
             $ref: '#/definitions/proto.CommonResponse'
       summary: 更新
       tags:
-      - 料架通道管理
+      - 料架通道层管理
   /api/mom/material/materialchannelproposingrecord/add:
     post:
       consumes:
@@ -12640,6 +12846,32 @@ paths:
       summary: 更新
       tags:
       - 物料退料原因管理
+  /api/mom/material/materialreturncause/upload:
+    post:
+      consumes:
+      - application/json
+      description: 上传
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      - description: Upload ProductModel
+        in: formData
+        name: f
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.CommonResponse'
+      summary: 上传
+      tags:
+      - 物料退料原因管理
   /api/mom/material/materialreturnrequestform/add:
     post:
       consumes:
@@ -13010,6 +13242,32 @@ paths:
       summary: 更新
       tags:
       - 物料退料方案管理
+  /api/mom/material/materialreturnsolution/upload:
+    post:
+      consumes:
+      - application/json
+      description: 上传
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      - description: Upload ProductModel
+        in: formData
+        name: f
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.CommonResponse'
+      summary: 上传
+      tags:
+      - 物料退料方案管理
   /api/mom/material/materialreturntype/add:
     post:
       consumes:
@@ -13177,6 +13435,32 @@ paths:
           schema:
             $ref: '#/definitions/proto.CommonResponse'
       summary: 更新
+      tags:
+      - 物料退料类型管理
+  /api/mom/material/materialreturntype/upload:
+    post:
+      consumes:
+      - application/json
+      description: 上传
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      - description: Upload ProductModel
+        in: formData
+        name: f
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.CommonResponse'
+      summary: 上传
       tags:
       - 物料退料类型管理
   /api/mom/material/materialshelf/add:
@@ -22151,6 +22435,32 @@ paths:
       summary: 分页查询
       tags:
       - 产品型号管理
+  /api/mom/productbase/productmodel/synchronize:
+    post:
+      consumes:
+      - application/json
+      description: 同步
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      - description: 产品类别ID
+        in: formData
+        name: productCategoryID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.CommonResponse'
+      summary: 同步
+      tags:
+      - 产品型号管理
   /api/mom/productbase/productmodel/update:
     put:
       consumes:
@@ -22176,6 +22486,32 @@ paths:
           schema:
             $ref: '#/definitions/proto.CommonResponse'
       summary: 更新
+      tags:
+      - 产品型号管理
+  /api/mom/productbase/productmodel/upload:
+    post:
+      consumes:
+      - application/json
+      description: 上传
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      - description: Upload ProductModel
+        in: formData
+        name: f
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.CommonResponse'
+      summary: 上传
       tags:
       - 产品型号管理
   /api/mom/productbase/productmodelbom/add:
@@ -22251,6 +22587,33 @@ paths:
           schema:
             $ref: '#/definitions/proto.CommonResponse'
       summary: 删除
+      tags:
+      - 产品型号Bom管理
+  /api/mom/productbase/productmodelbom/deletes:
+    delete:
+      consumes:
+      - application/json
+      description: 批量删除
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      - description: Delete ProductModelBoms
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/proto.GetByIDsRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.CommonResponse'
+      summary: 批量删除
       tags:
       - 产品型号Bom管理
   /api/mom/productbase/productmodelbom/detail:
@@ -22349,6 +22712,32 @@ paths:
           schema:
             $ref: '#/definitions/proto.CommonResponse'
       summary: 更新
+      tags:
+      - 产品型号Bom管理
+  /api/mom/productbase/productmodelbom/upload:
+    post:
+      consumes:
+      - application/json
+      description: 上传
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      - description: Upload ProductModel
+        in: formData
+        name: f
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.CommonResponse'
+      summary: 上传
       tags:
       - 产品型号Bom管理
   /api/mom/production/personnelqualification/add:
@@ -26083,6 +26472,27 @@ paths:
       summary: 查询所有
       tags:
       - 远程任务队列管理
+  /api/mom/system/remoteservicetaskqueue/callback:
+    get:
+      consumes:
+      - application/json
+      description: 回调
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.CommonResponse'
+      summary: 回调
+      tags:
+      - 远程任务队列管理
   /api/mom/system/remoteservicetaskqueue/delete:
     delete:
       consumes:
@@ -26134,6 +26544,27 @@ paths:
           schema:
             $ref: '#/definitions/proto.GetRemoteServiceTaskQueueDetailResponse'
       summary: 查询明细
+      tags:
+      - 远程任务队列管理
+  /api/mom/system/remoteservicetaskqueue/execute:
+    get:
+      consumes:
+      - application/json
+      description: 执行
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/proto.CommonResponse'
+      summary: 执行
       tags:
       - 远程任务队列管理
   /api/mom/system/remoteservicetaskqueue/query:

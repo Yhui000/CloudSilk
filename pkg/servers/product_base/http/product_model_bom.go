@@ -220,6 +220,85 @@ func DeleteProductModelBom(c *gin.Context) {
 	c.JSON(http.StatusOK, resp)
 }
 
+// DeleteProductModelBoms godoc
+// @Summary 批量删除
+// @Description 批量删除
+// @Tags 产品型号Bom管理
+// @Accept  json
+// @Produce  json
+// @Param authorization header string true "jwt token"
+// @Param data body proto.GetByIDsRequest true "Delete ProductModelBoms"
+// @Success 200 {object} proto.CommonResponse
+// @Router /api/mom/productbase/productmodelbom/deletes [delete]
+func DeleteProductModelBoms(c *gin.Context) {
+	transID := middleware.GetTransID(c)
+	req := &proto.GetByIDsRequest{}
+	resp := &proto.CommonResponse{
+		Code: proto.Code_Success,
+	}
+	err := c.BindJSON(req)
+	if err != nil {
+		resp.Code = proto.Code_BadRequest
+		resp.Message = err.Error()
+		c.JSON(http.StatusOK, resp)
+		log.Warnf(context.Background(), "TransID:%s,删除产品型号Bom请求参数无效:%v", transID, err)
+		return
+	}
+	err = middleware.Validate.Struct(req)
+	if err != nil {
+		resp.Code = proto.Code_BadRequest
+		resp.Message = err.Error()
+		c.JSON(http.StatusOK, resp)
+		return
+	}
+	err = logic.DeleteProductModelBoms(req.Ids)
+	if err != nil {
+		resp.Code = proto.Code_InternalServerError
+		resp.Message = err.Error()
+	}
+	c.JSON(http.StatusOK, resp)
+}
+
+// UploadProductModelBom godoc
+// @Summary 上传
+// @Description 上传
+// @Tags 产品型号Bom管理
+// @Accept  json
+// @Produce  json
+// @Param authorization header string true "jwt token"
+// @Param f formData file true "Upload ProductModel"
+// @Success 200 {object} proto.CommonResponse
+// @Router /api/mom/productbase/productmodelbom/upload [post]
+func UploadProductModelBom(c *gin.Context) {
+	transID := middleware.GetTransID(c)
+	resp := &proto.CommonResponse{
+		Code: proto.Code_Success,
+	}
+	fileHeader, err := c.FormFile("f")
+	if err != nil {
+		resp.Code = proto.Code_BadRequest
+		resp.Message = err.Error()
+		c.JSON(http.StatusOK, resp)
+		log.Warnf(context.Background(), "TransID:%s,上传产品型号Bom请求参数无效:%v", transID, err)
+		return
+	}
+
+	f, err := fileHeader.Open()
+	if err != nil {
+		resp.Code = proto.Code_BadRequest
+		resp.Message = err.Error()
+		c.JSON(http.StatusOK, resp)
+		return
+	}
+
+	err = logic.UploadProductModelBom(f)
+	if err != nil {
+		resp.Code = proto.Code_InternalServerError
+		resp.Message = err.Error()
+	}
+	c.JSON(http.StatusOK, resp)
+}
+
 func RegisterProductModelBomRouter(r *gin.Engine) {
 	g := r.Group("/api/mom/productbase/productmodelbom")
 
@@ -229,4 +308,6 @@ func RegisterProductModelBomRouter(r *gin.Engine) {
 	g.DELETE("delete", DeleteProductModelBom)
 	g.GET("all", GetAllProductModelBom)
 	g.GET("detail", GetProductModelBomDetail)
+	g.POST("upload", UploadProductModelBom)
+	g.DELETE("deletes", DeleteProductModelBoms)
 }

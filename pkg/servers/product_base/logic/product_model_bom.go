@@ -2,10 +2,14 @@ package logic
 
 import (
 	"errors"
+	"fmt"
+	"mime/multipart"
+	"strconv"
 
 	"github.com/CloudSilk/CloudSilk/pkg/model"
 	"github.com/CloudSilk/CloudSilk/pkg/proto"
 	"github.com/CloudSilk/pkg/utils"
+	"github.com/xuri/excelize/v2"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
@@ -90,4 +94,96 @@ func GetProductModelBomByIDs(ids []string) ([]*model.ProductModelBom, error) {
 
 func DeleteProductModelBom(id string) (err error) {
 	return model.DB.DB().Delete(&model.ProductModelBom{}, "`id` = ?", id).Error
+}
+
+func DeleteProductModelBoms(ids []string) (err error) {
+	return model.DB.DB().Delete(&model.ProductModelBom{}, "`id` in ?", ids).Error
+}
+
+func UploadProductModelBom(file multipart.File) error {
+	f, err := excelize.OpenReader(file)
+	if err != nil {
+		return err
+	}
+
+	rows, err := f.GetRows("产品型号BOM")
+	if err != nil {
+		return err
+	}
+
+	type productModelBom struct {
+		ProductModel        string  //产品型号
+		ItemNo              string  //项目号
+		MaterialNo          string  //物料号
+		MaterialDescription string  //物料描述
+		RequireQTY          float32 //需求数量
+		Unit                string  //单位
+		ProductionProcess   string  //需求工序
+	}
+
+	var count int
+	if err := model.DB.DB().Transaction(func(tx *gorm.DB) error {
+		if len(rows) > 0 {
+			for _, row := range rows[1:] {
+				m := productModelBom{
+					ProductModel:        row[0],
+					ItemNo:              row[1],
+					MaterialNo:          row[2],
+					MaterialDescription: row[3],
+					// RequireQTY:          row[4],
+					Unit:              row[5],
+					ProductionProcess: row[6],
+				}
+				requireQTY, err := strconv.ParseFloat(row[4], 32)
+				if err != nil {
+					return err
+				}
+				m.RequireQTY = float32(requireQTY)
+
+				productModel := &model.ProductModel{}
+				if err := tx.First(productModel, "`material_no` = ?", m.ProductModel).Error; err == gorm.ErrRecordNotFound {
+					continue
+				} else if err != nil {
+					return err
+				}
+
+				productModelBom := &model.ProductModelBom{}
+				if err := tx.Where("`product_model_id` = ? AND `material_no` = ?", productModel.ID, m.MaterialNo).First(productModelBom).Error; err != nil && err != gorm.ErrRecordNotFound {
+					return err
+				}
+
+				productModelBom.ItemNo = "00"
+				if m.ItemNo != "" {
+					productModelBom.ItemNo = m.ItemNo
+				}
+				productModelBom.MaterialDescription = m.MaterialDescription
+				productModelBom.RequireQTY = m.RequireQTY
+				productModelBom.Unit = "EA"
+				if m.Unit != "" {
+					productModelBom.Unit = m.Unit
+				}
+				productModelBom.ProductionProcess = m.ProductionProcess
+				if productModelBom.ID == "" {
+					productModelBom.ProductModelID = productModel.ID
+					productModelBom.MaterialNo = m.MaterialNo
+					if err := tx.Create(productModelBom).Error; err != nil {
+						return err
+					}
+				} else {
+					if err := tx.Omit("created_at").Save(productModelBom).Error; err != nil {
+						return err
+					}
+				}
+
+				count++
+			}
+		}
+		fmt.Printf("总计%d条记录，成功%d条记录，因无法识别产品型号而忽略%d条记录", len(rows), count, len(rows)-count)
+
+		return nil
+	}); err != nil {
+		return err
+	}
+
+	return nil
 }

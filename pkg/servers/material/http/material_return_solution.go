@@ -240,6 +240,46 @@ func DeleteMaterialReturnSolution(c *gin.Context) {
 	c.JSON(http.StatusOK, resp)
 }
 
+// UploadMaterialReturnSolution godoc
+// @Summary 上传
+// @Description 上传
+// @Tags 物料退料方案管理
+// @Accept  json
+// @Produce  json
+// @Param authorization header string true "jwt token"
+// @Param f formData file true "Upload ProductModel"
+// @Success 200 {object} proto.CommonResponse
+// @Router /api/mom/material/materialreturnsolution/upload [post]
+func UploadMaterialReturnSolution(c *gin.Context) {
+	transID := middleware.GetTransID(c)
+	resp := &proto.CommonResponse{
+		Code: proto.Code_Success,
+	}
+	fileHeader, err := c.FormFile("f")
+	if err != nil {
+		resp.Code = proto.Code_BadRequest
+		resp.Message = err.Error()
+		c.JSON(http.StatusOK, resp)
+		log.Warnf(context.Background(), "TransID:%s,上传物料退料方案请求参数无效:%v", transID, err)
+		return
+	}
+
+	f, err := fileHeader.Open()
+	if err != nil {
+		resp.Code = proto.Code_BadRequest
+		resp.Message = err.Error()
+		c.JSON(http.StatusOK, resp)
+		return
+	}
+
+	err = logic.UploadMaterialReturnSolution(f)
+	if err != nil {
+		resp.Code = proto.Code_InternalServerError
+		resp.Message = err.Error()
+	}
+	c.JSON(http.StatusOK, resp)
+}
+
 func RegisterMaterialReturnSolutionRouter(r *gin.Engine) {
 	g := r.Group("/api/mom/material/materialreturnsolution")
 
@@ -249,4 +289,5 @@ func RegisterMaterialReturnSolutionRouter(r *gin.Engine) {
 	g.DELETE("delete", DeleteMaterialReturnSolution)
 	g.GET("all", GetAllMaterialReturnSolution)
 	g.GET("detail", GetMaterialReturnSolutionDetail)
+	g.POST("upload", UploadMaterialReturnSolution)
 }

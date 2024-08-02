@@ -47,7 +47,7 @@ func CreateProductModel(m *model.ProductModel) (string, error) {
 	return m.ID, err
 }
 
-func DeleteProductModelBoms(tx *gorm.DB, old, m *model.ProductModel) error {
+func OnDeleteProductModelBoms(tx *gorm.DB, old, m *model.ProductModel) error {
 	var deleteIDs []string
 	for _, oldObj := range old.ProductModelBoms {
 		flag := false
@@ -79,7 +79,7 @@ func UpdateProductModel(m *model.ProductModel) error {
 			return err
 		}
 
-		if err := DeleteProductModelBoms(tx, oldProductModel, m); err != nil {
+		if err := OnDeleteProductModelBoms(tx, oldProductModel, m); err != nil {
 			return err
 		}
 
@@ -222,33 +222,36 @@ func ParamProductModelByID(id string) (err error) {
 	return nil
 }
 
-type productModel struct {
-	ProductCategory     string //类别
-	Code                string //型号
-	MaterialNo          string //物料号
-	MaterialDescription string //物料描述
-	Identifier          string //识别码
-	IsAdvanced          bool   //需前置生产
-}
-
-type productModelAttribute struct {
-	MaterialNo    string //产品物料号
-	Code          string //特性代号
-	AssignedValue string //特性值
-}
-
 func UploadProductModel(file multipart.File) error {
 	f, err := excelize.OpenReader(file)
+	if err != nil {
+		return err
+	}
 
 	rows, err := f.GetRows("产品型号")
 	if err != nil {
 		return err
 	}
 
+	type productModel struct {
+		ProductCategory     string //类别
+		Code                string //型号
+		MaterialNo          string //物料号
+		MaterialDescription string //物料描述
+		Identifier          string //识别码
+		IsAdvanced          bool   //需前置生产
+	}
+
+	type productModelAttribute struct {
+		MaterialNo    string //产品物料号
+		Code          string //特性代号
+		AssignedValue string //特性值
+	}
+
 	var productModelCount int
 	if err := model.DB.DB().Transaction(func(tx *gorm.DB) error {
 		if len(rows) > 0 {
-			for _, row := range rows {
+			for _, row := range rows[1:] {
 				m := productModel{
 					ProductCategory:     row[0],
 					Code:                row[1],
